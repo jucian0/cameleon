@@ -3,6 +3,7 @@ import { SidebarInset, SidebarProvider } from "components/ui/sidebar";
 import AppSidebar from "components/app-sidebar";
 import AppSidebarNav from "components/app-sidebar-nav";
 import { Heading } from "react-aria-components";
+import { CamelStudio } from "@/features/camel/studio";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -16,9 +17,7 @@ export default function Home() {
     <AppSidebar collapsible="dock" />
     <SidebarInset>
       <AppSidebarNav />
-      <div className="p-4 lg:p-6">
-        <Heading>Basic</Heading>
-      </div>
+      <CamelStudio />
     </SidebarInset>
   </SidebarProvider>)
 }

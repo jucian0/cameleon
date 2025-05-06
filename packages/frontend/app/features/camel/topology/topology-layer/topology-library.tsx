@@ -1,0 +1,198 @@
+import { type Key, type Selection, useAsyncList } from "react-stately";
+import { Autocomplete, ListBox, ListBoxItem, useFilter, Virtualizer, GridLayout } from "react-aria-components";
+import { addNewRoute, addStepAfter, addStepBetween } from '../topology-operations'
+import { useLayer } from "./topology-layer";
+import { getDefaultConfig } from "../topology-templates";
+import { Tabs } from "components/ui/tabs";
+import { tryCatch } from "@/features/utils/try-catch";
+import { SearchField } from "components/ui/search-field";
+import { useTopologyStore } from "../topology-store";
+import { fetchComponentsMetadata, fetchEIPsMetadata } from "../../data-requests/fetch-metadata";
+import { Card } from "components/ui/card";
+
+export function TopologyLibrary() {
+  const { node, setNode } = useLayer();
+  const { setCurrentCamelRoute, getCurrentCamelRoute, setCurrentCamelRouteId } = useTopologyStore();
+  const { contains } = useFilter({ sensitivity: 'base' });
+
+  function handleSelectionChange(selectedItem: Set<Key>) {
+    const [selectedItemKey] = Array.from(selectedItem as Set<Key>)
+
+    try {
+      if (!selectedItem || !node?.absolutePath) return;
+      // Create basic configuration object instead of using template
+      const newStepConfig = {
+        [selectedItemKey]: getDefaultConfig(selectedItemKey as string),
+      };
+      const selectedRoute = getCurrentCamelRoute();
+
+      if (!selectedRoute) {
+        const route = addNewRoute(newStepConfig);
+        setCurrentCamelRoute(route);
+        setCurrentCamelRouteId(route.route.id);
+        setNode();
+        return;
+      };
+
+
+
+
+      if (node.operation === "add-step") {
+        const updatedRoute = addStepAfter(
+          selectedRoute,
+          node.absolutePath,
+          newStepConfig
+        );
+        setCurrentCamelRoute(updatedRoute);
+      }
+
+      if (node.operation === "add-step-between") {
+        const updatedRoute = addStepBetween(
+          selectedRoute,
+          node.absolutePath,
+          newStepConfig
+        );
+        setCurrentCamelRoute(updatedRoute);
+      }
+      setNode();
+    } catch (error) {
+      console.error("Error adding step:", error);
+    }
+  }
+
+  return (
+    <Autocomplete aria-label="Topology library" filter={contains}>
+      <div className="flex items-center gap-2">
+        <SearchField
+          aria-label="Search by name"
+          placeholder="Search"
+          className="w-full"
+        />
+      </div>
+      <Tabs aria-label="Camel EIPs and Components" defaultSelectedKey="eips">
+        <Tabs.List>
+          <Tabs.Tab id="eips">EIPs</Tabs.Tab>
+          <Tabs.Tab id="components">Components</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel id="eips">
+          <CamelEIPsTab onSelectionChange={handleSelectionChange} />
+        </Tabs.Panel>
+        <Tabs.Panel id="components">
+          <CamelComponentsTab onSelectionChange={handleSelectionChange} />
+        </Tabs.Panel>
+      </Tabs>
+    </Autocomplete>
+  );
+}
+
+function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: any) => void }) {
+  const components = useAsyncList({
+    async load() {
+      const { data, error } = await tryCatch(fetchComponentsMetadata());
+      if (error || !Array.isArray(data.data)) {
+        return { items: [] };
+      }
+      return { items: data.data };
+    }
+  });
+
+  function handleSelectionChange(selectedKeys: Selection) {
+    const [selectedItem] = Array.from(selectedKeys as Set<Key>)
+      .map(key => components.items.find(item => item.name === key))
+      .filter(Boolean);
+    if (!selectedItem) return;
+    onSelectionChange(selectedKeys);
+  }
+  return (
+    <Virtualizer
+      layout={GridLayout}>
+      <ListBox
+        className={""}
+        selectionMode="single"
+        onSelectionChange={handleSelectionChange}
+        renderEmptyState={() => <>No components to display</>}
+      >
+        {components.items.map((item) => (
+          <ListBoxItem
+            textValue={item.name}
+            key={item.name}
+            id={item.name}
+          >
+            <Card className="h-40 overflow-auto p-0">
+              <Card.Header className="flex gap-2 p-2">
+                <img
+                  src={item.iconUrl}
+                  alt={item.name}
+                  className="h-8 w-8"
+                />
+                <div className="flex flex-col">
+                  {item.title}
+                </div>
+              </Card.Header>
+              <Card.Content className="p-2">
+                {item.description}
+              </Card.Content>
+            </Card>
+          </ListBoxItem>
+        ))}
+      </ListBox>
+    </Virtualizer>
+  )
+}
+
+function CamelEIPsTab({ onSelectionChange }: { onSelectionChange: (node: any) => void }) {
+  const eips = useAsyncList({
+    async load() {
+      const { data, error } = await tryCatch(fetchEIPsMetadata());
+      console.error("EIPs data", data);
+      if (error || !Array.isArray(data.data)) {
+        return { items: [] };
+      }
+      return { items: data.data };
+    }
+  });
+
+  function handleSelectionChange(selectedKeys: Selection) {
+    const [selectedItem] = Array.from(selectedKeys as Set<Key>)
+      .map(key => eips.items.find(item => item.name === key))
+      .filter(Boolean);
+    if (!selectedItem) return;
+    onSelectionChange(selectedKeys);
+  }
+  return (
+    <Virtualizer
+      layout={GridLayout}>
+      <ListBox
+        className={""}
+        selectionMode="single"
+        onSelectionChange={handleSelectionChange}
+        items={eips.items}
+        renderEmptyState={() => <>No EIPs to display</>}
+      >
+        {(item) => (
+          <ListBoxItem
+            textValue={item.name}
+            key={item.name}
+            id={item.name}
+          >
+            <Card className="h-40 overflow-auto p-0">
+              <Card.Header className="flex gap-2 p-2">
+                <img
+                  src={item.iconUrl}
+                  alt={item.name}
+                  className="h-8 w-8"
+                />
+                <div className="flex flex-col">
+                  {item.title}
+                </div>
+              </Card.Header>
+              <Card.Content className="p-2">
+                {item.description}
+              </Card.Content>
+            </Card>
+          </ListBoxItem>
+        )}
+      </ListBox>
+    </Virtualizer>
+  )
+}
