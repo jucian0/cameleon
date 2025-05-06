@@ -79,7 +79,7 @@ export default function AppSidebar(props: React.ComponentProps<typeof Sidebar>) 
             </SidebarDisclosure>
             <SidebarDisclosure id={2}>
               <SidebarDisclosureTrigger>
-                <SwaggerIcon className="size-4" />
+                <SwaggerIcon className="size-5" />
                 <SidebarLabel>Open API</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
