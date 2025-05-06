@@ -12,41 +12,29 @@ import {
   SidebarHeader,
   SidebarItem,
   SidebarLabel,
-  SidebarLink,
   SidebarRail,
-  SidebarSection,
   SidebarSectionGroup,
   useSidebar,
 } from "./ui/sidebar"
 import {
-  IconArchive,
-  IconArrowDown,
-  IconArrowUp,
-  IconBrandApple,
-  IconBuilding,
-  IconCheck,
   IconChevronLgDown,
-  IconCircleQuestionmark,
-  IconClock,
-  IconCreditCard,
   IconDashboard,
-  IconDotsHorizontal,
-  IconHashtag,
   IconHeadphones,
-  IconListBullets,
   IconLogout,
-  IconMessage,
-  IconNotes,
-  IconPackage,
-  IconPlus,
   IconSettings,
   IconShield,
-  IconShoppingBag,
-  IconTicket,
 } from "@intentui/icons"
 import { twMerge } from "tailwind-merge"
 import { ThemeMenu } from "@/features/theme/menu"
 import { LanguageMenu } from "@/features/locale/menu"
+import { CamelionIcon } from "./icons/camelion"
+import { StudioIcon } from "./icons/studio"
+import { ComponentIcon } from "./icons/component"
+import { CamelStudioIcon } from "./icons/camel-studio"
+import { ProcessorIcon } from "./icons/processor"
+import { PresetIcon } from "./icons/preset"
+import { ContractsIcon } from "./icons/contracts"
+import { SwaggerIcon } from "./icons/swagger"
 
 export default function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar()
@@ -57,141 +45,47 @@ export default function AppSidebar(props: React.ComponentProps<typeof Sidebar>) 
           className="flex items-center gap-x-2 group-data-[collapsible=dock]:size-10 group-data-[collapsible=dock]:justify-center"
           href="/docs/2.x/components/layouts/sidebar"
         >
-          <IconBrandApple className="size-5" />
-          <SidebarLabel className="font-medium">Apple</SidebarLabel>
+          <CamelionIcon className="size-6 fill-primary" />
+          <SidebarLabel className="font-medium">Camelion</SidebarLabel>
         </Link>
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarSectionGroup>
-          <SidebarSection title="Overview">
-            <SidebarItem tooltip="Overview" isCurrent href="#">
-              <IconDashboard />
-              <SidebarLabel>Overview</SidebarLabel>
-            </SidebarItem>
-
-            <SidebarItem tooltip="Orders">
-              {({ isCollapsed, isFocused }) => (
-                <>
-                  <SidebarLink href="#">
-                    <IconShoppingBag />
-                    <SidebarLabel>Orders</SidebarLabel>
-                  </SidebarLink>
-                  {(!isCollapsed || isFocused) && (
-                    <Menu>
-                      <Menu.Trigger data-slot="menu-trigger" aria-label="Manage">
-                        <IconDotsHorizontal />
-                      </Menu.Trigger>
-                      <Menu.Content offset={0} placement="right top">
-                        <Menu.Item href="#new-order">
-                          <IconPlus />
-                          Create New Order
-                        </Menu.Item>
-                        <Menu.Item href="#view-all">
-                          <IconListBullets />
-                          View All Orders
-                        </Menu.Item>
-                        <Menu.Item href="#pending-orders">
-                          <IconClock />
-                          Pending Orders
-                        </Menu.Item>
-                        <Menu.Item href="#completed-orders">
-                          <IconCheck />
-                          Completed Orders
-                        </Menu.Item>
-                        <Menu.Item href="#export-orders">
-                          <IconArrowUp />
-                          Export Orders
-                        </Menu.Item>
-                      </Menu.Content>
-                    </Menu>
-                  )}
-                </>
-              )}
-            </SidebarItem>
-            <SidebarItem tooltip="Products">
-              {({ isCollapsed, isFocused }) => (
-                <>
-                  <SidebarLink href="#">
-                    <SidebarLabel>Products</SidebarLabel>
-                  </SidebarLink>
-                  {(!isCollapsed || isFocused) && (
-                    <Menu>
-                      <Menu.Trigger aria-label="Manage">
-                        <IconDotsHorizontal />
-                      </Menu.Trigger>
-                      <Menu.Content offset={0} placement="right top">
-                        <Menu.Item href="#new-product">
-                          <IconPlus />
-                          Add New Product
-                        </Menu.Item>
-                        <Menu.Item href="#archive">
-                          <IconArchive />
-                          Archive Product
-                        </Menu.Item>
-                        <Menu.Item href="#manage-categories">
-                          <IconHashtag />
-                          Manage Categories
-                        </Menu.Item>
-                        <Menu.Item href="#import">
-                          <IconArrowDown />
-                          Import Products
-                        </Menu.Item>
-                        <Menu.Item href="#export">
-                          <IconArrowUp />
-                          Export Products
-                        </Menu.Item>
-                      </Menu.Content>
-                    </Menu>
-                  )}
-                </>
-              )}
-            </SidebarItem>
-            <SidebarItem href="#" badge="4 Pending" tooltip="Payments">
-              <IconCreditCard />
-              <SidebarLabel>Payments</SidebarLabel>
-            </SidebarItem>
-          </SidebarSection>
-
           <SidebarDisclosureGroup defaultExpandedKeys={[1]}>
             <SidebarDisclosure id={1}>
               <SidebarDisclosureTrigger>
-                <IconDotsHorizontal />
-                <SidebarLabel>Support</SidebarLabel>
+                <CamelStudioIcon className="size-4" />
+                <SidebarLabel>Apache Camel</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
-                <SidebarItem href="#" tooltip="Tickets">
-                  <IconTicket />
-                  <SidebarLabel>Tickets</SidebarLabel>
+                <SidebarItem href="#" tooltip="Studio">
+                  <StudioIcon className="size-4" />
+                  <SidebarLabel>Studio</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="#" tooltip="Chat Support">
-                  <IconMessage />
-                  <SidebarLabel>Chat Support</SidebarLabel>
+                <SidebarItem href="#" tooltip="Processors">
+                  <ProcessorIcon className="size-4" />
+                  <SidebarLabel>Processors</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="#" tooltip="FAQ">
-                  <IconCircleQuestionmark />
-                  <SidebarLabel>FAQ</SidebarLabel>
+                <SidebarItem href="#components" tooltip="Components">
+                  <ComponentIcon className="size-4" />
+                  <SidebarLabel>Components</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="#" tooltip="Documentation">
-                  <IconNotes />
-                  <SidebarLabel>Documentation</SidebarLabel>
+                <SidebarItem href="#presets" tooltip="Presets">
+                  <PresetIcon className="size-4" />
+                  <SidebarLabel>Presets</SidebarLabel>
                 </SidebarItem>
               </SidebarDisclosurePanel>
             </SidebarDisclosure>
             <SidebarDisclosure id={2}>
               <SidebarDisclosureTrigger>
-                <IconPackage />
-                <SidebarLabel>Inventory</SidebarLabel>
+                <SwaggerIcon className="size-4" />
+                <SidebarLabel>Open API</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
-                <SidebarItem href="#" tooltip="Warehouse">
-                  <IconBuilding />
-                  <SidebarLabel>Warehouse</SidebarLabel>
-                </SidebarItem>
-                <SidebarItem href="#" tooltip="Stock Levels">
-                  <SidebarLabel>Stock Levels</SidebarLabel>
-                </SidebarItem>
-                <SidebarItem href="#" tooltip="Shipping">
-                  <SidebarLabel>Shipping</SidebarLabel>
+                <SidebarItem href="#" tooltip="Contracts">
+                  <ContractsIcon className="size-4" />
+                  <SidebarLabel>Contracts</SidebarLabel>
                 </SidebarItem>
               </SidebarDisclosurePanel>
             </SidebarDisclosure>
