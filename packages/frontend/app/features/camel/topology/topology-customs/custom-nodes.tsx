@@ -20,7 +20,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 	};
 
 	return (
-		<div onClick={handleClick} role="button" className="cursor-pointer relative flex border rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-40">
+		<div onClick={handleClick} role="button" className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-40">
 			<div className="flex flex-row gap-1 relative justify-between w-full pl-4 items-center">
 				<div className="flex flex-row gap-2 justify-center items-stretch">
 					{data.iconName && (

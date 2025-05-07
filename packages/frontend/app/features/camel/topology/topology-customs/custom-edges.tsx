@@ -26,7 +26,7 @@ function CustomEdge({ sourceX, sourceY, targetX, targetY, sourcePosition, target
 	const targetStepType = targetNode?.data.stepType ?? "";
 	const edgeStyle = {
 		...style,
-		stroke: "#DF7A59",
+		stroke: "hsl(181, 70%, 48%)",
 		strokeDasharray: sourceStepType.includes('add') || targetStepType.includes('add') ? '5, 3' : undefined
 	};
 

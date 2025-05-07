@@ -9,7 +9,7 @@ const Base = React.forwardRef<HTMLDivElement, HandleProps>(({ children, ...props
 			ref={ref}
 			{...props}
 			className={
-				"h-[11px] w-[11px] rounded-full border border-slate-300 bg-slate-100 transition dark:border-secondary dark:bg-secondary"
+				"h-[11px] w-[11px] rounded-full border border-primary bg-primary transition dark:border-primary dark:bg-primary"
 			}
 		>
 			{children}
@@ -20,7 +20,7 @@ const Base = React.forwardRef<HTMLDivElement, HandleProps>(({ children, ...props
 export const BaseHandle = (props: HandleProps) => {
 	return (
 		<Base {...props} style={{ background: "transparent", border: "none" }}>
-			<div className="-left-0 -top-0 absolute h-[6px] w-[6px] rounded-full border border-primary bg-primary transition dark:border-secondary dark:bg-secondary" />
+			<div className="-left-0 -top-0 absolute h-[6px] w-[6px] rounded-full border border-primary bg-primary transition dark:border-primary dark:bg-primary" />
 		</Base>
 	);
 };

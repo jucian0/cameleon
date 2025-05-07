@@ -1,0 +1,2993 @@
+[
+  {
+    "name": "aggregate",
+    "title": "Aggregate",
+    "description": "Aggregates many messages into a single message",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/aggregate.svg",
+    "properties": {
+      "parallelProcessing": {
+        "title": "Parallel Processing",
+        "description": "When aggregated are completed they are being send out of the aggregator. This option indicates whether or not Camel should use a thread pool with multiple threads for concurrency. If no custom thread pool has been specified then Camel creates a default pool with 10 concurrent threads.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "optimisticLocking": {
+        "title": "Optimistic Locking",
+        "description": "Turns on using optimistic locking, which requires the aggregationRepository being used, is supporting this by implementing org.apache.camel.spi.OptimisticLockingAggregationRepository .",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "aggregationStrategyMethodName": {
+        "title": "Aggregation Strategy Method Name",
+        "description": "This option can be used to explicit declare the method name to use, when using beans as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregationStrategyMethodAllowNull": {
+        "title": "Aggregation Strategy Method Allow Null",
+        "description": "If this option is false then the aggregate method is not used for the very first aggregation. If this option is true then null values is used as the oldExchange (at the very first aggregation), when using beans as the AggregationStrategy.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "completionSize": {
+        "title": "Completion Size",
+        "description": "Number of messages aggregated before the aggregation is complete. This option can be set as either a fixed value or using an Expression which allows you to evaluate a size dynamically - will use Integer as result. If both are set Camel will fallback to use the fixed value if the Expression result was null or 0.",
+        "type": "number",
+        "format": "integer",
+        "secret": false
+      },
+      "completionInterval": {
+        "title": "Completion Interval",
+        "description": "A repeating period in millis by which the aggregator will complete all current aggregated exchanges. Camel has a background task which is triggered every period. You cannot use this option together with completionTimeout, only one of them can be used.",
+        "type": "number",
+        "format": "duration",
+        "secret": false
+      },
+      "completionTimeout": {
+        "title": "Completion Timeout",
+        "description": "Time in millis that an aggregated exchange should be inactive before its complete (timeout). This option can be set as either a fixed value or using an Expression which allows you to evaluate a timeout dynamically - will use Long as result. If both are set Camel will fallback to use the fixed value if the Expression result was null or 0. You cannot use this option together with completionInterval, only one of the two can be used. By default the timeout checker runs every second, you can use the completionTimeoutCheckerInterval option to configure how frequently to run the checker. The timeout is an approximation and there is no guarantee that the a timeout is triggered exactly after the timeout value. It is not recommended to use very low timeout values or checker intervals.",
+        "type": "number",
+        "format": "duration",
+        "secret": false
+      },
+      "completionTimeoutCheckerInterval": {
+        "title": "Completion Timeout Checker Interval",
+        "description": "Interval in millis that is used by the background task that checks for timeouts ( org.apache.camel.TimeoutMap ). By default the timeout checker runs every second. The timeout is an approximation and there is no guarantee that the a timeout is triggered exactly after the timeout value. It is not recommended to use very low timeout values or checker intervals.",
+        "type": "number",
+        "format": "duration",
+        "defaultValue": 1000,
+        "secret": false,
+        "group": "advanced"
+      },
+      "completionFromBatchConsumer": {
+        "title": "Completion From Batch Consumer",
+        "description": "Enables the batch completion mode where we aggregate from a org.apache.camel.BatchConsumer and aggregate the total number of exchanges the org.apache.camel.BatchConsumer has reported as total by checking the exchange property org.apache.camel.Exchange#BATCH_COMPLETE when its complete. This option cannot be used together with discardOnAggregationFailure.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "completionOnNewCorrelationGroup": {
+        "title": "Completion On New Correlation Group",
+        "description": "Enables completion on all previous groups when a new incoming correlation group. This can for example be used to complete groups with same correlation keys when they are in consecutive order. Notice when this is enabled then only 1 correlation group can be in progress as when a new correlation group starts, then the previous groups is forced completed.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "eagerCheckCompletion": {
+        "title": "Eager Check Completion",
+        "description": "Use eager completion checking which means that the completionPredicate will use the incoming Exchange. As opposed to without eager completion checking the completionPredicate will use the aggregated Exchange.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "ignoreInvalidCorrelationKeys": {
+        "title": "Ignore Invalid Correlation Keys",
+        "description": "If a correlation key cannot be successfully evaluated it will be ignored by logging a DEBUG and then just ignore the incoming Exchange.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "closeCorrelationKeyOnCompletion": {
+        "title": "Close Correlation Key On Completion",
+        "description": "Closes a correlation key when its complete. Any late received exchanges which has a correlation key that has been closed, it will be defined and a ClosedCorrelationKeyException is thrown.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "discardOnCompletionTimeout": {
+        "title": "Discard On Completion Timeout",
+        "description": "Discards the aggregated message on completion timeout. This means on timeout the aggregated message is dropped and not sent out of the aggregator.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "discardOnAggregationFailure": {
+        "title": "Discard On Aggregation Failure",
+        "description": "Discards the aggregated message when aggregation failed (an exception was thrown from AggregationStrategy . This means the partly aggregated message is dropped and not sent out of the aggregator. This option cannot be used together with completionFromBatchConsumer.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "forceCompletionOnStop": {
+        "title": "Force Completion On Stop",
+        "description": "Indicates to complete all current aggregated exchanges when the context is stopped",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "completeAllOnStop": {
+        "title": "Complete All On Stop",
+        "description": "Indicates to wait to complete all current and partial (pending) aggregated exchanges when the context is stopped. This also means that we will wait for all pending exchanges which are stored in the aggregation repository to complete so the repository is empty before we can stop. You may want to enable this when using the memory based aggregation repository that is memory based only, and do not store data on disk. When this option is enabled, then the aggregator is waiting to complete all those exchanges before its stopped, when stopping CamelContext or the route using it.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "choice",
+    "title": "Choice",
+    "description": "Route messages based on a series of predicates",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/choice.svg",
+    "properties": {
+      "precondition": {
+        "title": "Precondition",
+        "description": "Indicates whether this Choice EIP is in precondition mode or not. If so its branches (when/otherwise) are evaluated during startup to keep at runtime only the branch that matched.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": []
+  },
+  {
+    "name": "circuitBreaker",
+    "title": "Circuit Breaker",
+    "description": "Route messages in a fault tolerance way using Circuit Breaker",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/circuitBreaker.svg",
+    "properties": {
+      "configuration": {
+        "title": "Configuration",
+        "description": "Refers to a circuit breaker configuration (such as resillience4j, or microprofile-fault-tolerance) to use for configuring the circuit breaker EIP.",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "claimCheck",
+    "title": "Claim Check",
+    "description": "The Claim Check EIP allows you to replace message content with a claim check (a unique key), which can be used to retrieve the message content at a later time.",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/claimCheck.svg",
+    "properties": {
+      "operation": {
+        "title": "Operation",
+        "description": "The claim check operation to use. The following operations are supported: Get - Gets (does not remove) the claim check by the given key. GetAndRemove - Gets and removes the claim check by the given key. Set - Sets a new (will override if key already exists) claim check with the given key. Push - Sets a new claim check on the stack (does not use key). Pop - Gets the latest claim check from the stack (does not use key).",
+        "type": "string",
+        "secret": false,
+        "enum": [
+          "Get",
+          "GetAndRemove",
+          "Set",
+          "Push",
+          "Pop"
+        ]
+      },
+      "key": {
+        "title": "Key",
+        "description": "To use a specific key for claim check id (for dynamic keys use simple language syntax as the key).",
+        "type": "string",
+        "secret": false
+      },
+      "filter": {
+        "title": "Filter",
+        "description": "Specify a filter to control what data gets merged data back from the claim check repository. The following syntax is supported: body - to aggregate the message body attachments - to aggregate all the message attachments headers - to aggregate all the message headers header:pattern - to aggregate all the message headers that matches the pattern. The following pattern rules are applied in this order: exact match, returns true wildcard match (pattern ends with a and the name starts with the pattern), returns true regular expression match, returns true otherwise returns false You can specify multiple rules separated by comma. For example, the following includes the message body and all headers starting with foo: body,header:foo. The syntax supports the following prefixes which can be used to specify include,exclude, or remove - to include (which is the default mode) - - to exclude (exclude takes precedence over include) -- - to remove (remove takes precedence) For example to exclude a header name foo, and remove all headers starting with bar, -header:foo,--headers:bar Note you cannot have both include and exclude header:pattern at the same time.",
+        "type": "string",
+        "secret": false
+      },
+      "aggregationStrategyMethodName": {
+        "title": "Aggregation Strategy Method Name",
+        "description": "This option can be used to explicit declare the method name to use, when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "convertBodyTo",
+    "title": "Convert Body To",
+    "description": "Converts the message body to another type",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/convertBodyTo.svg",
+    "properties": {
+      "type": {
+        "title": "Type",
+        "description": "The java type to convert to",
+        "type": "string",
+        "secret": false
+      },
+      "mandatory": {
+        "title": "Mandatory",
+        "description": "When mandatory then the conversion must return a value (cannot be null), if this is not possible then NoTypeConversionAvailableException is thrown. Setting this to false could mean conversion is not possible and the value is null.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "charset": {
+        "title": "Charset",
+        "description": "To use a specific charset when converting",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "type"
+    ]
+  },
+  {
+    "name": "delay",
+    "title": "Delay",
+    "description": "Delays processing for a specified length of time",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/delay.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to define how long time to wait (in millis)",
+        "type": "expression",
+        "secret": false
+      },
+      "asyncDelayed": {
+        "title": "Async Delayed",
+        "description": "Enables asynchronous delay which means the thread will not block while delaying.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "callerRunsWhenRejected": {
+        "title": "Caller Runs When Rejected",
+        "description": "Whether or not the caller should run the task when it was rejected by the thread pool. Is by default true",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "dynamicRouter",
+    "title": "Dynamic Router",
+    "description": "Route messages based on dynamic rules",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/dynamicRouter.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to call that returns the endpoint(s) to route to in the dynamic routing. Important: The expression will be called in a while loop fashion, until the expression returns null which means the dynamic router is finished.",
+        "type": "expression",
+        "secret": false
+      },
+      "uriDelimiter": {
+        "title": "Uri Delimiter",
+        "description": "Sets the uri delimiter to use",
+        "type": "string",
+        "defaultValue": ",",
+        "secret": false
+      },
+      "ignoreInvalidEndpoints": {
+        "title": "Ignore Invalid Endpoints",
+        "description": "Ignore the invalidate endpoint exception when try to create a producer with that endpoint",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "cacheSize": {
+        "title": "Cache Size",
+        "description": "Sets the maximum size used by the org.apache.camel.spi.ProducerCache which is used to cache and reuse producers when using this dynamic router, when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "enrich",
+    "title": "Enrich",
+    "description": "Enriches a message with data from a secondary resource",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/enrich.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression that computes the endpoint uri to use as the resource endpoint to enrich from",
+        "type": "expression",
+        "secret": false
+      },
+      "aggregationStrategyMethodName": {
+        "title": "Aggregation Strategy Method Name",
+        "description": "This option can be used to explicit declare the method name to use, when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregationStrategyMethodAllowNull": {
+        "title": "Aggregation Strategy Method Allow Null",
+        "description": "If this option is false then the aggregate method is not used if there was no data to enrich. If this option is true then null values is used as the oldExchange (when no data to enrich), when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregateOnException": {
+        "title": "Aggregate On Exception",
+        "description": "If this option is false then the aggregate method is not used if there was an exception thrown while trying to retrieve the data to enrich from the resource. Setting this option to true allows end users to control what to do if there was an exception in the aggregate method. For example to suppress the exception or set a custom message body etc.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "shareUnitOfWork": {
+        "title": "Share Unit Of Work",
+        "description": "Shares the org.apache.camel.spi.UnitOfWork with the parent and the resource exchange. Enrich will by default not share unit of work between the parent exchange and the resource exchange. This means the resource exchange has its own individual unit of work.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "cacheSize": {
+        "title": "Cache Size",
+        "description": "Sets the maximum size used by the org.apache.camel.spi.ProducerCache which is used to cache and reuse producer when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "ignoreInvalidEndpoint": {
+        "title": "Ignore Invalid Endpoint",
+        "description": "Ignore the invalidate endpoint exception when try to create a producer with that endpoint",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "allowOptimisedComponents": {
+        "title": "Allow Optimised Components",
+        "description": "Whether to allow components to optimise enricher if they are org.apache.camel.spi.SendDynamicAware .",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "filter",
+    "title": "Filter",
+    "description": "Filter out messages based using a predicate",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/filter.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to determine if the message should be filtered or not. If the expression returns an empty value or false then the message is filtered (dropped), otherwise the message is continued being routed.",
+        "type": "expression",
+        "secret": false
+      },
+      "statusPropertyName": {
+        "title": "Status Property Name",
+        "description": "Name of exchange property to use for storing the status of the filtering. Setting this allows to know if the filter predicate evaluated as true or false.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "idempotentConsumer",
+    "title": "Idempotent Consumer",
+    "description": "Filters out duplicate messages",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/idempotentConsumer.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression used to calculate the correlation key to use for duplicate check. The Exchange which has the same correlation key is regarded as a duplicate and will be rejected.",
+        "type": "expression",
+        "secret": false
+      },
+      "eager": {
+        "title": "Eager",
+        "description": "Sets whether to eagerly add the key to the idempotent repository or wait until the exchange is complete. Eager is default enabled.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "completionEager": {
+        "title": "Completion Eager",
+        "description": "Sets whether to complete the idempotent consumer eager or when the exchange is done. If this option is true to complete eager, then the idempotent consumer will trigger its completion when the exchange reached the end of the block of the idempotent consumer pattern. So if the exchange is continued routed after the block ends, then whatever happens there does not affect the state. If this option is false (default) to not complete eager, then the idempotent consumer will complete when the exchange is done being routed. So if the exchange is continued routed after the block ends, then whatever happens there also affect the state. For example if the exchange failed due to an exception, then the state of the idempotent consumer will be a rollback.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "skipDuplicate": {
+        "title": "Skip Duplicate",
+        "description": "Sets whether to skip duplicates or not. The default behavior is to skip duplicates. A duplicate message would have the Exchange property org.apache.camel.Exchange#DUPLICATE_MESSAGE set to a Boolean#TRUE value. A none duplicate message will not have this property set.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "removeOnFailure": {
+        "title": "Remove On Failure",
+        "description": "Sets whether to remove or keep the key on failure. The default behavior is to remove the key on failure.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "log",
+    "title": "Log",
+    "description": "Logs the defined message to the logger",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/log.svg",
+    "properties": {
+      "message": {
+        "title": "Message",
+        "description": "Sets the log message (uses simple language)",
+        "type": "object",
+        "secret": false,
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string",
+            "description": "The message body"
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "loggingLevel": {
+        "title": "Logging Level",
+        "description": "Sets the logging level. The default value is INFO",
+        "type": "string",
+        "defaultValue": "INFO",
+        "secret": false,
+        "enum": [
+          "TRACE",
+          "DEBUG",
+          "INFO",
+          "WARN",
+          "ERROR",
+          "OFF"
+        ]
+      },
+      "logName": {
+        "title": "Log Name",
+        "description": "Sets the name of the logger",
+        "type": "string",
+        "secret": false
+      },
+      "marker": {
+        "title": "Marker",
+        "description": "To use slf4j marker",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "template": {
+      "log": {
+        "id": "${id}",
+        "body": {
+          "message": "${message.body}"
+        }
+      }
+    },
+    "required": [
+      "message"
+    ]
+  },
+  {
+    "name": "loop",
+    "title": "Loop",
+    "description": "Processes a message multiple times",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/loop.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to define how many times we should loop. Notice the expression is only evaluated once, and should return a number as how many times to loop. A value of zero or negative means no looping. The loop is like a for-loop fashion, if you want a while loop, then the dynamic router may be a better choice.",
+        "type": "expression",
+        "secret": false
+      },
+      "copy": {
+        "title": "Copy",
+        "description": "If the copy attribute is true, a copy of the input Exchange is used for each iteration. That means each iteration will start from a copy of the same message. By default loop will loop the same exchange all over, so each iteration may have different message content.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "doWhile": {
+        "title": "Do While",
+        "description": "Enables the while loop that loops until the predicate evaluates to false or null.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "breakOnShutdown": {
+        "title": "Break On Shutdown",
+        "description": "If the breakOnShutdown attribute is true, then the loop will not iterate until it reaches the end when Camel is shut down.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "marshal",
+    "title": "Marshal",
+    "description": "Marshals data into a specified format for transmission over a transport or component",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/marshal.svg",
+    "properties": {
+      "dataFormatType": {
+        "title": "Data Format Type",
+        "description": "The data format to be used",
+        "type": "dataformat",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "dataFormatType"
+    ]
+  },
+  {
+    "name": "multicast",
+    "title": "Multicast",
+    "description": "Routes the same message to multiple paths either sequentially or in parallel.",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/multicast.svg",
+    "properties": {
+      "aggregationStrategyMethodName": {
+        "title": "Aggregation Strategy Method Name",
+        "description": "This option can be used to explicit declare the method name to use, when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregationStrategyMethodAllowNull": {
+        "title": "Aggregation Strategy Method Allow Null",
+        "description": "If this option is false then the aggregate method is not used if there was no data to enrich. If this option is true then null values is used as the oldExchange (when no data to enrich), when using POJOs as the AggregationStrategy",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "parallelAggregate": {
+        "title": "Parallel Aggregate",
+        "description": "If enabled then the aggregate method on AggregationStrategy can be called concurrently. Notice that this would require the implementation of AggregationStrategy to be implemented as thread-safe. By default this is false meaning that Camel synchronizes the call to the aggregate method. Though in some use-cases this can be used to archive higher performance when the AggregationStrategy is implemented as thread-safe.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "parallelProcessing": {
+        "title": "Parallel Processing",
+        "description": "If enabled then sending messages to the multicasts occurs concurrently. Note the caller thread will still wait until all messages has been fully processed, before it continues. Its only the sending and processing the replies from the multicasts which happens concurrently. When parallel processing is enabled, then the Camel routing engin will continue processing using last used thread from the parallel thread pool. However, if you want to use the original thread that called the multicast, then make sure to enable the synchronous option as well.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "synchronous": {
+        "title": "Synchronous",
+        "description": "Sets whether synchronous processing should be strictly used. When enabled then the same thread is used to continue routing after the multicast is complete, even if parallel processing is enabled.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "streaming": {
+        "title": "Streaming",
+        "description": "If enabled then Camel will process replies out-of-order, eg in the order they come back. If disabled, Camel will process replies in the same order as defined by the multicast.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "stopOnException": {
+        "title": "Stop On Exception",
+        "description": "Will now stop further processing if an exception or failure occurred during processing of an org.apache.camel.Exchange and the caused exception will be thrown. Will also stop if processing the exchange failed (has a fault message) or an exception was thrown and handled by the error handler (such as using onException). In all situations the multicast will stop further processing. This is the same behavior as in pipeline, which is used by the routing engine. The default behavior is to not stop but continue processing till the end",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "timeout": {
+        "title": "Timeout",
+        "description": "Sets a total timeout specified in millis, when using parallel processing. If the Multicast hasn't been able to send and process all replies within the given timeframe, then the timeout triggers and the Multicast breaks out and continues. Notice if you provide a TimeoutAwareAggregationStrategy then the timeout method is invoked before breaking out. If the timeout is reached with running tasks still remaining, certain tasks for which it is difficult for Camel to shut down in a graceful manner may continue to run. So use this option with a bit of care.",
+        "type": "number",
+        "format": "duration",
+        "defaultValue": 0,
+        "secret": false,
+        "group": "advanced"
+      },
+      "shareUnitOfWork": {
+        "title": "Share Unit Of Work",
+        "description": "Shares the org.apache.camel.spi.UnitOfWork with the parent and each of the sub messages. Multicast will by default not share unit of work between the parent exchange and each multicasted exchange. This means each sub exchange has its own individual unit of work.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "pipeline",
+    "title": "Pipeline",
+    "description": "Routes the message to a sequence of processors.",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/pipeline.svg",
+    "properties": {
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "policy",
+    "title": "Policy",
+    "description": "Defines a policy the route will use",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/policy.svg",
+    "properties": {
+      "ref": {
+        "title": "Ref",
+        "description": "Sets a reference to use for lookup the policy in the registry.",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "ref"
+    ]
+  },
+  {
+    "name": "pollEnrich",
+    "title": "Poll Enrich",
+    "description": "Enriches messages with data polled from a secondary resource",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/pollEnrich.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression that computes the endpoint uri to use as the resource endpoint to enrich from",
+        "type": "expression",
+        "secret": false
+      },
+      "aggregationStrategyMethodName": {
+        "title": "Aggregation Strategy Method Name",
+        "description": "This option can be used to explicit declare the method name to use, when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregationStrategyMethodAllowNull": {
+        "title": "Aggregation Strategy Method Allow Null",
+        "description": "If this option is false then the aggregate method is not used if there was no data to enrich. If this option is true then null values is used as the oldExchange (when no data to enrich), when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregateOnException": {
+        "title": "Aggregate On Exception",
+        "description": "If this option is false then the aggregate method is not used if there was an exception thrown while trying to retrieve the data to enrich from the resource. Setting this option to true allows end users to control what to do if there was an exception in the aggregate method. For example to suppress the exception or set a custom message body etc.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "timeout": {
+        "title": "Timeout",
+        "description": "Timeout in millis when polling from the external service. The timeout has influence about the poll enrich behavior. It basically operations in three different modes: negative value - Waits until a message is available and then returns it. Warning that this method could block indefinitely if no messages are available. 0 - Attempts to receive a message exchange immediately without waiting and returning null if a message exchange is not available yet. positive value - Attempts to receive a message exchange, waiting up to the given timeout to expire if a message is not yet available. Returns null if timed out The default value is -1 and therefore the method could block indefinitely, and therefore its recommended to use a timeout value",
+        "type": "number",
+        "format": "duration",
+        "defaultValue": -1,
+        "secret": false
+      },
+      "cacheSize": {
+        "title": "Cache Size",
+        "description": "Sets the maximum size used by the org.apache.camel.spi.ConsumerCache which is used to cache and reuse consumers when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "ignoreInvalidEndpoint": {
+        "title": "Ignore Invalid Endpoint",
+        "description": "Ignore the invalidate endpoint exception when try to create a producer with that endpoint",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "process",
+    "title": "Process",
+    "description": "Calls a Camel processor",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/process.svg",
+    "properties": {
+      "ref": {
+        "title": "Ref",
+        "description": "Reference to the Processor to lookup in the registry to use. Can also be used for creating new beans by their class name by prefixing with #class, eg #class:com.foo.MyClassType. And it is also possible to refer to singleton beans by their type in the registry by prefixing with #type: syntax, eg #type:com.foo.MyClassType",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "ref"
+    ]
+  },
+  {
+    "name": "recipientList",
+    "title": "Recipient List",
+    "description": "Route messages to a number of dynamically specified recipients",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/recipientList.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression that returns which endpoints (url) to send the message to (the recipients). If the expression return an empty value then the message is not sent to any recipients.",
+        "type": "expression",
+        "secret": false
+      },
+      "delimiter": {
+        "title": "Delimiter",
+        "description": "Delimiter used if the Expression returned multiple endpoints. Can be turned off using the value false. The default value is ,",
+        "type": "string",
+        "defaultValue": ",",
+        "secret": false
+      },
+      "aggregationStrategyMethodName": {
+        "title": "Aggregation Strategy Method Name",
+        "description": "This option can be used to explicit declare the method name to use, when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregationStrategyMethodAllowNull": {
+        "title": "Aggregation Strategy Method Allow Null",
+        "description": "If this option is false then the aggregate method is not used if there was no data to enrich. If this option is true then null values is used as the oldExchange (when no data to enrich), when using POJOs as the AggregationStrategy",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "parallelAggregate": {
+        "title": "Parallel Aggregate",
+        "description": "If enabled then the aggregate method on AggregationStrategy can be called concurrently. Notice that this would require the implementation of AggregationStrategy to be implemented as thread-safe. By default this is false meaning that Camel synchronizes the call to the aggregate method. Though in some use-cases this can be used to archive higher performance when the AggregationStrategy is implemented as thread-safe.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "parallelProcessing": {
+        "title": "Parallel Processing",
+        "description": "If enabled then sending messages to the recipients occurs concurrently. Note the caller thread will still wait until all messages has been fully processed, before it continues. Its only the sending and processing the replies from the recipients which happens concurrently. When parallel processing is enabled, then the Camel routing engin will continue processing using last used thread from the parallel thread pool. However, if you want to use the original thread that called the recipient list, then make sure to enable the synchronous option as well.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "synchronous": {
+        "title": "Synchronous",
+        "description": "Sets whether synchronous processing should be strictly used. When enabled then the same thread is used to continue routing after the recipient list is complete, even if parallel processing is enabled.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "timeout": {
+        "title": "Timeout",
+        "description": "Sets a total timeout specified in millis, when using parallel processing. If the Recipient List hasn't been able to send and process all replies within the given timeframe, then the timeout triggers and the Recipient List breaks out and continues. Notice if you provide a TimeoutAwareAggregationStrategy then the timeout method is invoked before breaking out. If the timeout is reached with running tasks still remaining, certain tasks for which it is difficult for Camel to shut down in a graceful manner may continue to run. So use this option with a bit of care.",
+        "type": "number",
+        "format": "duration",
+        "defaultValue": 0,
+        "secret": false
+      },
+      "stopOnException": {
+        "title": "Stop On Exception",
+        "description": "Will now stop further processing if an exception or failure occurred during processing of an org.apache.camel.Exchange and the caused exception will be thrown. Will also stop if processing the exchange failed (has a fault message) or an exception was thrown and handled by the error handler (such as using onException). In all situations the recipient list will stop further processing. This is the same behavior as in pipeline, which is used by the routing engine. The default behavior is to not stop but continue processing till the end",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "ignoreInvalidEndpoints": {
+        "title": "Ignore Invalid Endpoints",
+        "description": "Ignore the invalidate endpoint exception when try to create a producer with that endpoint",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "streaming": {
+        "title": "Streaming",
+        "description": "If enabled then Camel will process replies out-of-order, eg in the order they come back. If disabled, Camel will process replies in the same order as defined by the recipient list.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "cacheSize": {
+        "title": "Cache Size",
+        "description": "Sets the maximum size used by the org.apache.camel.spi.ProducerCache which is used to cache and reuse producers when using this recipient list, when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "shareUnitOfWork": {
+        "title": "Share Unit Of Work",
+        "description": "Shares the org.apache.camel.spi.UnitOfWork with the parent and each of the sub messages. Recipient List will by default not share unit of work between the parent exchange and each recipient exchange. This means each sub exchange has its own individual unit of work.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "removeHeader",
+    "title": "Remove Header",
+    "description": "Removes a named header from the message",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/removeHeader.svg",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "description": "Name of header to remove",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "name"
+    ]
+  },
+  {
+    "name": "removeHeaders",
+    "title": "Remove Headers",
+    "description": "Removes message headers whose name matches a specified pattern",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/removeHeaders.svg",
+    "properties": {
+      "pattern": {
+        "title": "Pattern",
+        "description": "Name or pattern of headers to remove. The pattern is matched in the following order: 1 = exact match 2 = wildcard (pattern ends with a and the name starts with the pattern) 3 = regular expression (all of above is case in-sensitive).",
+        "type": "string",
+        "secret": false
+      },
+      "excludePattern": {
+        "title": "Exclude Pattern",
+        "description": "Name or patter of headers to not remove. The pattern is matched in the following order: 1 = exact match 2 = wildcard (pattern ends with a and the name starts with the pattern) 3 = regular expression (all of above is case in-sensitive).",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "pattern"
+    ]
+  },
+  {
+    "name": "removeProperties",
+    "title": "Remove Properties",
+    "description": "Removes message exchange properties whose name matches a specified pattern",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/removeProperties.svg",
+    "properties": {
+      "pattern": {
+        "title": "Pattern",
+        "description": "Name or pattern of properties to remove. The pattern is matched in the following order: 1 = exact match 2 = wildcard (pattern ends with a and the name starts with the pattern) 3 = regular expression (all of above is case in-sensitive).",
+        "type": "string",
+        "secret": false
+      },
+      "excludePattern": {
+        "title": "Exclude Pattern",
+        "description": "Name or pattern of properties to not remove. The pattern is matched in the following order: 1 = exact match 2 = wildcard (pattern ends with a and the name starts with the pattern) 3 = regular expression (all of above is case in-sensitive).",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "pattern"
+    ]
+  },
+  {
+    "name": "removeProperty",
+    "title": "Remove Property",
+    "description": "Removes a named property from the message exchange",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/removeProperty.svg",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "description": "Name of property to remove.",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "name"
+    ]
+  },
+  {
+    "name": "resequence",
+    "title": "Resequence",
+    "description": "Resequences (re-order) messages based on an expression",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/resequence.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to use for re-ordering the messages, such as a header with a sequence number",
+        "type": "expression",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "rollback",
+    "title": "Rollback",
+    "description": "Forces a rollback by stopping routing the message",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/rollback.svg",
+    "properties": {
+      "message": {
+        "title": "Message",
+        "description": "Message to use in rollback exception",
+        "type": "string",
+        "secret": false
+      },
+      "markRollbackOnly": {
+        "title": "Mark Rollback Only",
+        "description": "Mark the transaction for rollback only (cannot be overruled to commit)",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "markRollbackOnlyLast": {
+        "title": "Mark Rollback Only Last",
+        "description": "Mark only last sub transaction for rollback only. When using sub transactions (if the transaction manager support this)",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "routingSlip",
+    "title": "Routing Slip",
+    "description": "Routes a message through a series of steps that are pre-determined (the slip)",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/routingSlip.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to define the routing slip, which defines which endpoints to route the message in a pipeline style. Notice the expression is evaluated once, if you want a more dynamic style, then the dynamic router eip is a better choice.",
+        "type": "expression",
+        "secret": false
+      },
+      "uriDelimiter": {
+        "title": "Uri Delimiter",
+        "description": "Sets the uri delimiter to use",
+        "type": "string",
+        "defaultValue": ",",
+        "secret": false
+      },
+      "ignoreInvalidEndpoints": {
+        "title": "Ignore Invalid Endpoints",
+        "description": "Ignore the invalidate endpoint exception when try to create a producer with that endpoint",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "cacheSize": {
+        "title": "Cache Size",
+        "description": "Sets the maximum size used by the org.apache.camel.spi.ProducerCache which is used to cache and reuse producers when using this routing slip, when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "saga",
+    "title": "Saga",
+    "description": "Enables Sagas on the route",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/saga.svg",
+    "properties": {
+      "propagation": {
+        "title": "Propagation",
+        "description": "Set the Saga propagation mode (REQUIRED, REQUIRES_NEW, MANDATORY, SUPPORTS, NOT_SUPPORTED, NEVER).",
+        "type": "string",
+        "defaultValue": "REQUIRED",
+        "secret": false,
+        "group": "advanced",
+        "enum": [
+          "REQUIRED",
+          "REQUIRES_NEW",
+          "MANDATORY",
+          "SUPPORTS",
+          "NOT_SUPPORTED",
+          "NEVER"
+        ]
+      },
+      "completionMode": {
+        "title": "Completion Mode",
+        "description": "Determine how the saga should be considered complete. When set to AUTO, the saga is completed when the exchange that initiates the saga is processed successfully, or compensated when it completes exceptionally. When set to MANUAL, the user must complete or compensate the saga using the saga:complete or saga:compensate endpoints.",
+        "type": "string",
+        "defaultValue": "AUTO",
+        "secret": false,
+        "group": "advanced",
+        "enum": [
+          "AUTO",
+          "MANUAL"
+        ]
+      },
+      "timeout": {
+        "title": "Timeout",
+        "description": "Set the maximum amount of time for the Saga. After the timeout is expired, the saga will be compensated automatically (unless a different decision has been taken in the meantime).",
+        "type": "number",
+        "format": "duration",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "sample",
+    "title": "Sample",
+    "description": "Extract a sample of the messages passing through a route",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/sample.svg",
+    "properties": {
+      "samplePeriod": {
+        "title": "Sample Period",
+        "description": "Sets the sample period during which only a single Exchange will pass through.",
+        "type": "number",
+        "format": "duration",
+        "defaultValue": 1000,
+        "secret": false
+      },
+      "messageFrequency": {
+        "title": "Message Frequency",
+        "description": "Sets the sample message count which only a single Exchange will pass through after this many received.",
+        "type": "number",
+        "format": "integer",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "script",
+    "title": "Script",
+    "description": "Executes a script from a language which does not change the message body.",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/script.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to return the transformed message body (the new message body to use)",
+        "type": "expression",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "serviceCall",
+    "title": "Service Call",
+    "description": "To call remote services",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/serviceCall.svg",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "description": "Sets the name of the service to use",
+        "type": "string",
+        "secret": false
+      },
+      "uri": {
+        "title": "Uri",
+        "description": "The uri of the endpoint to send to. The uri can be dynamic computed using the org.apache.camel.language.simple.SimpleLanguage expression.",
+        "type": "string",
+        "secret": false
+      },
+      "component": {
+        "title": "Component",
+        "description": "The component to use.",
+        "type": "string",
+        "defaultValue": "http",
+        "secret": false
+      },
+      "pattern": {
+        "title": "Pattern",
+        "description": "Sets the optional ExchangePattern used to invoke this endpoint",
+        "type": "string",
+        "secret": false,
+        "enum": [
+          "InOnly",
+          "InOut"
+        ]
+      },
+      "configurationRef": {
+        "title": "Configuration Ref",
+        "description": "Refers to a ServiceCall configuration to use",
+        "type": "string",
+        "secret": false
+      },
+      "serviceDiscoveryRef": {
+        "title": "Service Discovery Ref",
+        "description": "Sets a reference to a custom ServiceDiscovery to use.",
+        "type": "string",
+        "secret": false
+      },
+      "serviceFilterRef": {
+        "title": "Service Filter Ref",
+        "description": "Sets a reference to a custom ServiceFilter to use.",
+        "type": "string",
+        "secret": false
+      },
+      "serviceChooserRef": {
+        "title": "Service Chooser Ref",
+        "description": "Sets a reference to a custom ServiceChooser to use.",
+        "type": "string",
+        "secret": false
+      },
+      "loadBalancerRef": {
+        "title": "Load Balancer Ref",
+        "description": "Sets a reference to a custom ServiceLoadBalancer to use.",
+        "type": "string",
+        "secret": false
+      },
+      "expressionRef": {
+        "title": "Expression Ref",
+        "description": "Set a reference to a custom Expression to use.",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "name"
+    ]
+  },
+  {
+    "name": "setBody",
+    "title": "Set Body",
+    "description": "Sets the contents of the message body",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/setBody.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression that returns the new body to use",
+        "type": "expression",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "setExchangePattern",
+    "title": "Set Exchange Pattern",
+    "description": "Sets the exchange pattern on the message exchange",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/setExchangePattern.svg",
+    "properties": {
+      "pattern": {
+        "title": "Pattern",
+        "description": "Sets the new exchange pattern of the Exchange to be used from this point forward",
+        "type": "string",
+        "secret": false,
+        "enum": [
+          "InOnly",
+          "InOut"
+        ]
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "pattern"
+    ]
+  },
+  {
+    "name": "setHeader",
+    "title": "Set Header",
+    "description": "Sets the value of a message header",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/setHeader.svg",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "description": "Name of message header to set a new value The simple language can be used to define a dynamic evaluated header name to be used. Otherwise a constant name will be used.",
+        "type": "string",
+        "secret": false
+      },
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to return the value of the header",
+        "type": "expression",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "name",
+      "expression"
+    ]
+  },
+  {
+    "name": "setProperty",
+    "title": "Set Property",
+    "description": "Sets a named property on the message exchange",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/setProperty.svg",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "description": "Name of exchange property to set a new value. The simple language can be used to define a dynamic evaluated exchange property name to be used. Otherwise a constant name will be used.",
+        "type": "string",
+        "secret": false
+      },
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to return the value of the message exchange property",
+        "type": "expression",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "name",
+      "expression"
+    ]
+  },
+  {
+    "name": "sort",
+    "title": "Sort",
+    "description": "Sorts the contents of the message",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/sort.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Optional expression to sort by something else than the message body",
+        "type": "expression",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "split",
+    "title": "Split",
+    "description": "Splits a single message into many sub-messages.",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/split.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression of how to split the message body, such as as-is, using a tokenizer, or using a xpath.",
+        "type": "string",
+        "secret": false
+      },
+      "delimiter": {
+        "title": "Delimiter",
+        "description": "Delimiter used in splitting messages. Can be turned off using the value false. The default value is ,",
+        "type": "string",
+        "defaultValue": ",",
+        "secret": false
+      },
+      "aggregationStrategyMethodName": {
+        "title": "Aggregation Strategy Method Name",
+        "description": "This option can be used to explicit declare the method name to use, when using POJOs as the AggregationStrategy.",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "aggregationStrategyMethodAllowNull": {
+        "title": "Aggregation Strategy Method Allow Null",
+        "description": "If this option is false then the aggregate method is not used if there was no data to enrich. If this option is true then null values is used as the oldExchange (when no data to enrich), when using POJOs as the AggregationStrategy",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "parallelAggregate": {
+        "title": "Parallel Aggregate",
+        "description": "If enabled then the aggregate method on AggregationStrategy can be called concurrently. Notice that this would require the implementation of AggregationStrategy to be implemented as thread-safe. By default this is false meaning that Camel synchronizes the call to the aggregate method. Though in some use-cases this can be used to archive higher performance when the AggregationStrategy is implemented as thread-safe.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "parallelProcessing": {
+        "title": "Parallel Processing",
+        "description": "If enabled then processing each split messages occurs concurrently. Note the caller thread will still wait until all messages has been fully processed, before it continues. It's only processing the sub messages from the splitter which happens concurrently. When parallel processing is enabled, then the Camel routing engin will continue processing using last used thread from the parallel thread pool. However, if you want to use the original thread that called the splitter, then make sure to enable the synchronous option as well.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "synchronous": {
+        "title": "Synchronous",
+        "description": "Sets whether synchronous processing should be strictly used. When enabled then the same thread is used to continue routing after the split is complete, even if parallel processing is enabled.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "streaming": {
+        "title": "Streaming",
+        "description": "When in streaming mode, then the splitter splits the original message on-demand, and each split message is processed one by one. This reduces memory usage as the splitter do not split all the messages first, but then we do not know the total size, and therefore the org.apache.camel.Exchange#SPLIT_SIZE is empty. In non-streaming mode (default) the splitter will split each message first, to know the total size, and then process each message one by one. This requires to keep all the split messages in memory and therefore requires more memory. The total size is provided in the org.apache.camel.Exchange#SPLIT_SIZE header. The streaming mode also affects the aggregation behavior. If enabled then Camel will process replies out-of-order, e.g. in the order they come back. If disabled, Camel will process replies in the same order as the messages was split.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "stopOnException": {
+        "title": "Stop On Exception",
+        "description": "Will now stop further processing if an exception or failure occurred during processing of an org.apache.camel.Exchange and the caused exception will be thrown. Will also stop if processing the exchange failed (has a fault message) or an exception was thrown and handled by the error handler (such as using onException). In all situations the splitter will stop further processing. This is the same behavior as in pipeline, which is used by the routing engine. The default behavior is to not stop but continue processing till the end",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "timeout": {
+        "title": "Timeout",
+        "description": "Sets a total timeout specified in millis, when using parallel processing. If the Splitter hasn't been able to split and process all the sub messages within the given timeframe, then the timeout triggers and the Splitter breaks out and continues. Notice if you provide a TimeoutAwareAggregationStrategy then the timeout method is invoked before breaking out. If the timeout is reached with running tasks still remaining, certain tasks for which it is difficult for Camel to shut down in a graceful manner may continue to run. So use this option with a bit of care.",
+        "type": "number",
+        "format": "duration",
+        "defaultValue": 0,
+        "secret": false,
+        "group": "advanced"
+      },
+      "shareUnitOfWork": {
+        "title": "Share Unit Of Work",
+        "description": "Shares the org.apache.camel.spi.UnitOfWork with the parent and each of the sub messages. Splitter will by default not share unit of work between the parent exchange and each split exchange. This means each split exchange has its own individual unit of work.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "step",
+    "title": "Step",
+    "description": "Routes the message to a sequence of processors which is grouped together as one logical name",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/step.svg",
+    "properties": {
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "stop",
+    "title": "Stop",
+    "description": "Stops the processing of the current message",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/stop.svg",
+    "properties": {
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "throttle",
+    "title": "Throttle",
+    "description": "Controls the rate at which messages are passed to the next node in the route",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/throttle.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to configure the maximum number of messages to throttle per request",
+        "type": "expression",
+        "secret": false
+      },
+      "timePeriodMillis": {
+        "title": "Time Period Millis",
+        "description": "Sets the time period during which the maximum request count is valid for",
+        "type": "number",
+        "format": "duration",
+        "defaultValue": 1000,
+        "secret": false
+      },
+      "asyncDelayed": {
+        "title": "Async Delayed",
+        "description": "Enables asynchronous delay which means the thread will not block while delaying.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "callerRunsWhenRejected": {
+        "title": "Caller Runs When Rejected",
+        "description": "Whether or not the caller should run the task when it was rejected by the thread pool. Is by default true",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "rejectExecution": {
+        "title": "Reject Execution",
+        "description": "Whether or not throttler throws the ThrottlerRejectedExecutionException when the exchange exceeds the request limit Is by default false",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "throwException",
+    "title": "Throw Exception",
+    "description": "Throws an exception",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/throwException.svg",
+    "properties": {
+      "message": {
+        "title": "Message",
+        "description": "To create a new exception instance and use the given message as caused message (supports simple language)",
+        "type": "string",
+        "secret": false
+      },
+      "exceptionType": {
+        "title": "Exception Type",
+        "description": "The class of the exception to create using the message.",
+        "type": "string",
+        "secret": false
+      },
+      "ref": {
+        "title": "Ref",
+        "description": "Reference to the exception instance to lookup from the registry to throw",
+        "type": "string",
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "to",
+    "title": "To",
+    "description": "Sends the message to a static endpoint",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/to.svg",
+    "properties": {
+      "uri": {
+        "title": "Uri",
+        "description": "Sets the uri of the endpoint to send to.",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "pattern": {
+        "title": "Pattern",
+        "description": "Sets the optional ExchangePattern used to invoke this endpoint",
+        "type": "string",
+        "secret": false,
+        "group": "advanced",
+        "enum": [
+          "InOnly",
+          "InOut"
+        ]
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "uri"
+    ]
+  },
+  {
+    "name": "toD",
+    "title": "To D",
+    "description": "Sends the message to a dynamic endpoint",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/toD.svg",
+    "properties": {
+      "uri": {
+        "title": "Uri",
+        "description": "The uri of the endpoint to send to. The uri can be dynamic computed using the org.apache.camel.language.simple.SimpleLanguage expression.",
+        "type": "string",
+        "secret": false
+      },
+      "pattern": {
+        "title": "Pattern",
+        "description": "Sets the optional ExchangePattern used to invoke this endpoint",
+        "type": "string",
+        "secret": false,
+        "group": "advanced",
+        "enum": [
+          "InOnly",
+          "InOut"
+        ]
+      },
+      "cacheSize": {
+        "title": "Cache Size",
+        "description": "Sets the maximum size used by the org.apache.camel.spi.ProducerCache which is used to cache and reuse producers when using this recipient list, when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "ignoreInvalidEndpoint": {
+        "title": "Ignore Invalid Endpoint",
+        "description": "Whether to ignore invalid endpoint URIs and skip sending the message.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "allowOptimisedComponents": {
+        "title": "Allow Optimised Components",
+        "description": "Whether to allow components to optimise toD if they are org.apache.camel.spi.SendDynamicAware .",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "autoStartComponents": {
+        "title": "Auto Start Components",
+        "description": "Whether to auto startup components when toD is starting up.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "uri"
+    ]
+  },
+  {
+    "name": "transacted",
+    "title": "Transacted",
+    "description": "Enables transaction on the route",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/transacted.svg",
+    "properties": {
+      "ref": {
+        "title": "Ref",
+        "description": "Sets a reference to use for lookup the policy in the registry.",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    }
+  },
+  {
+    "name": "transform",
+    "title": "Transform",
+    "description": "Transforms the message body based on an expression",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/transform.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to return the transformed message body (the new message body to use)",
+        "type": "expression",
+        "secret": false
+      },
+      "fromType": {
+        "title": "From Type",
+        "description": "From type used in data type transformation.",
+        "type": "string",
+        "secret": false
+      },
+      "toType": {
+        "title": "To Type",
+        "description": "To type used as a target data type in the transformation.",
+        "type": "string",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "unmarshal",
+    "title": "Unmarshal",
+    "description": "Converts the message data received from the wire into a format that Apache Camel processors can consume",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/unmarshal.svg",
+    "properties": {
+      "dataFormatType": {
+        "title": "Data Format Type",
+        "description": "The data format to be used",
+        "type": "dataformat",
+        "secret": false
+      },
+      "allowNullBody": {
+        "title": "Allow Null Body",
+        "description": "Indicates whether null is allowed as value of a body to unmarshall.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "dataFormatType"
+    ]
+  },
+  {
+    "name": "validate",
+    "title": "Validate",
+    "description": "Validates a message based on an expression",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/validate.svg",
+    "properties": {
+      "expression": {
+        "title": "Expression",
+        "description": "Expression to use for validation as a predicate. The expression should return either true or false. If returning false the message is invalid and an exception is thrown.",
+        "type": "expression",
+        "secret": false
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "expression"
+    ]
+  },
+  {
+    "name": "wireTap",
+    "title": "Wire Tap",
+    "description": "Routes a copy of a message (or creates a new message) to a secondary destination while continue routing the original message.",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/wireTap.svg",
+    "properties": {
+      "copy": {
+        "title": "Copy",
+        "description": "Uses a copy of the original exchange",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "dynamicUri": {
+        "title": "Dynamic Uri",
+        "description": "Whether the uri is dynamic or static. If the uri is dynamic then the simple language is used to evaluate a dynamic uri to use as the wire-tap destination, for each incoming message. This works similar to how the toD EIP pattern works. If static then the uri is used as-is as the wire-tap destination.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "uri": {
+        "title": "Uri",
+        "description": "The uri of the endpoint to send to. The uri can be dynamic computed using the org.apache.camel.language.simple.SimpleLanguage expression.",
+        "type": "string",
+        "secret": false
+      },
+      "pattern": {
+        "title": "Pattern",
+        "description": "Sets the optional ExchangePattern used to invoke this endpoint",
+        "type": "string",
+        "secret": false,
+        "group": "advanced",
+        "enum": [
+          "InOnly",
+          "InOut"
+        ]
+      },
+      "cacheSize": {
+        "title": "Cache Size",
+        "description": "Sets the maximum size used by the org.apache.camel.spi.ProducerCache which is used to cache and reuse producers when using this recipient list, when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers.",
+        "type": "number",
+        "format": "integer",
+        "secret": false,
+        "group": "advanced"
+      },
+      "ignoreInvalidEndpoint": {
+        "title": "Ignore Invalid Endpoint",
+        "description": "Whether to ignore invalid endpoint URIs and skip sending the message.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "allowOptimisedComponents": {
+        "title": "Allow Optimised Components",
+        "description": "Whether to allow components to optimise toD if they are org.apache.camel.spi.SendDynamicAware .",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "autoStartComponents": {
+        "title": "Auto Start Components",
+        "description": "Whether to auto startup components when toD is starting up.",
+        "type": "boolean",
+        "defaultValue": true,
+        "secret": false,
+        "group": "advanced"
+      },
+      "disabled": {
+        "title": "Disabled",
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime.",
+        "type": "boolean",
+        "defaultValue": false,
+        "secret": false,
+        "group": "advanced"
+      },
+      "id": {
+        "title": "Id",
+        "description": "Sets the id of this node",
+        "type": "string",
+        "secret": false
+      },
+      "description": {
+        "title": "Description",
+        "description": "Sets the description of this node",
+        "type": "string",
+        "secret": false
+      }
+    },
+    "required": [
+      "uri"
+    ]
+  },
+  {
+    "name": "when",
+    "title": "When",
+    "description": "Triggers a route when the expression evaluates to true",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/when.svg",
+    "properties": {
+      "id": {
+        "index": 0,
+        "kind": "attribute",
+        "title": "Id",
+        "group": "common",
+        "type": "string",
+        "javaType": "java.lang.String",
+        "deprecated": false,
+        "autowired": false,
+        "secret": false,
+        "description": "Sets the id of this node"
+      },
+      "description": {
+        "index": 1,
+        "kind": "attribute",
+        "title": "Description",
+        "group": "common",
+        "type": "string",
+        "javaType": "java.lang.String",
+        "deprecated": false,
+        "autowired": false,
+        "secret": false,
+        "description": "Sets the description of this node"
+      },
+      "disabled": {
+        "index": 2,
+        "kind": "attribute",
+        "title": "Disabled",
+        "group": "advanced",
+        "label": "advanced",
+        "type": "boolean",
+        "javaType": "java.lang.Boolean",
+        "deprecated": false,
+        "autowired": false,
+        "secret": false,
+        "defaultValue": false,
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime."
+      },
+      "expression": {
+        "index": 3,
+        "kind": "expression",
+        "title": "Expression",
+        "group": "common",
+        "type": "object",
+        "javaType": "org.apache.camel.model.language.ExpressionDefinition",
+        "items": {
+          "enum": [
+            "constant",
+            "csimple",
+            "datasonnet",
+            "exchangeProperty",
+            "groovy",
+            "header",
+            "hl7terser",
+            "java",
+            "joor",
+            "jq",
+            "js",
+            "jsonpath",
+            "language",
+            "method",
+            "mvel",
+            "ognl",
+            "python",
+            "ref",
+            "simple",
+            "spel",
+            "tokenize",
+            "variable",
+            "wasm",
+            "xpath",
+            "xquery",
+            "xtokenize"
+          ]
+        },
+        "deprecated": false,
+        "autowired": false,
+        "secret": false,
+        "asPredicate": true,
+        "description": "Expression used as the predicate to evaluate whether this when should trigger and route the message or not."
+      },
+      "outputs": {
+        "index": 4,
+        "kind": "element",
+        "title": "Outputs",
+        "group": "common",
+        "type": "array",
+        "javaType": "java.util.List<org.apache.camel.model.ProcessorDefinition<java.lang.Object>>",
+        "items": {
+          "enum": [
+            "aggregate",
+            "bean",
+            "choice",
+            "circuitBreaker",
+            "claimCheck",
+            "convertBodyTo",
+            "convertHeaderTo",
+            "convertVariableTo",
+            "delay",
+            "doCatch",
+            "doFinally",
+            "doTry",
+            "dynamicRouter",
+            "enrich",
+            "filter",
+            "idempotentConsumer",
+            "intercept",
+            "interceptFrom",
+            "interceptSendToEndpoint",
+            "kamelet",
+            "loadBalance",
+            "log",
+            "loop",
+            "marshal",
+            "multicast",
+            "onCompletion",
+            "onException",
+            "onFallback",
+            "otherwise",
+            "pausable",
+            "pipeline",
+            "policy",
+            "poll",
+            "pollEnrich",
+            "process",
+            "recipientList",
+            "removeHeader",
+            "removeHeaders",
+            "removeProperties",
+            "removeProperty",
+            "removeVariable",
+            "resequence",
+            "resumable",
+            "rollback",
+            "routingSlip",
+            "saga",
+            "sample",
+            "script",
+            "serviceCall",
+            "setBody",
+            "setExchangePattern",
+            "setHeader",
+            "setHeaders",
+            "setProperty",
+            "setVariable",
+            "setVariables",
+            "sort",
+            "split",
+            "step",
+            "stop",
+            "threads",
+            "throttle",
+            "throwException",
+            "to",
+            "toD",
+            "tokenizer",
+            "transacted",
+            "transform",
+            "unmarshal",
+            "validate",
+            "when",
+            "whenSkipSendToEndpoint",
+            "wireTap"
+          ]
+        },
+        "deprecated": false,
+        "autowired": false,
+        "secret": false
+      }
+    },
+    "required": [
+      "expression",
+      "outputs"
+    ]
+  },
+  {
+    "name": "otherwise",
+    "title": "Otherwise",
+    "description": "Route to be executed when all other choices evaluate to false",
+    "iconUrl": "https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/otherwise.svg",
+    "properties": {
+      "id": {
+        "index": 0,
+        "kind": "attribute",
+        "title": "Id",
+        "group": "common",
+        "type": "string",
+        "javaType": "java.lang.String",
+        "deprecated": false,
+        "autowired": false,
+        "secret": false,
+        "description": "Sets the id of this node"
+      },
+      "description": {
+        "index": 1,
+        "kind": "attribute",
+        "title": "Description",
+        "group": "common",
+        "type": "string",
+        "javaType": "java.lang.String",
+        "deprecated": false,
+        "autowired": false,
+        "secret": false,
+        "description": "Sets the description of this node"
+      },
+      "disabled": {
+        "index": 2,
+        "kind": "attribute",
+        "title": "Disabled",
+        "group": "advanced",
+        "label": "advanced",
+        "type": "boolean",
+        "javaType": "java.lang.Boolean",
+        "deprecated": false,
+        "autowired": false,
+        "secret": false,
+        "defaultValue": false,
+        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime."
+      },
+      "outputs": {
+        "index": 3,
+        "kind": "element",
+        "title": "Outputs",
+        "group": "common",
+        "type": "array",
+        "javaType": "java.util.List",
+        "items": {
+          "enum": [
+            "aggregate",
+            "bean",
+            "choice",
+            "circuitBreaker",
+            "claimCheck",
+            "convertBodyTo",
+            "convertHeaderTo",
+            "convertVariableTo",
+            "delay",
+            "doCatch",
+            "doFinally",
+            "doTry",
+            "dynamicRouter",
+            "enrich",
+            "filter",
+            "idempotentConsumer",
+            "intercept",
+            "interceptFrom",
+            "interceptSendToEndpoint",
+            "kamelet",
+            "loadBalance",
+            "log",
+            "loop",
+            "marshal",
+            "multicast",
+            "onCompletion",
+            "onException",
+            "onFallback",
+            "otherwise",
+            "pausable",
+            "pipeline",
+            "policy",
+            "poll",
+            "pollEnrich",
+            "process",
+            "recipientList",
+            "removeHeader",
+            "removeHeaders",
+            "removeProperties",
+            "removeProperty",
+            "removeVariable",
+            "resequence",
+            "resumable",
+            "rollback",
+            "routingSlip",
+            "saga",
+            "sample",
+            "script",
+            "serviceCall",
+            "setBody",
+            "setExchangePattern",
+            "setHeader",
+            "setHeaders",
+            "setProperty",
+            "setVariable",
+            "setVariables",
+            "sort",
+            "split",
+            "step",
+            "stop",
+            "threads",
+            "throttle",
+            "throwException",
+            "to",
+            "toD",
+            "tokenizer",
+            "transacted",
+            "transform",
+            "unmarshal",
+            "validate",
+            "when",
+            "whenSkipSendToEndpoint",
+            "wireTap"
+          ]
+        },
+        "deprecated": false,
+        "autowired": false,
+        "secret": false
+      }
+    },
+    "required": [
+      "outputs"
+    ]
+  }
+]
