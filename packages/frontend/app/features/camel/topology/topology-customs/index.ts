@@ -1,5 +1,5 @@
 import React from "react";
-import { NodeType } from "../topology-types";
+import type { NodeType } from "../topology-types";
 import { CustomAddNode, DefaultNode } from "./custom-nodes";
 export * from "./custom-edges";
 

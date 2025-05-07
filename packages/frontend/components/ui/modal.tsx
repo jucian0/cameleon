@@ -9,13 +9,7 @@ import { type VariantProps, tv } from "tailwind-variants"
 
 import {
   Dialog,
-  DialogBody,
-  DialogClose,
-  DialogCloseIcon,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+
 } from "./dialog"
 
 const Modal = (props: DialogTriggerProps) => {
@@ -77,8 +71,8 @@ const modalContentStyles = tv({
 
 interface ModalContentProps
   extends Omit<ModalOverlayProps, "className" | "children">,
-    Pick<DialogProps, "aria-label" | "aria-labelledby" | "role" | "children">,
-    VariantProps<typeof modalContentStyles> {
+  Pick<DialogProps, "aria-label" | "aria-labelledby" | "role" | "children">,
+  VariantProps<typeof modalContentStyles> {
   closeButton?: boolean
   isBlurred?: boolean
   classNames?: {
@@ -126,7 +120,7 @@ const ModalContent = ({
           {(values) => (
             <>
               {typeof children === "function" ? children(values) : children}
-              {closeButton && <DialogCloseIcon isDismissable={isDismissable} />}
+              {closeButton && <Dialog.CloseIndicator isDismissable={isDismissable} />}
             </>
           )}
         </Dialog>
@@ -136,12 +130,12 @@ const ModalContent = ({
 }
 
 const ModalTrigger = DialogTrigger
-const ModalHeader = DialogHeader
-const ModalTitle = DialogTitle
-const ModalDescription = DialogDescription
-const ModalFooter = DialogFooter
-const ModalBody = DialogBody
-const ModalClose = DialogClose
+const ModalHeader = Dialog.Header
+const ModalTitle = Dialog.Title
+const ModalDescription = Dialog.Description
+const ModalFooter = Dialog.Footer
+const ModalBody = Dialog.Body
+const ModalClose = Dialog.Close
 
 Modal.Trigger = ModalTrigger
 Modal.Header = ModalHeader

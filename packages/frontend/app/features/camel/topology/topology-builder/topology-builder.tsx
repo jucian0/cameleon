@@ -24,7 +24,7 @@ const getLayoutedNodes = (nodes: Node[], edges: Edge[]) => {
 	});
 };
 
-const getlayoutedEdges = (nodes: Node[], edges: Edge[]) => {
+const getLayoutedEdges = (nodes: Node[], edges: Edge[]) => {
 	const g = new dagre.graphlib.Graph();
 	g.setGraph({ rankdir: "TB" });
 	g.setDefaultEdgeLabel(() => ({}));
@@ -46,18 +46,24 @@ function Flow() {
 	const { nodes, edges, onNodesChange, onEdgesChange } = canvas;
 
 	return (
-		<div className="w-full h-[calc(100vh-100px)] relative">
+		<div className="w-full h-[calc(100vh-52px)] relative">
 			<ReactFlow
 				fitView
 				nodes={getLayoutedNodes(nodes, edges)}
-				edges={getlayoutedEdges(nodes, edges)}
+				edges={getLayoutedEdges(nodes, edges)}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 			>
 				<Background />
-				<MiniMap nodeStrokeWidth={3} zoomable pannable />
+				{/* <MiniMap
+					nodeStrokeWidth={3}
+					zoomable
+					pannable
+					className="fill-secondary"
+					style={{ backgroundColor: "lightblue" }} // Apply color to the SVG background
+				/> */}
 				<TopologyZoom position="top-left" />
 				<TopologyRouteSelector position="top-right" />
 			</ReactFlow>
