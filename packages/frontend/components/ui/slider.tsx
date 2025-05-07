@@ -107,14 +107,6 @@ const Slider = ({
       )}
       {...props}
     >
-      <div className="flex text-fg">
-        {props.label && <Label>{props.label}</Label>}
-        {output === "inline" && (
-          <SliderOutput className="text-muted-fg text-sm tabular-nums data-[orientation=vertical]:mx-auto data-[orientation=horizontal]:ml-auto">
-            {({ state }) => state.values.map((_, i) => state.getThumbValueLabel(i)).join(" – ")}
-          </SliderOutput>
-        )}
-      </div>
       <SliderTrack>
         {({ state }) => (
           <>
