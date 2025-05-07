@@ -20,7 +20,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 	};
 
 	return (
-		<div onClick={handleClick} role="button" className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-40">
+		<div onClick={handleClick} role="button" className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-16 h-12">
 			<div className="flex flex-row gap-1 relative justify-between w-full pl-4 items-center">
 				<div className="flex flex-row gap-2 justify-center items-stretch">
 					{data.iconName && (
@@ -28,7 +28,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 							<img src={iconPath} className="w-6 h-auto" />
 						</div>
 					)}
-					<span className="center">{data.stepType}</span>
+					{/* <span className="center">{data.stepType}</span> */}
 				</div>
 				<div className="flex flex-row items-center justify-center">
 					<Separator orientation="vertical" className="h-8 bg-border" />
@@ -80,13 +80,13 @@ export const CustomAddNode = React.memo(({ data }: NodeProps<Node>) => {
 	};
 
 	return (
-		<div onClick={handleClick} role="button" className="relative cursor-pointer flex justify-center border-dashed border-primary border rounded-lg bg-transparent transition-all duration-200 ease-in-out w-40 p-1 px-2 gap-2">
+		<div onClick={handleClick} role="button" className="relative cursor-pointer flex justify-center border-dashed border-primary border rounded-lg bg-transparent transition-all duration-200 ease-in-out w-8 h-8 p-1 px-2 gap-2">
 			{data.iconName && (
 				<div className="flex items-center justify-center">
 					<PlusIcon size={16} className="text-primary" />
 				</div>
 			)}
-			<span className="center">{data.label}</span>
+			{/* <span className="center">{data.label}</span> */}
 			<BaseHandle type="target" position={Position.Top} />
 		</div>
 	);
