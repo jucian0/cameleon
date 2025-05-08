@@ -118,6 +118,7 @@ const SelectTrigger = ({ className, ...props }: SelectTriggerProps) => {
           className,
         }),
       )}
+
     >
       {props.prefix && <span className="-mr-1">{props.prefix}</span>}
       <SelectValue
