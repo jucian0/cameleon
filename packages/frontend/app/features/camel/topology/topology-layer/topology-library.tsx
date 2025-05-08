@@ -144,7 +144,6 @@ function CamelEIPsTab({ onSelectionChange }: { onSelectionChange: (node: any) =>
   const eips = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchEIPsMetadata());
-      console.error("EIPs data", data);
       if (error || !Array.isArray(data.data)) {
         return { items: [] };
       }

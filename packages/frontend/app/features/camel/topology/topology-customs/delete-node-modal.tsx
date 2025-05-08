@@ -9,7 +9,7 @@ type Props = {
   isOpen: boolean;
 };
 
-export function DeleteNodeModal(props: Props) {
+export function DeleteNodeModal(props: Readonly<Props>) {
   const { getCurrentCamelRoute, setCurrentCamelRoute } = useTopologyStore();
   const { node, onOpenChange, isOpen } = props;
 

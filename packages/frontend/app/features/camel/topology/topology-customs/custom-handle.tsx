@@ -32,7 +32,7 @@ const wrapperClassNames: Record<Position, string> = {
 	[Position.Right]: "top-1/2 -translate-y-1/2 translate-x-[10px]",
 };
 
-export const AddNodeHandle = ({
+export const CustomHandle = ({
 	showButton = true,
 	position = Position.Bottom,
 	children,

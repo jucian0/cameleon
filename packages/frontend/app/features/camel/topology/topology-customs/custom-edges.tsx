@@ -1,12 +1,12 @@
 import { type EdgeProps, BaseEdge, EdgeLabelRenderer, getBezierPath } from "@xyflow/react";
-import { PlusIcon } from "lucide-react";
 import { type Node } from "./../topology-types";
 import { Button } from "components/ui/button";
 import { useTopologyStore } from "../topology-store";
 import { useLayer } from "../topology-layer/topology-layer";
+import { IconPlus } from "@intentui/icons";
 
 const SHOULD_HIDE_IF_BEFORE = ["camel-step", "choice", "multicast", "doTry"];
-const SHOULD_HIDE_IF_TARGET = ["camel-step", "choice", "multicast", "merge"];
+const SHOULD_HIDE_IF_TARGET = ["camel-step", "choice", "multicast", "merge", "add-step"];
 
 function CustomEdge({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, target, source }: EdgeProps) {
 	const targetNode = useTopologyStore((state) => state.canvas.nodes.find((node) => node.id === target));
@@ -37,17 +37,17 @@ function CustomEdge({ sourceX, sourceY, targetX, targetY, sourcePosition, target
 	}
 
 	// if Bezier is used, this value should be replaced by labelY
-	const buttonYPosition = targetStepType === "add-step" ? sourceY + 16 : labelY;
+	//const buttonYPosition = targetStepType === "add-step" ? sourceY + 16 : labelY;
 	const shouldShowLabel = !SHOULD_HIDE_IF_BEFORE.includes(sourceStepType) && !SHOULD_HIDE_IF_TARGET.includes(targetStepType)
 
 	return (<><BaseEdge path={edgePath} style={edgeStyle} /> <EdgeLabelRenderer>
 		{shouldShowLabel && <div
 			className="nodrag nopan pointer-events-auto absolute"
 			style={{
-				transform: `translate(-50%, -50%) translate(${sourceX}px,${buttonYPosition}px)`,
+				transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
 			}}
 		>
-			<Button onPress={handleClick} className={"h-4 w-4 p-0 rounded"}><PlusIcon size={16} /></Button>
+			<Button onPress={handleClick} className={"h-4 w-4 p-0 rounded"}><IconPlus /></Button>
 		</div>}
 	</EdgeLabelRenderer>
 	</>)

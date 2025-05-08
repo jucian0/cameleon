@@ -1,4 +1,4 @@
-import { ReactFlow, Background, MiniMap } from "@xyflow/react";
+import { ReactFlow, Background } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { TopologyLayer } from "../topology-layer/topology-layer";
 import dagre, { } from "dagre";
@@ -57,13 +57,6 @@ function Flow() {
 				onEdgesChange={onEdgesChange}
 			>
 				<Background />
-				{/* <MiniMap
-					nodeStrokeWidth={3}
-					zoomable
-					pannable
-					className="fill-secondary"
-					style={{ backgroundColor: "lightblue" }} // Apply color to the SVG background
-				/> */}
 				<TopologyZoom position="top-left" />
 				<TopologyRouteSelector position="top-right" />
 			</ReactFlow>
