@@ -9,12 +9,88 @@ import { useLayer } from "../topology-layer/topology-layer";
 import { IconDotsVertical, IconPencilBox, IconTrash } from "@intentui/icons";
 import { Menu } from "components/ui/menu";
 
+const eipListNames = [
+	'aggregate',
+	'bean',
+	'choice',
+	'circuit-breaker',
+	'claim-check',
+	'convert-body-to',
+	'convert-header-to',
+	'convert-variable-to',
+	'delay',
+	'do-try',
+	'dynamic-router',
+	'enrich',
+	'filter',
+	'idempotent-consumer',
+	'load-balancer',
+	'log',
+	'loop',
+	'marshal',
+	'multicast',
+	'pausable',
+	'policy',
+	'poll-enrich',
+	'process',
+	'recipient-list',
+	'remove-header',
+	'remove-headers',
+	'remove-properties',
+	'remove-property',
+	'remove-variable',
+	'resequence',
+	'resumable',
+	'routing-slip',
+	'saga',
+	'sample',
+	'script',
+	'set-body',
+	'set-exchange-pattern',
+	'set-header',
+	'set-headers',
+	'set-variable',
+	'set-variables',
+	'sort',
+	'split',
+	'step',
+	'stop',
+	'threads',
+	'throttle',
+	'throw-exception',
+	'to',
+	'to-d',
+	'transacted',
+	'transform',
+	'unmarshal',
+	'validate',
+	'wire-tap',
+	'claim-check',
+	'convertVariableTo',
+	'convertHeaderTo',
+	'convertBodyTo',
+
+
+	// EIPs complements 
+
+	'when',
+	'otherwise',
+	'do-while',
+	'do-finally',
+	'do-catch'
+]
+
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
-	const iconPath = `http://localhost:5173/camel-icons/eips/${data.iconName}.svg`;
-	const componentIconPath = `http://localhost:5173/camel-icons/components/${data.iconName}.svg`;
 
-	console.log("data", data.iconName);
+	const iconPath = React.useMemo(() => {
+		if (eipListNames.includes(data.iconName)) {
+			return `/camel-icons/eips/${data.iconName}.svg`;
+		} else {
+			return `/camel-icons/components/${data.iconName}.svg`;
+		}
+	}, [data.iconName]);
+
 
 	const { setNode } = useLayer();
 
@@ -35,10 +111,9 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 				<div className="flex flex-row gap-2 justify-center items-stretch">
 					{data.iconName && (
 						<div className="flex items-center justify-center">
-							<img alt={data.iconName} src={iconPath || componentIconPath} className="w-6 h-auto" />
+							<img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
 						</div>
 					)}
-					{/* <span className="center">{data.stepType}</span> */}
 				</div>
 				<div className="flex flex-row items-center justify-center">
 					<Separator orientation="vertical" className="h-8 bg-border" />

@@ -69,8 +69,8 @@ const Sheet = (props: SheetProps) => {
 
 interface SheetContentProps
   extends Omit<React.ComponentProps<typeof Modal>, "children" | "className">,
-    Omit<ModalOverlayProps, "className">,
-    VariantProps<typeof overlayStyles> {
+  Omit<ModalOverlayProps, "className">,
+  VariantProps<typeof overlayStyles> {
   "aria-label"?: DialogProps["aria-label"]
   "aria-labelledby"?: DialogProps["aria-labelledby"]
   role?: DialogProps["role"]
@@ -133,7 +133,7 @@ const SheetContent = ({
           </Dialog>
         )}
       </Modal>
-    </ModalOverlay>
+    </ModalOverlay >
   )
 }
 

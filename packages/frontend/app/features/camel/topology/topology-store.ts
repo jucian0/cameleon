@@ -22,7 +22,7 @@ import type { Node, Edge, CamelConfig, Route } from "@/features/camel/topology/t
 import { jsonToTopologyBuilder } from "./topology-parser";
 import { tryCatch } from "@/features/utils/try-catch";
 import { fetchCamelConfig } from "../data-requests/fetch-camel-config";
-import { jsonToYaml } from "@/features/utils/yaml-json";
+import { jsonToYaml } from "./yaml-json";
 
 type TopologyStore = {
 	camelConfig: CamelConfig;

@@ -142,12 +142,15 @@ function CamelEIPsTab({ onSelectionChange }: { onSelectionChange: (node: any) =>
   const eips = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchEIPsMetadata());
-      if (error || !Array.isArray(data.data)) {
+      if (error) {
         return { items: [] };
       }
-      return { items: data.data };
+      return { items: Object.values(data.data) };
     }
   });
+  console.log("EIPs", eips.items);
+
+
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
@@ -168,23 +171,23 @@ function CamelEIPsTab({ onSelectionChange }: { onSelectionChange: (node: any) =>
       >
         {(item) => (
           <ListBoxItem
-            textValue={item.name}
-            key={item.name}
-            id={item.name}
+            textValue={item.model.name}
+            key={item.model.name}
+            id={item.model.name}
           >
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
                 <img
-                  src={item.iconUrl}
-                  alt={item.name}
+                  src={`/camel-icons/eips/${item.model.name}.svg`}
+                  alt={item.model.name}
                   className="h-8 w-8"
                 />
                 <div className="flex flex-col">
-                  {item.title}
+                  {item.model.title}
                 </div>
               </Card.Header>
               <Card.Content className="p-2">
-                {item.description}
+                {item.model.description}
               </Card.Content>
             </Card>
           </ListBoxItem>
