@@ -86,12 +86,14 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
   const components = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchComponentsMetadata());
-      if (error || !Array.isArray(data.data)) {
+      if (error) {
         return { items: [] };
       }
-      return { items: data.data };
+      return { items: Object.values(data.data) };
     }
   });
+
+  console.log(components, '<<<<<')
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
@@ -100,6 +102,7 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
     if (!selectedItem) return;
     onSelectionChange(selectedKeys);
   }
+
   return (
     <Virtualizer
       layout={GridLayout}>
@@ -118,11 +121,11 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
 
-                {/* <img
-                  src={item.iconUrl}
-                  alt={item.name}
+                <img
+                  src={`/camel-icons/components/${item.component.name}.svg`}
+                  alt={item.component.name}
                   className="h-8 w-8"
-                /> */}
+                />
                 <div className="flex flex-col">
                   {item.component.title}
                 </div>
@@ -148,9 +151,6 @@ function CamelEIPsTab({ onSelectionChange }: { onSelectionChange: (node: any) =>
       return { items: Object.values(data.data) };
     }
   });
-  console.log("EIPs", eips.items);
-
-
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)

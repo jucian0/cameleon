@@ -12,13 +12,13 @@ export function TopologyLayer() {
 		setNode();
 	};
 
-	const iconPath = `https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/${node?.iconName}.svg`;
+
 	return (
 		<Sheet isOpen={isOpen} onOpenChange={onUnSelectedNode}>
 			<Sheet.Content isDismissable>
 				<Sheet.Header>
 					<Sheet.Title className="gap-2">
-						<img src={iconPath} className="w-6 h-auto" />
+						{/* <img src={iconPath} className="w-6 h-auto" /> */}
 						{node?.stepType}
 					</Sheet.Title>
 				</Sheet.Header>
