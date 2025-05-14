@@ -12,6 +12,9 @@ import { Menu } from "components/ui/menu";
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 	const iconPath = `http://localhost:5173/camel-icons/eips/${data.iconName}.svg`;
+	const componentIconPath = `http://localhost:5173/camel-icons/components/${data.iconName}.svg`;
+
+	console.log("data", data.iconName);
 
 	const { setNode } = useLayer();
 
@@ -25,7 +28,6 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 		}
 	}
 
-	console.log("rendering node", props);
 
 	return (
 		<div onClick={handleClick} onKeyDown={handleKeyDown} tabIndex={0} role="button" className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-16 h-10">
@@ -33,7 +35,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 				<div className="flex flex-row gap-2 justify-center items-stretch">
 					{data.iconName && (
 						<div className="flex items-center justify-center">
-							<img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
+							<img alt={data.iconName} src={iconPath || componentIconPath} className="w-6 h-auto" />
 						</div>
 					)}
 					{/* <span className="center">{data.stepType}</span> */}
