@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="300" height="300" version="1.1" viewBox="0 0 300 300" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+
+<g transform="matrix(1.06 0 0 1.06 149.37 149.76)">
+<g style="">
+		<g transform="matrix(2.15 0 0 2.15 -71.06 71.16)">
+<path transform="translate(-30.5 -96.5)" d="m27.2 80c0 7.3-5.9 13.2-13.2 13.2s-13.2-5.9-13.2-13.2 5.9-13.2 13.2-13.2h13.2v13.2zm6.6 0c0-7.3 5.9-13.2 13.2-13.2s13.2 5.9 13.2 13.2v33c0 7.3-5.9 13.2-13.2 13.2s-13.2-5.9-13.2-13.2v-33z" fill="#e01e5a" stroke-linecap="round"/>
+</g>
+		<g transform="matrix(2.15 0 0 2.15 -71.16 -71.06)">
+<linearGradient id="slacka" x2="59.5" y1="29.75" y2="29.75" gradientTransform="translate(.7 .6)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1f87ce" offset="0"/>
+<stop stop-color="#18afe4" offset="1"/>
+</linearGradient>
+<path transform="translate(-30.45 -30.35)" d="m47 27c-7.3 0-13.2-5.9-13.2-13.2s5.9-13.2 13.2-13.2 13.2 5.9 13.2 13.2v13.2h-13.2zm0 6.7c7.3 0 13.2 5.9 13.2 13.2s-5.9 13.2-13.2 13.2h-33.1c-7.3 0-13.2-5.9-13.2-13.2s5.9-13.2 13.2-13.2h33.1z" fill="url(#slacka)" stroke-linecap="round"/>
+</g>
+		<g transform="matrix(2.15 0 0 2.15 71.06 -71.06)">
+<linearGradient id="slackc" x2="59.4" y1="29.75" y2="29.75" gradientTransform="translate(66.9 .6)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2eb670" offset="0"/>
+<stop stop-color="#49ca31" offset="1"/>
+</linearGradient>
+<path transform="translate(-96.6 -30.35)" d="m99.9 46.9c0-7.3 5.9-13.2 13.2-13.2s13.2 5.9 13.2 13.2-5.9 13.2-13.2 13.2h-13.2v-13.2zm-6.6 0c0 7.3-5.9 13.2-13.2 13.2s-13.2-5.9-13.2-13.2v-33.1c0-7.3 5.9-13.2 13.2-13.2s13.2 5.9 13.2 13.2v33.1z" fill="url(#slackc)" stroke-linecap="round"/>
+</g>
+		<g transform="matrix(2.15 0 0 2.15 71.17 71.16)">
+<linearGradient id="slackb" x2="59.5" y1="29.7" y2="29.7" gradientTransform="translate(66.9 66.8)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#ecb220" offset="0"/>
+<stop stop-color="#ffd700" offset="1"/>
+</linearGradient>
+<path transform="translate(-96.65 -96.5)" d="m80.1 99.8c7.3 0 13.2 5.9 13.2 13.2s-5.9 13.2-13.2 13.2-13.2-5.9-13.2-13.2v-13.2h13.2zm0-6.6c-7.3 0-13.2-5.9-13.2-13.2s5.9-13.2 13.2-13.2h33.1c7.3 0 13.2 5.9 13.2 13.2s-5.9 13.2-13.2 13.2h-33.1z" fill="url(#slackb)" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+</svg>
