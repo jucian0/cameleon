@@ -4,15 +4,14 @@ import { Position, type NodeProps } from "@xyflow/react";
 import type { Node } from "../topology-types";
 import { BaseHandle } from "./custom-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
-import { Menu } from "components/ui/menu";
 import { Separator } from "components/ui/separator";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconDotsVertical, IconPencilBox, IconTrash } from "@intentui/icons";
-
+import { Menu } from "components/ui/menu";
 
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
-	const iconPath = `https://tst-ipaas-public-assets.s3.us-east-1.amazonaws.com/images/eips/${data.iconName}.svg`;
+	const iconPath = `http://localhost:5173/camel-icons/eips/${data.iconName}.svg`;
 
 	const { setNode } = useLayer();
 
@@ -26,13 +25,15 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 		}
 	}
 
+	console.log("rendering node", props);
+
 	return (
 		<div onClick={handleClick} onKeyDown={handleKeyDown} tabIndex={0} role="button" className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-16 h-10">
 			<div className="flex flex-row gap-1 relative justify-between w-full pl-4 items-center">
 				<div className="flex flex-row gap-2 justify-center items-stretch">
 					{data.iconName && (
 						<div className="flex items-center justify-center">
-							<img src={iconPath} className="w-6 h-auto" />
+							<img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
 						</div>
 					)}
 					{/* <span className="center">{data.stepType}</span> */}
