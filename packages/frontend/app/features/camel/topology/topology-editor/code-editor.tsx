@@ -1,7 +1,7 @@
 import React from "react";
 import MonacoEditor from "@monaco-editor/react";
-import { yamlToJson } from "@/features/utils/yaml-json";
 import { useTopologyStore } from "../topology-store";
+import { yamlToJson } from "../yaml-json";
 
 export function TopologyEditor() {
 	const { getCamelConfigYaml, setCamelConfig } = useTopologyStore();

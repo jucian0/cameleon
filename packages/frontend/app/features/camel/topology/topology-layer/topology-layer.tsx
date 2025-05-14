@@ -22,7 +22,7 @@ export function TopologyLayer() {
 						{node?.stepType}
 					</Sheet.Title>
 				</Sheet.Header>
-				<Sheet.Body className="space-y-4 max-w-full">
+				<Sheet.Body className="space-y-4 max-w-full w-[500px]">
 					{node?.type.includes('add-step') ? <TopologyLibrary /> : <Form />}
 				</Sheet.Body>
 			</Sheet.Content>
