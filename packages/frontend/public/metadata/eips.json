@@ -947,10 +947,10 @@
       }
     }
   },
-  "circuitBreaker": {
+  "circuit-breaker": {
     "model": {
       "kind": "model",
-      "name": "circuitBreaker",
+      "name": "circuit-breaker",
       "title": "Circuit Breaker",
       "description": "Route messages in a fault tolerance way using Circuit Breaker",
       "deprecated": false,
@@ -1206,10 +1206,10 @@
       }
     }
   },
-  "claimCheck": {
+  "claim-check": {
     "model": {
       "kind": "model",
-      "name": "claimCheck",
+      "name": "claim-check",
       "title": "Claim Check",
       "description": "The Claim Check EIP allows you to replace message content with a claim check (a unique key), which can be used to retrieve the message content at a later time.",
       "deprecated": false,
@@ -1338,10 +1338,10 @@
       }
     }
   },
-  "convertBodyTo": {
+  "convert-body-to": {
     "model": {
       "kind": "model",
-      "name": "convertBodyTo",
+      "name": "convert-body-to",
       "title": "Convert Body To",
       "description": "Converts the message body to another type",
       "deprecated": false,
@@ -1438,10 +1438,10 @@
       }
     }
   },
-  "convertHeaderTo": {
+  "convert-header-to": {
     "model": {
       "kind": "model",
-      "name": "convertHeaderTo",
+      "name": "convert-header-to",
       "title": "Convert Header To",
       "description": "Converts the message header to another type",
       "deprecated": false,
@@ -1564,10 +1564,10 @@
       }
     }
   },
-  "convertVariableTo": {
+  "convert-variable-to": {
     "model": {
       "kind": "model",
-      "name": "convertVariableTo",
+      "name": "convert-variable-to",
       "title": "Convert Variable To",
       "description": "Converts the variable to another type",
       "deprecated": false,
@@ -1833,10 +1833,10 @@
       }
     }
   },
-  "doCatch": {
+  "do-catch": {
     "model": {
       "kind": "model",
-      "name": "doCatch",
+      "name": "do-catch",
       "title": "Do Catch",
       "description": "Catches exceptions as part of a try, catch, finally block",
       "deprecated": false,
@@ -2046,7 +2046,7 @@
   "doFinally": {
     "model": {
       "kind": "model",
-      "name": "doFinally",
+      "name": "do-finally",
       "title": "Do Finally",
       "description": "Path traversed when a try, catch, finally block exits",
       "deprecated": false,
@@ -2229,7 +2229,7 @@
   "doTry": {
     "model": {
       "kind": "model",
-      "name": "doTry",
+      "name": "do-try",
       "title": "Do Try",
       "description": "Marks the beginning of a try, catch, finally block",
       "deprecated": false,
@@ -2371,10 +2371,10 @@
       }
     }
   },
-  "dynamicRouter": {
+  "dynamic-router": {
     "model": {
       "kind": "model",
-      "name": "dynamicRouter",
+      "name": "dynamic-router",
       "title": "Dynamic Router",
       "description": "Route messages based on dynamic rules",
       "deprecated": false,
@@ -2986,7 +2986,7 @@
   "idempotent-consumer": {
     "model": {
       "kind": "model",
-      "name": "idempotentConsumer",
+      "name": "idempotent-consumer",
       "title": "Idempotent Consumer",
       "description": "Filters out duplicate messages",
       "deprecated": false,
@@ -3256,168 +3256,10 @@
       }
     }
   },
-  "kamelet": {
-    "model": {
-      "kind": "model",
-      "name": "kamelet",
-      "title": "Kamelet",
-      "description": "To call Kamelets in special situations",
-      "deprecated": false,
-      "label": "eip,routing",
-      "javaType": "org.apache.camel.model.KameletDefinition",
-      "supportLevel": "Stable",
-      "abstract": false,
-      "input": true,
-      "output": true
-    },
-    "properties": {
-      "id": {
-        "index": 0,
-        "kind": "attribute",
-        "displayName": "Id",
-        "group": "common",
-        "required": false,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Sets the id of this node"
-      },
-      "description": {
-        "index": 1,
-        "kind": "attribute",
-        "displayName": "Description",
-        "group": "common",
-        "required": false,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Sets the description of this node"
-      },
-      "disabled": {
-        "index": 2,
-        "kind": "attribute",
-        "displayName": "Disabled",
-        "group": "advanced",
-        "label": "advanced",
-        "required": false,
-        "type": "boolean",
-        "javaType": "java.lang.Boolean",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "defaultValue": false,
-        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime."
-      },
-      "name": {
-        "index": 3,
-        "kind": "attribute",
-        "displayName": "Name",
-        "group": "common",
-        "required": true,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Name of the Kamelet (templateId/routeId) to call. Options for the kamelet can be specified using uri syntax, eg mynamecount=4&type=gold."
-      },
-      "outputs": {
-        "index": 4,
-        "kind": "element",
-        "displayName": "Outputs",
-        "group": "common",
-        "required": true,
-        "type": "array",
-        "javaType": "java.util.List",
-        "oneOf": [
-          "aggregate",
-          "bean",
-          "choice",
-          "circuitBreaker",
-          "claimCheck",
-          "convertBodyTo",
-          "convertHeaderTo",
-          "convertVariableTo",
-          "delay",
-          "doCatch",
-          "doFinally",
-          "doTry",
-          "dynamicRouter",
-          "enrich",
-          "filter",
-          "idempotentConsumer",
-          "intercept",
-          "interceptFrom",
-          "interceptSendToEndpoint",
-          "kamelet",
-          "loadBalance",
-          "log",
-          "loop",
-          "marshal",
-          "multicast",
-          "onCompletion",
-          "onException",
-          "onFallback",
-          "otherwise",
-          "pausable",
-          "pipeline",
-          "policy",
-          "poll",
-          "pollEnrich",
-          "process",
-          "recipientList",
-          "removeHeader",
-          "removeHeaders",
-          "removeProperties",
-          "removeProperty",
-          "removeVariable",
-          "resequence",
-          "resumable",
-          "rollback",
-          "routingSlip",
-          "saga",
-          "sample",
-          "script",
-          "serviceCall",
-          "setBody",
-          "setExchangePattern",
-          "setHeader",
-          "setHeaders",
-          "setProperty",
-          "setVariable",
-          "setVariables",
-          "sort",
-          "split",
-          "step",
-          "stop",
-          "threads",
-          "throttle",
-          "throwException",
-          "to",
-          "toD",
-          "tokenizer",
-          "transacted",
-          "transform",
-          "unmarshal",
-          "validate",
-          "when",
-          "whenSkipSendToEndpoint",
-          "wireTap"
-        ],
-        "deprecated": false,
-        "autowired": false,
-        "secret": false
-      }
-    }
-  },
   "load-balance": {
     "model": {
       "kind": "model",
-      "name": "loadBalance",
+      "name": "load-balance",
       "title": "Load Balance",
       "description": "Balances message processing among a number of nodes",
       "deprecated": false,
@@ -4697,109 +4539,10 @@
       }
     }
   },
-  "poll": {
-    "model": {
-      "kind": "model",
-      "name": "poll",
-      "title": "Poll",
-      "description": "Polls a message from a static endpoint",
-      "deprecated": false,
-      "label": "eip,routing",
-      "javaType": "org.apache.camel.model.PollDefinition",
-      "supportLevel": "Stable",
-      "abstract": false,
-      "input": true,
-      "output": false
-    },
-    "properties": {
-      "id": {
-        "index": 0,
-        "kind": "attribute",
-        "displayName": "Id",
-        "group": "common",
-        "required": false,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Sets the id of this node"
-      },
-      "description": {
-        "index": 1,
-        "kind": "attribute",
-        "displayName": "Description",
-        "group": "common",
-        "required": false,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Sets the description of this node"
-      },
-      "disabled": {
-        "index": 2,
-        "kind": "attribute",
-        "displayName": "Disabled",
-        "group": "advanced",
-        "label": "advanced",
-        "required": false,
-        "type": "boolean",
-        "javaType": "java.lang.Boolean",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "defaultValue": false,
-        "description": "Whether to disable this EIP from the route during build time. Once an EIP has been disabled then it cannot be enabled later at runtime."
-      },
-      "variableReceive": {
-        "index": 3,
-        "kind": "attribute",
-        "displayName": "Variable Receive",
-        "group": "common",
-        "required": false,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "To use a variable to store the received message body (only body, not headers). This is handy for easy access to the received message body via variables. Important: When using receive variable then the received body is stored only in this variable and not on the current Message ."
-      },
-      "uri": {
-        "index": 4,
-        "kind": "attribute",
-        "displayName": "Uri",
-        "group": "common",
-        "required": true,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Sets the uri of the endpoint to poll from."
-      },
-      "timeout": {
-        "index": 5,
-        "kind": "attribute",
-        "displayName": "Timeout",
-        "group": "advanced",
-        "label": "advanced",
-        "required": false,
-        "type": "duration",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "defaultValue": "20000",
-        "description": "Timeout in millis when polling from the external service. The timeout has influence about the poll enrich behavior. It basically operations in three different modes: negative value - Waits until a message is available and then returns it. Warning that this method could block indefinitely if no messages are available. 0 - Attempts to receive a message exchange immediately without waiting and returning null if a message exchange is not available yet. positive value - Attempts to receive a message exchange, waiting up to the given timeout to expire if a message is not yet available. Returns null if timed out The default value is 20000 (20 seconds)."
-      }
-    }
-  },
   "poll-enrich": {
     "model": {
       "kind": "model",
-      "name": "pollEnrich",
+      "name": "poll-enrich",
       "title": "Poll Enrich",
       "description": "Enriches messages with data polled from a secondary resource",
       "deprecated": false,
@@ -5107,10 +4850,10 @@
       }
     }
   },
-  "recipient-List": {
+  "recipient-list": {
     "model": {
       "kind": "model",
-      "name": "recipientList",
+      "name": "recipient-list",
       "title": "Recipient List",
       "description": "Route messages to a number of dynamically specified recipients",
       "deprecated": false,
@@ -5447,10 +5190,10 @@
       }
     }
   },
-  "remove-Header": {
+  "remove-header": {
     "model": {
       "kind": "model",
-      "name": "removeHeader",
+      "name": "remove-header",
       "title": "Remove Header",
       "description": "Removes a named header from the message",
       "deprecated": false,
@@ -5518,10 +5261,10 @@
       }
     }
   },
-  "remove-Headers": {
+  "remove-headers": {
     "model": {
       "kind": "model",
-      "name": "removeHeaders",
+      "name": "remove-headers",
       "title": "Remove Headers",
       "description": "Removes message headers whose name matches a specified pattern",
       "deprecated": false,
@@ -5606,7 +5349,7 @@
   "remove-properties": {
     "model": {
       "kind": "model",
-      "name": "removeProperties",
+      "name": "remove-properties",
       "title": "Remove Properties",
       "description": "Removes message exchange properties whose name matches a specified pattern",
       "deprecated": false,
@@ -5691,7 +5434,7 @@
   "remove-property": {
     "model": {
       "kind": "model",
-      "name": "removeProperty",
+      "name": "remove-property",
       "title": "Remove Property",
       "description": "Removes a named property from the message exchange",
       "deprecated": false,
@@ -5762,7 +5505,7 @@
   "remove-variable": {
     "model": {
       "kind": "model",
-      "name": "removeVariable",
+      "name": "remove-variable",
       "title": "Remove Variable",
       "description": "Removes a named variable",
       "deprecated": false,
@@ -6144,7 +5887,7 @@
   "routing-slip": {
     "model": {
       "kind": "model",
-      "name": "routingSlip",
+      "name": "routing-slip",
       "title": "Routing Slip",
       "description": "Routes a message through a series of steps that are pre-determined (the slip)",
       "deprecated": false,
@@ -6750,7 +6493,7 @@
   "set-body": {
     "model": {
       "kind": "model",
-      "name": "setBody",
+      "name": "set-body",
       "title": "Set Body",
       "description": "Sets the contents of the message body",
       "deprecated": false,
@@ -6849,7 +6592,7 @@
   "set-exchange-pattern": {
     "model": {
       "kind": "model",
-      "name": "setExchangePattern",
+      "name": "set-exchange-pattern",
       "title": "Set Exchange Pattern",
       "description": "Sets the exchange pattern on the message exchange",
       "deprecated": false,
@@ -6924,7 +6667,7 @@
   "set-header": {
     "model": {
       "kind": "model",
-      "name": "setHeader",
+      "name": "set-header",
       "title": "Set Header",
       "description": "Sets the value of a message header",
       "deprecated": false,
@@ -7036,7 +6779,7 @@
   "set-headers": {
     "model": {
       "kind": "model",
-      "name": "setHeaders",
+      "name": "set-headers",
       "title": "Set Headers",
       "description": "Allows setting multiple headers on the message at the same time.",
       "deprecated": false,
@@ -7110,7 +6853,7 @@
   "set-property": {
     "model": {
       "kind": "model",
-      "name": "setProperty",
+      "name": "set-property",
       "title": "Set Property",
       "description": "Sets a named property on the message exchange",
       "deprecated": false,
@@ -7222,7 +6965,7 @@
   "set-variable": {
     "model": {
       "kind": "model",
-      "name": "setVariable",
+      "name": "set-variable",
       "title": "Set Variable",
       "description": "Sets the value of a variable",
       "deprecated": false,
@@ -7334,7 +7077,7 @@
   "set-variables": {
     "model": {
       "kind": "model",
-      "name": "setVariables",
+      "name": "set-variables",
       "title": "Set Variables",
       "description": "Allows setting multiple variables at the same time.",
       "deprecated": false,
@@ -7402,78 +7145,6 @@
         "autowired": false,
         "secret": false,
         "description": "Contains the variables to be set"
-      }
-    }
-  },
-  "simple": {
-    "model": {
-      "kind": "model",
-      "name": "simple",
-      "title": "Simple",
-      "description": "Evaluates a Camel simple expression.",
-      "deprecated": false,
-      "firstVersion": "1.1.0",
-      "label": "language,core,java",
-      "javaType": "org.apache.camel.model.language.SimpleExpression",
-      "supportLevel": "Stable",
-      "abstract": false,
-      "input": false,
-      "output": false
-    },
-    "properties": {
-      "id": {
-        "index": 0,
-        "kind": "attribute",
-        "displayName": "Id",
-        "group": "common",
-        "required": false,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Sets the id of this node"
-      },
-      "expression": {
-        "index": 1,
-        "kind": "value",
-        "displayName": "Expression",
-        "group": "common",
-        "required": true,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "The expression value in your chosen language syntax"
-      },
-      "resultType": {
-        "index": 2,
-        "kind": "attribute",
-        "displayName": "Result Type",
-        "group": "common",
-        "required": false,
-        "type": "string",
-        "javaType": "java.lang.String",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "description": "Sets the class of the result type (type from output)"
-      },
-      "trim": {
-        "index": 3,
-        "kind": "attribute",
-        "displayName": "Trim",
-        "group": "advanced",
-        "label": "advanced",
-        "required": false,
-        "type": "boolean",
-        "javaType": "java.lang.Boolean",
-        "deprecated": false,
-        "autowired": false,
-        "secret": false,
-        "defaultValue": true,
-        "description": "Whether to trim the value to remove leading and trailing whitespaces and line breaks"
       }
     }
   },
@@ -8660,7 +8331,7 @@
   "throw-exception": {
     "model": {
       "kind": "model",
-      "name": "throwException",
+      "name": "throw-exception",
       "title": "Throw Exception",
       "description": "Throws an exception",
       "deprecated": false,
@@ -8887,7 +8558,7 @@
   "to-d": {
     "model": {
       "kind": "model",
-      "name": "toD",
+      "name": "to-d",
       "title": "To D",
       "description": "Sends the message to a dynamic endpoint",
       "deprecated": false,
@@ -9727,7 +9398,7 @@
   "wire-tap": {
     "model": {
       "kind": "model",
-      "name": "wireTap",
+      "name": "wire-tap",
       "title": "Wire Tap",
       "description": "Routes a copy of a message (or creates a new message) to a secondary destination while continue routing the original message.",
       "deprecated": false,
