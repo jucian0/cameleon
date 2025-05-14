@@ -1,0 +1,13 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 32 32"
+  class="icon"
+  width="32px"
+  height="32px"
+  fill="currentColor"
+>
+  <path d="M23 7h4v4h-4zM23 13h4v4h-4zM17 7h4v4h-4zM17 13h4v4h-4z"></path>
+  <circle cx="14.5" cy="24.5" r="1.5"></circle>
+  <path d="M21 30H8a2.002 2.002 0 0 1-2-2V4a2.002 2.002 0 0 1 2-2h13v2H8v24h13v-8h2v8a2.002 2.002 0 0 1-2 2Z"></path>
+  <path d="M0 0h32v32H0z" data-name="&lt;Transparent Rectangle&gt;" style="fill: none;"></path>
+</svg>

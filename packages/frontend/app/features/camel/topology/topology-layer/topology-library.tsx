@@ -34,9 +34,6 @@ export function TopologyLibrary() {
         return;
       };
 
-
-
-
       if (node.operation === "add-step") {
         const updatedRoute = addStepAfter(
           selectedRoute,
@@ -120,17 +117,18 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
           >
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
-                <img
+
+                {/* <img
                   src={item.iconUrl}
                   alt={item.name}
                   className="h-8 w-8"
-                />
+                /> */}
                 <div className="flex flex-col">
-                  {item.title}
+                  {item.component.title}
                 </div>
               </Card.Header>
               <Card.Content className="p-2">
-                {item.description}
+                {item.component.description}
               </Card.Content>
             </Card>
           </ListBoxItem>

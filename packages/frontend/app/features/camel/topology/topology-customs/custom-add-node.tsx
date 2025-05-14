@@ -6,9 +6,9 @@ import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 
 export const CustomAddNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
-	console.log("CustomAddNode", props);
 	const { setNode } = useLayer();
-	const handleClick = () => {
+
+	function handleClick() {
 		setNode(data);
 	};
 
