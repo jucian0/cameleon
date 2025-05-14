@@ -124,7 +124,7 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
                 <img
                   src={`/camel-icons/components/${item.component.name}.svg`}
                   alt={item.component.name}
-                  className="h-8 w-8"
+                  className="h-8 w-8 rounded"
                 />
                 <div className="flex flex-col">
                   {item.component.title}
