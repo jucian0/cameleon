@@ -8,9 +8,9 @@ import { TopologyRouteSelector } from "../topology-router-selector/topology-rout
 import type { Edge, Node } from "../topology-types";
 import { useTopologyStore } from "../topology-store";
 
-const getLayoutedNodes = (nodes: Node[], edges: Edge[]) => {
+const getLayoutedNodes = (nodes: Node[], edges: Edge[], direction: string) => {
 	const g = new dagre.graphlib.Graph();
-	g.setGraph({ rankdir: "TB" });
+	g.setGraph({ rankdir: direction });
 	g.setDefaultEdgeLabel(() => ({}));
 
 	nodes.forEach((node) => g.setNode(node.id, { width: 150, height: 50 }));
@@ -24,9 +24,9 @@ const getLayoutedNodes = (nodes: Node[], edges: Edge[]) => {
 	});
 };
 
-const getLayoutedEdges = (nodes: Node[], edges: Edge[]) => {
+const getLayoutedEdges = (nodes: Node[], edges: Edge[], direction: string) => {
 	const g = new dagre.graphlib.Graph();
-	g.setGraph({ rankdir: "TB" });
+	g.setGraph({ rankdir: direction });
 	g.setDefaultEdgeLabel(() => ({}));
 
 	nodes.forEach((node) => g.setNode(node.id, { width: 150, height: 50 }));
@@ -44,17 +44,19 @@ const getLayoutedEdges = (nodes: Node[], edges: Edge[]) => {
 function Flow() {
 	const { canvas } = useTopologyStore();
 	const { nodes, edges, onNodesChange, onEdgesChange } = canvas;
+	const { direction } = canvas
 
 	return (
 		<div className="w-full h-[calc(100vh-52px)] relative">
 			<ReactFlow
 				fitView
-				nodes={getLayoutedNodes(nodes, edges)}
-				edges={getLayoutedEdges(nodes, edges)}
+				nodes={getLayoutedNodes(nodes, edges, direction)}
+				edges={getLayoutedEdges(nodes, edges, direction)}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
+				attributionPosition="bottom-left"
 			>
 				<Background />
 				<TopologyZoom position="top-left" />

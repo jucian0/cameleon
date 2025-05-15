@@ -8,6 +8,7 @@ import { Separator } from "components/ui/separator";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconDotsVertical, IconPencilBox, IconTrash } from "@intentui/icons";
 import { Menu } from "components/ui/menu";
+import { useTopologyStore } from "../topology-store";
 
 const eipListNames = [
 	'aggregate',
@@ -82,6 +83,10 @@ const eipListNames = [
 
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
+	const { canvas } = useTopologyStore()
+	const { direction } = canvas
+	const targetPosition = direction === "LR" ? Position.Left : Position.Top;
+	const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
 
 	const iconPath = React.useMemo(() => {
 		if (eipListNames.includes(data.iconName)) {
@@ -120,8 +125,8 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 					<NodeMenu node={data} />
 				</div>
 			</div>
-			{data.absolutePath !== 'route.from' && <BaseHandle type="target" position={Position.Top} />}
-			<BaseHandle type="source" position={Position.Bottom} isConnectable={false} />
+			{data.absolutePath !== 'route.from' && <BaseHandle type="target" position={targetPosition} />}
+			<BaseHandle type="source" position={sourcePosition} isConnectable={false} />
 		</div>
 	);
 });

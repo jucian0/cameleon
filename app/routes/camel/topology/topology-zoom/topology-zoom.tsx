@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { Maximize, Minus, Plus } from "lucide-react";
+import { Maximize, Minus, Plus, ArrowDown } from "lucide-react";
 
 import {
   Panel,
@@ -10,6 +10,7 @@ import {
 } from "@xyflow/react";
 import { Button } from "components/ui/button";
 import { Slider } from "components/ui/slider";
+import { useTopologyStore } from "../topology-store";
 
 
 export const TopologyZoom = forwardRef<
@@ -26,6 +27,9 @@ export const TopologyZoom = forwardRef<
     }),
     (a, b) => a.minZoom !== b.minZoom || a.maxZoom !== b.maxZoom,
   );
+
+  const { canvas } = useTopologyStore();
+  const { direction, setDirection } = canvas;
 
   return (
     <Panel
@@ -72,6 +76,14 @@ export const TopologyZoom = forwardRef<
         onPress={() => fitView({ duration: 300 })}
       >
         <Maximize className="h-4 w-4" />
+      </Button>
+
+      <Button
+        intent="secondary"
+        size="extra-small"
+        onPress={() => setDirection(direction === "LR" ? "TB" : "LR")}
+      >
+        <ArrowDown className={`h-4 w-4 ${direction === "LR" ? "rotate-90" : ""}`} />
       </Button>
     </Panel>
   );

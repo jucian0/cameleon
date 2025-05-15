@@ -4,8 +4,13 @@ import type { Node } from "../topology-types";
 import { BaseHandle } from "./custom-handle";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
+import { useTopologyStore } from "../topology-store";
 
 export const CustomAddNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
+	const { canvas } = useTopologyStore()
+	const { direction } = canvas
+	const targetPosition = direction === "LR" ? Position.Left : Position.Top;
+
 	const { setNode } = useLayer();
 
 	function handleClick() {
@@ -26,7 +31,7 @@ export const CustomAddNode = React.memo(({ data, ...props }: NodeProps<Node>) =>
 						<IconPlus className="text-primary" />
 					</div>
 				)}
-				<BaseHandle type="target" position={Position.Top} />
+				<BaseHandle type="target" position={targetPosition} />
 			</div>
 		</div>
 	);
