@@ -72,6 +72,7 @@ function createEdge(id: string, source: string, target: string): Edge {
 		id,
 		source,
 		target,
+		//	animated: true,
 	};
 }
 
