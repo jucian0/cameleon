@@ -8,7 +8,7 @@ import { useTopologyStore } from "../topology-store";
 
 export function Form() {
 	const { node } = useLayer();
-	const { getCurrentCamelRoute, setCurrentCamelRoute, currentCamelRouteId } = useTopologyStore();
+	const { getCurrentCamelRoute, setCurrentCamelRoute } = useTopologyStore();
 	const selectedRoute = getCurrentCamelRoute();
 
 	const formData = React.useMemo(() => {

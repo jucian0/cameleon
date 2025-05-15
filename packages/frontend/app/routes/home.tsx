@@ -2,7 +2,6 @@ import type { Route } from "./+types/home";
 import { SidebarInset, SidebarProvider } from "components/ui/sidebar";
 import AppSidebar from "components/app-sidebar";
 import AppSidebarNav from "components/app-sidebar-nav";
-import { Heading } from "react-aria-components";
 import { CamelStudio } from "@/features/camel/studio";
 
 export function meta({ }: Route.MetaArgs) {

@@ -93,11 +93,9 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
     }
   });
 
-  console.log(components, '<<<<<')
-
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
-      .map(key => components.items.find(item => item.name === key))
+      .map(key => components.items.find(item => item.component.name === key))
       .filter(Boolean);
     if (!selectedItem) return;
     onSelectionChange(selectedKeys);
@@ -114,9 +112,9 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
       >
         {components.items.map((item) => (
           <ListBoxItem
-            textValue={item.name}
-            key={item.name}
-            id={item.name}
+            textValue={item.component.name}
+            key={item.component.name}
+            id={item.component.name}
           >
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
@@ -141,7 +139,7 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
   )
 }
 
-function CamelEIPsTab({ onSelectionChange }: { onSelectionChange: (node: any) => void }) {
+function CamelEIPsTab({ onSelectionChange }: Readonly<{ onSelectionChange: (node: any) => void }>) {
   const eips = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchEIPsMetadata());
@@ -154,7 +152,7 @@ function CamelEIPsTab({ onSelectionChange }: { onSelectionChange: (node: any) =>
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
-      .map(key => eips.items.find(item => item.name === key))
+      .map(key => eips.items.find(item => item.model.name === key))
       .filter(Boolean);
     if (!selectedItem) return;
     onSelectionChange(selectedKeys);
