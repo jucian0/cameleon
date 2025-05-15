@@ -1,5 +1,5 @@
 import { parseDocument, Document, isMap, isSeq } from "yaml";
-import type { CamelConfig } from "../camel/topology/topology-types";
+import type { CamelConfig } from "./topology-types";
 
 
 export function yamlToJson(yamlString: string): CamelConfig {

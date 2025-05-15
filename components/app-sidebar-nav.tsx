@@ -12,8 +12,7 @@ import {
   IconLogout,
   IconSettings,
 } from "@intentui/icons"
-import { ThemeMenu } from "@/features/theme/menu"
-import { LanguageMenu } from "@/features/locale/menu"
+import { ThemeMenu } from "@/routes/set-theme/menu"
 
 export default function AppSidebarNav() {
   return (
@@ -58,7 +57,6 @@ function UserMenu() {
           <Menu.Label>Command Menu</Menu.Label>
         </Menu.Item>
         <ThemeMenu />
-        <LanguageMenu />
         <Menu.Separator />
         <Menu.Item href="#contact-s">
           <Menu.Label>Contact Support</Menu.Label>

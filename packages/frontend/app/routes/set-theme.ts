@@ -1,1 +1,0 @@
-export { action } from "@/features/theme/server"

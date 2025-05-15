@@ -4,7 +4,7 @@ import { addNewRoute, addStepAfter, addStepBetween } from '../topology-operation
 import { useLayer } from "./topology-layer";
 import { getDefaultConfig } from "../topology-templates";
 import { Tabs } from "components/ui/tabs";
-import { tryCatch } from "@/features/utils/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { SearchField } from "components/ui/search-field";
 import { useTopologyStore } from "../topology-store";
 import { fetchComponentsMetadata, fetchEIPsMetadata } from "../../data-requests/fetch-metadata";
