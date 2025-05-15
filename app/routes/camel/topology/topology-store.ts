@@ -18,11 +18,11 @@
  */
 import { create } from "zustand";
 import { applyEdgeChanges, applyNodeChanges, type EdgeChange, type NodeChange } from "@xyflow/react";
-import type { Node, Edge, CamelConfig, Route } from "@/features/camel/topology/topology-types";
 import { jsonToTopologyBuilder } from "./topology-parser";
-import { tryCatch } from "@/features/utils/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { fetchCamelConfig } from "../data-requests/fetch-camel-config";
 import { jsonToYaml } from "./yaml-json";
+import type { CamelConfig, Edge, Route, Node } from "./topology-types";
 
 type TopologyStore = {
 	camelConfig: CamelConfig;

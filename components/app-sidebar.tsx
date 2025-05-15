@@ -25,8 +25,6 @@ import {
   IconShield,
 } from "@intentui/icons"
 import { twMerge } from "tailwind-merge"
-import { ThemeMenu } from "@/features/theme/menu"
-import { LanguageMenu } from "@/features/locale/menu"
 import { CamelionIcon } from "./icons/camelion"
 import { StudioIcon } from "./icons/studio"
 import { ComponentIcon } from "./icons/component"
@@ -35,9 +33,12 @@ import { ProcessorIcon } from "./icons/processor"
 import { PresetIcon } from "./icons/preset"
 import { ContractsIcon } from "./icons/contracts"
 import { SwaggerIcon } from "./icons/swagger"
+import { ThemeMenu } from "@/routes/set-theme/menu"
+import { useLocation } from "react-router"
 
-export default function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+export default function AppSidebar(props: Readonly<React.ComponentProps<typeof Sidebar>>) {
   const { state } = useSidebar()
+  const { pathname } = useLocation()
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -59,19 +60,19 @@ export default function AppSidebar(props: React.ComponentProps<typeof Sidebar>) 
                 <SidebarLabel>Apache Camel</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
-                <SidebarItem href="#" tooltip="Studio">
+                <SidebarItem href="camel/studio" tooltip="Studio" isCurrent={pathname.includes('studio')}>
                   <StudioIcon className="size-4" />
                   <SidebarLabel>Studio</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="#" tooltip="Processors">
+                <SidebarItem href="camel/processors" tooltip="Processors" isCurrent={pathname.includes('processors')}>
                   <ProcessorIcon className="size-4" />
                   <SidebarLabel>Processors</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="#components" tooltip="Components">
+                <SidebarItem href="camel/components" tooltip="Components" isCurrent={pathname.includes('components')}>
                   <ComponentIcon className="size-4" />
                   <SidebarLabel>Components</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="#presets" tooltip="Presets">
+                <SidebarItem href="#presets" tooltip="Presets" isCurrent={pathname.includes('presets')}>
                   <PresetIcon className="size-4" />
                   <SidebarLabel>Presets</SidebarLabel>
                 </SidebarItem>
@@ -137,7 +138,6 @@ export default function AppSidebar(props: React.ComponentProps<typeof Sidebar>) 
             </Menu.Item>
             <Menu.Separator />
             <ThemeMenu />
-            <LanguageMenu />
             <Menu.Item href="#logout">
               <IconLogout />
               Log out

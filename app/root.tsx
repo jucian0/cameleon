@@ -1,21 +1,15 @@
 import stylesheet from "@/app.css?url"
-import { themeSessionResolver } from "./features/theme/server"
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData, useNavigate, type LinksFunction, type LoaderFunctionArgs } from "react-router"
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "./features/theme/provider"
 import { RouterProvider } from "react-aria-components"
-import { getLocale, i18nextMiddleware } from "./features/locale/server"
-import { useChangeLanguage } from "remix-i18next/react"
-import { useTranslation } from "react-i18next"
+import { themeSessionResolver } from "./routes/set-theme/server"
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "./routes/set-theme/provider"
 
-export const unstable_middleware = [i18nextMiddleware];
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request)
-  let locale = getLocale(context);
 
   return {
     theme: getTheme(),
-    locale,
   }
 }
 
@@ -36,11 +30,9 @@ export default function AppWithProviders() {
 function App() {
   const loaderData = useLoaderData<typeof loader>()
   const [theme] = useTheme()
-  const { i18n } = useTranslation()
-  useChangeLanguage(loaderData.locale);
 
   return (
-    <html lang={loaderData.locale} dir={i18n.dir(i18n.language)} data-theme={theme ?? ""} className={theme ?? ""}>
+    <html lang='en' data-theme={theme ?? ""} className={theme ?? ""}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />

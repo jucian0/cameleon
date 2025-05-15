@@ -1,12 +1,9 @@
-import { TopologyEditor } from "./topology/topology-editor/code-editor";
 import React from "react";
 import { useTopologyStore } from "./topology/topology-store";
-import { Button } from "components/ui/button";
-import { Tabs } from "components/ui/tabs";
 import { TopologyBuilder } from "./topology/topology-builder/topology-builder";
 
 
-export function CamelStudio() {
+export default function CamelStudio() {
 	const { fetchCamelConfig } = useTopologyStore()
 	React.useEffect(() => {
 		fetchCamelConfig()

@@ -1,1 +1,0 @@
-export { action } from "@/features/locale/server"
