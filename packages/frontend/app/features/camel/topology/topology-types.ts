@@ -14,12 +14,14 @@ export type Edge = RFLow.Edge;
 export type NodeType = 'add-step' | 'camel-step'
 
 export type EPIDefinition = {
-	name: string;
-	title: string;
-	description: string;
-	iconUrl: string;
 	properties: Readonly<Record<string, PropertyDefinition>>;
+	model: Record<string, any>;
 };
+
+export type ComponentDefinition = {
+	properties: Readonly<Record<string, PropertyDefinition>>;
+	component: Record<string, any>
+}
 
 export type PropertyDefinition = {
 	title: string;
