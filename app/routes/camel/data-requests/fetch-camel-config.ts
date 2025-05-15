@@ -8,7 +8,7 @@ import { yamlToJson } from "../topology/yaml-json";
 * @returns {Promise<CamelConfig>} The Camel configuration.
 */
 export async function fetchCamelConfig(): Promise<CamelConfig> {
-  return axios.get("metadata/camel-config.json")
+  return axios.get("/metadata/camel-config.json")
     .then((response) => {
       const decodedData = decode(response.data.camelConfig);
       return yamlToJson(decodedData.toString());
