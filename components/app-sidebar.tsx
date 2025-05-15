@@ -13,6 +13,7 @@ import {
   SidebarItem,
   SidebarLabel,
   SidebarRail,
+  SidebarSection,
   SidebarSectionGroup,
   useSidebar,
 } from "./ui/sidebar"
@@ -78,20 +79,26 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
                 </SidebarItem>
               </SidebarDisclosurePanel>
             </SidebarDisclosure>
-            <SidebarDisclosure id={2}>
+            {/* <SidebarDisclosure id={2}>
               <SidebarDisclosureTrigger>
                 <SwaggerIcon className="size-5" />
                 <SidebarLabel>Open API</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
-                <SidebarItem href="#" tooltip="Contracts">
+                <SidebarItem href="#" tooltip="Contracts" badge="Coming soon" isCurrent={pathname.includes('contracts')}>
                   <ContractsIcon className="size-4" />
                   <SidebarLabel>Contracts</SidebarLabel>
                 </SidebarItem>
               </SidebarDisclosurePanel>
-            </SidebarDisclosure>
+            </SidebarDisclosure> */}
           </SidebarDisclosureGroup>
         </SidebarSectionGroup>
+        <SidebarSection>
+          <SidebarItem href="#" tooltip="Contracts" badge="Coming soon" isCurrent={pathname.includes('contracts')} isDisabled>
+            <SwaggerIcon className="size-4" />
+            <SidebarLabel>Open API</SidebarLabel>
+          </SidebarItem>
+        </SidebarSection>
       </SidebarContent>
 
       <SidebarFooter>
