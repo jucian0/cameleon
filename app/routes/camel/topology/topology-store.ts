@@ -111,7 +111,7 @@ export const useTopologyStore = create<TopologyStore>(
 		canvas: {
 			nodes: [],
 			edges: [],
-			direction: "LR",
+			direction: "TB",
 			onNodesChange: (nodes) => {
 				const newNodes = applyNodeChanges(nodes, get().canvas.nodes);
 				set({ canvas: { ...get().canvas, nodes: newNodes } });

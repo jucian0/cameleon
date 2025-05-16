@@ -6,7 +6,7 @@ import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 
 const SHOULD_HIDE_IF_BEFORE = ["camel-step", "choice", "multicast", "doTry"];
-const SHOULD_HIDE_IF_TARGET = ["camel-step", "choice", "multicast", "merge", "add-step"];
+const SHOULD_HIDE_IF_TARGET = ["camel-step", "choice", "multicast", "merge"];
 
 function CustomEdge({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, target, source }: EdgeProps) {
 	const targetNode = useTopologyStore((state) => state.canvas.nodes.find((node) => node.id === target));
