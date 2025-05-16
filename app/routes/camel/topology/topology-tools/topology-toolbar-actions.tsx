@@ -1,16 +1,12 @@
-import { forwardRef } from "react";
-import { Panel, type PanelProps } from "@xyflow/react";
 import { useTopologyStore } from "../topology-store";
 import type { Key } from "react-stately";
 import { Select } from "components/ui/select";
 import { Button, buttonStyles } from "components/ui/button";
 import { IconCheck } from "@intentui/icons";
+import { TopologyEditor } from "../topology-editor/code-editor";
 
 
-export const TopologyRouteSelector = forwardRef<
-  HTMLDivElement,
-  Omit<PanelProps, "children">
->(({ className, ...props }, ref) => {
+export const TopologyToolbarActions = () => {
   const { camelConfig, currentCamelRouteId, setCurrentCamelRouteId } = useTopologyStore();
 
 
@@ -29,13 +25,9 @@ export const TopologyRouteSelector = forwardRef<
   }
 
   return (
-    <Panel
-      ref={ref}
-      className={`flex gap-2 bg-primary-foreground text-foreground ${className}`}
-      {...props}
-    >
+    <div className={`flex items-center gap-1`}>
       <Button size="extra-small"><IconCheck />Save</Button>
-      <Select onSelectionChange={handleRouteChange} placeholder="Select a route" selectedKey={currentCamelRouteId}>
+      <Select aria-label="Select a route" onSelectionChange={handleRouteChange} placeholder="Select a route" selectedKey={currentCamelRouteId}>
         <Select.Trigger className={buttonStyles({
           className: "w-[140px] bg-primary-foreground",
           intent: "secondary",
@@ -53,6 +45,7 @@ export const TopologyRouteSelector = forwardRef<
           }
         </Select.List>
       </Select>
-    </Panel>
+      <TopologyEditor />
+    </div>
   );
-});
+};

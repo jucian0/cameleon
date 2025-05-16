@@ -2,10 +2,14 @@ import React from "react";
 import MonacoEditor from "@monaco-editor/react";
 import { useTopologyStore } from "../topology-store";
 import { yamlToJson } from "../yaml-json";
+import { Sheet } from "components/ui/sheet";
+import { Button } from "components/ui/button";
+import { Code2Icon } from "lucide-react";
+import { useTheme } from "remix-themes";
 
 export function TopologyEditor() {
 	const { getCamelConfigYaml, setCamelConfig } = useTopologyStore();
-	const [code, setCode] = React.useState(getCamelConfigYaml());
+	const theme = useTheme();
 
 	const editorDidMount = (editor: any, monaco: any) => {
 		editor.focus();
@@ -13,7 +17,6 @@ export function TopologyEditor() {
 
 	const onChange = (newValue: string | undefined, e: any) => {
 		if (newValue !== undefined) {
-			setCode(newValue);
 			setCamelConfig(yamlToJson(newValue));
 		}
 	};
@@ -23,16 +26,26 @@ export function TopologyEditor() {
 	};
 
 	return (
-		<div className="w-full h-full relative border rounded-lg p-3">
-			<MonacoEditor
-				className="w-full h-full bg-scroll"
-				language="yaml"
-				theme="vs-light"
-				value={code}
-				options={options}
-				onChange={onChange}
-				onMount={editorDidMount}
-			/>
-		</div>
+		<Sheet>
+			<Button size="extra-small" intent="secondary" >
+				<Code2Icon className="w-4 h-4" />
+			</Button>
+			<Sheet.Content classNames={{ content: "w-[800px]" }}  >
+				<Sheet.Body>
+					<div className="w-full h-full relative rounded-lg pr-4 py-3">
+						<MonacoEditor
+							className="w-full h-full bg-scroll"
+							language="yaml"
+							theme={theme[0] === "dark" ? "vs-dark" : "vs-light"}
+							value={getCamelConfigYaml()}
+							options={options}
+							onChange={onChange}
+							onMount={editorDidMount}
+						/>
+					</div>
+				</Sheet.Body>
+
+			</Sheet.Content>
+		</Sheet>
 	);
 }

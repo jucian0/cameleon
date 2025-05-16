@@ -47,7 +47,7 @@ function CustomEdge({ sourceX, sourceY, targetX, targetY, sourcePosition, target
 				transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
 			}}
 		>
-			<Button onPress={handleClick} className={"h-4 w-4 p-0 rounded"}><IconPlus /></Button>
+			<Button aria-label="Add step" onPress={handleClick} className={"h-4 w-4 p-0 rounded"}><IconPlus /></Button>
 		</div>}
 	</EdgeLabelRenderer>
 	</>)
