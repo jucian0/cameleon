@@ -51,7 +51,7 @@ export const CustomHandle = ({
 			<div className={`absolute flex items-center ${wrapperClassName} pointer-events-none`}>
 				<div className={`bg-gray-300 ${vertical ? "w-[1px] h-0" : "h-[1px] w-0"}`} />
 				<div className="nodrag nopan pointer-events-auto">
-					<Button size="extra-small" intent="outline" className="h-8 rounded-full flex items-center justify-center">
+					<Button aria-label="Add child node" size="extra-small" intent="outline" className="h-8 rounded-full flex items-center justify-center">
 						<PlusIcon size={14} /> {children}
 					</Button>
 				</div>

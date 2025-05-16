@@ -25,7 +25,7 @@ export const CustomAddNode = React.memo(({ data, ...props }: NodeProps<Node>) =>
 
 	return (
 		<div className="w-16 flex items-center justify-center">
-			<div onClick={handleClick} onKeyDown={handleKeyDown} role="button" tabIndex={0} className="relative cursor-pointer flex justify-center border-dashed border-primary border rounded bg-transparent transition-all duration-200 ease-in-out w-6 h-6 p-1 px-2 gap-2">
+			<div aria-label="Add node" onClick={handleClick} onKeyDown={handleKeyDown} role="button" tabIndex={0} className="relative cursor-pointer flex justify-center border-dashed border-primary border rounded bg-transparent transition-all duration-200 ease-in-out w-6 h-6 p-1 px-2 gap-2">
 				{data.iconName && (
 					<div className="flex items-center justify-center">
 						<IconPlus className="text-primary" />

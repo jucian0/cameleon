@@ -141,7 +141,7 @@ function NodeMenu({ node }: any) {
 	return (
 		<>
 			<Menu isOpen={isOpen} onOpenChange={setIsOpen}>
-				<Menu.Trigger onPress={handleMenuOpen}>
+				<Menu.Trigger onPress={handleMenuOpen} aria-label="Node menu">
 					<IconDotsVertical />
 				</Menu.Trigger>
 				<Menu.Content placement="bottom">
