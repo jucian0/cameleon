@@ -18,6 +18,7 @@
  */
 import { v4 as uuidV4 } from "uuid";
 import type { Edge, Node, NodeType, Route, Step, StepType } from "./topology-types";
+import { Position } from "@xyflow/react";
 
 // ==================== Types ====================
 type ProcessStepsResult = {
@@ -64,6 +65,8 @@ function createNode(id: string, type: NodeType, stepType: StepType, absolutePath
 		},
 		position: { x: 0, y: 0 },
 		type: resolveNodeType(type),
+		sourcePosition: Position.Right,
+		targetPosition: Position.Left,
 	};
 }
 

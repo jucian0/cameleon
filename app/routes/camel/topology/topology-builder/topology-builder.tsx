@@ -3,7 +3,7 @@ import "@xyflow/react/dist/style.css";
 import { TopologyLayer } from "../topology-layer/topology-layer";
 import dagre, { } from "dagre";
 import { edgeTypes, nodeTypes } from "../topology-customs";
-import { TopologyZoom } from "../topology-zoom/topology-zoom";
+import { TopologyTools } from "../topology-tools/topology-tools";
 import { TopologyRouteSelector } from "../topology-router-selector/topology-router-selector";
 import type { Edge, Node } from "../topology-types";
 import { useTopologyStore } from "../topology-store";
@@ -50,16 +50,16 @@ function Flow() {
 		<div className="w-full h-[calc(100vh-52px)] relative">
 			<ReactFlow
 				fitView
+				key={canvas.direction} // forces remount on direction change
 				nodes={getLayoutedNodes(nodes, edges, direction)}
 				edges={getLayoutedEdges(nodes, edges, direction)}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
-				attributionPosition="bottom-left"
 			>
 				<Background />
-				<TopologyZoom position="top-left" />
+				<TopologyTools position="top-left" />
 				<TopologyRouteSelector position="top-right" />
 			</ReactFlow>
 		</div>

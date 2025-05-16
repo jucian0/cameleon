@@ -3,7 +3,7 @@ import { Panel, type PanelProps } from "@xyflow/react";
 import { useTopologyStore } from "../topology-store";
 import type { Key } from "react-stately";
 import { Select } from "components/ui/select";
-import { Button } from "components/ui/button";
+import { Button, buttonStyles } from "components/ui/button";
 import { IconCheck } from "@intentui/icons";
 
 
@@ -34,9 +34,13 @@ export const TopologyRouteSelector = forwardRef<
       className={`flex gap-2 bg-primary-foreground text-foreground ${className}`}
       {...props}
     >
-      <Button><IconCheck />Save</Button>
+      <Button size="extra-small"><IconCheck />Save</Button>
       <Select onSelectionChange={handleRouteChange} placeholder="Select a route" selectedKey={currentCamelRouteId}>
-        <Select.Trigger className="w-[140px] bg-primary-foreground" />
+        <Select.Trigger className={buttonStyles({
+          className: "w-[140px] bg-primary-foreground",
+          intent: "secondary",
+          size: "extra-small",
+        })} />
         <Select.List items={camelRoutes}>
           {
             (item) => (
