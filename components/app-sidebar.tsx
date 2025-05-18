@@ -45,7 +45,7 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
       <SidebarHeader>
         <Link
           className="flex items-center gap-x-2 group-data-[collapsible=dock]:size-10 group-data-[collapsible=dock]:justify-center"
-          href="/docs/2.x/components/layouts/sidebar"
+          href="/"
         >
           <CamelionIcon className="size-6 fill-primary" />
           <SidebarLabel className="font-medium">Camelion</SidebarLabel>
