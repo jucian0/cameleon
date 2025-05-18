@@ -1,0 +1,31 @@
+- route:
+    id: route-1a43
+    nodePrefixId: route-540
+    from:
+      id: from-ce46
+      uri: activemq
+      steps:
+        - log:
+            id: log-4251
+            message: { body }
+        - loadBalance:
+            id: loadBalance-a52f
+            steps:
+              - log:
+                  id: log-c4d7
+                  message: { body }
+              - log:
+                  id: log-c4d7
+                  message: { body }
+              - loadBalance:
+                  id: loadBalance-a52f
+                  steps:
+                    - log:
+                        id: log-c4d7
+                        message: { body }
+                    - log:
+                        id: log-c4d7
+                        message: { body }
+        - log:
+            id: log-bcf2
+            message: { body }
