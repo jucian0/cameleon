@@ -1,0 +1,22 @@
+- route:
+    id: route-8b14
+    nodePrefixId: route-b46
+    from:
+      id: from-82d2
+      uri: activemq
+      steps:
+        - multicast:
+            id: multicast-df0e
+            steps:
+              - log:
+                  id: log-8225
+                  message: ${body}
+              - log:
+                  id: log-65eb
+                  message: ${body}
+              - log:
+                  id: log-9afa
+                  message: ${body}
+        - log:
+            id: log-2e6c
+            message: ${body}

@@ -1,0 +1,28 @@
+- route:
+    id: route-16c1
+    nodePrefixId: route-764
+    from:
+      id: from-6034
+      uri: activemq
+      steps:
+        - doTry:
+            id: doTry-fbc2
+            doCatch:
+              - id: doCatch-fe2b
+                steps:
+                  - log:
+                      id: log-7835
+                      message: ${body}
+            doFinally:
+              id: doFinally-9d41
+              steps:
+                - log:
+                    id: log-fcb9
+                    message: ${body}
+            steps:
+              - log:
+                  id: log-7338
+                  message: ${body}
+        - log:
+            id: log-4e94
+            message: ${body}

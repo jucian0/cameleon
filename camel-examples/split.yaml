@@ -1,0 +1,23 @@
+- route:
+    id: route-8b14
+    nodePrefixId: route-b46
+    from:
+      id: from-82d2
+      uri: activemq
+      steps:
+        - split:
+            id: split-c00f
+            expression:
+              groovy:
+                id: groovy-6c3c
+                expression: body
+            steps:
+              - log:
+                  id: log-957c
+                  message: ${body}
+              - log:
+                  id: log-988e
+                  message: ${body}
+        - log:
+            id: log-f952
+            message: ${body}

@@ -9,6 +9,7 @@ import { useTheme } from "remix-themes";
 
 export function TopologyEditor() {
 	const { getCamelConfigYaml, setCamelConfig } = useTopologyStore();
+	const [code, setCode] = React.useState<string | undefined>(getCamelConfigYaml());
 	const theme = useTheme();
 
 	const editorDidMount = (editor: any, monaco: any) => {
@@ -37,7 +38,8 @@ export function TopologyEditor() {
 							className="w-full h-full bg-scroll"
 							language="yaml"
 							theme={theme[0] === "dark" ? "vs-dark" : "vs-light"}
-							value={getCamelConfigYaml()}
+							//	value={code}
+							defaultValue={getCamelConfigYaml()}
 							options={options}
 							onChange={onChange}
 							onMount={editorDidMount}

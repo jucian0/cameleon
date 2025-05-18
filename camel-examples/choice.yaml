@@ -1,0 +1,35 @@
+- route:
+    id: route-b1af
+    nodePrefixId: route-6ea
+    from:
+      id: from-cb27
+      uri: activemq
+      steps:
+        - choice:
+            id: choice-9857
+            when:
+              - id: when-9baf
+                expression:
+                  groovy:
+                    id: groovy-f8f9
+                steps:
+                  - log:
+                      id: log-125e
+                      message: ${body}
+              - id: when-2906
+                expression:
+                  groovy:
+                    id: groovy-7609
+                steps:
+                  - log:
+                      id: log-4c61
+                      message: ${body}
+            otherwise:
+              id: otherwise-3d2c
+              steps:
+                - log:
+                    id: log-d54c
+                    message: ${body}
+        - log:
+            id: log-3d41
+            message: ${body}
