@@ -16,16 +16,12 @@ export default function AuthPage() {
   const [supabase] = useState(createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY));
 
   async function handleGithubSignIn() {
-    console.log("Signing in with GitHub...", supabase);
     await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
         redirectTo: "http://localhost:3000/auth/callback",
       },
-    }).catch((error) => {
-      console.error("Error signing in with GitHub:", error);
-      alert("Failed to sign in with GitHub. Please try again.");
-    });
+    })
   }
 
   return (

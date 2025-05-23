@@ -32,14 +32,28 @@ import { ComponentIcon } from "./icons/component"
 import { CamelStudioIcon } from "./icons/camel-studio"
 import { ProcessorIcon } from "./icons/processor"
 import { PresetIcon } from "./icons/preset"
-import { ContractsIcon } from "./icons/contracts"
 import { SwaggerIcon } from "./icons/swagger"
 import { ThemeMenu } from "@/routes/set-theme/menu"
-import { useLocation } from "react-router"
+import { useLocation, useRouteLoaderData } from "react-router"
+import { useState } from "react"
+import { createClient } from "@/modules/supabase/supabase-client"
 
 export default function AppSidebar(props: Readonly<React.ComponentProps<typeof Sidebar>>) {
   const { state } = useSidebar()
   const { pathname } = useLocation()
+
+  const { env } = useRouteLoaderData("root") as {
+    env: {
+      SUPABASE_URL: string;
+      SUPABASE_ANON_KEY: string;
+    }
+  }
+
+  const [supabase] = useState(createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY));
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+  }
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -145,7 +159,7 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
             </Menu.Item>
             <Menu.Separator />
             <ThemeMenu />
-            <Menu.Item href="#logout">
+            <Menu.Item onAction={handleLogout}>
               <IconLogout />
               Log out
             </Menu.Item>
