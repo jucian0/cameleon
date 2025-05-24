@@ -34,25 +34,36 @@ import { ProcessorIcon } from "./icons/processor"
 import { PresetIcon } from "./icons/preset"
 import { SwaggerIcon } from "./icons/swagger"
 import { ThemeMenu } from "@/routes/set-theme/menu"
-import { useLocation, useRouteLoaderData } from "react-router"
+import { useLocation, useNavigate, useRouteLoaderData } from "react-router"
 import { useState } from "react"
 import { createClient } from "@/modules/supabase/supabase-client"
 
 export default function AppSidebar(props: Readonly<React.ComponentProps<typeof Sidebar>>) {
   const { state } = useSidebar()
   const { pathname } = useLocation()
+  const navigate = useNavigate()
 
-  const { env } = useRouteLoaderData("root") as {
+  const { env, user } = useRouteLoaderData("root") as {
     env: {
       SUPABASE_URL: string;
       SUPABASE_ANON_KEY: string;
-    }
+    },
+    user: any
   }
 
+  console.log("user", user)
   const [supabase] = useState(createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY));
 
   async function handleLogout() {
-    await supabase.auth.signOut()
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        throw new Error(error.message)
+      }
+      navigate("/auth")
+    } catch {
+      navigate("/");
+    }
   }
   return (
     <Sidebar {...props}>
