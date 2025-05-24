@@ -1,30 +1,15 @@
 import stylesheet from "@/root.css?url"
-import { Links, Meta, Outlet, redirect, Scripts, ScrollRestoration, useLoaderData, useNavigate, type LinksFunction, type LoaderFunctionArgs } from "react-router"
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData, useNavigate, type LinksFunction, type LoaderFunctionArgs } from "react-router"
 import { RouterProvider } from "react-aria-components"
 import { themeSessionResolver } from "./routes/set-theme/server"
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "./routes/set-theme/provider"
 import { createServerSupabase } from "./modules/supabase/supabase-server"
 
-async function authMiddleware({ request, next }: any) {
-  const { supabase } = createServerSupabase(request);
-  const { data, error } = await supabase.auth.getSession();
-  if (!data.session || error) {
-    return redirect("/auth");
-  }
-}
-
-export const unstable_middleware = [authMiddleware]
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request)
   const { supabase } = createServerSupabase(request);
-  const { data } = await supabase.auth.getSession();
 
-  const currentUser = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", data.session?.user?.id as string)
-    .single();
+  const currentUser = await supabase.auth.getUser()
 
   return {
     theme: getTheme(),
