@@ -37,22 +37,16 @@ import { ThemeMenu } from "@/routes/set-theme/menu"
 import { useLocation, useNavigate, useRouteLoaderData } from "react-router"
 import { useState } from "react"
 import { createClient } from "@/modules/supabase/supabase-client"
+import type { Loader } from "./../app/root"
 
 export default function AppSidebar(props: Readonly<React.ComponentProps<typeof Sidebar>>) {
   const { state } = useSidebar()
   const { pathname } = useLocation()
   const navigate = useNavigate()
 
-  const { env, user } = useRouteLoaderData("root") as {
-    env: {
-      SUPABASE_URL: string;
-      SUPABASE_ANON_KEY: string;
-    },
-    user: any
-  }
+  const loaderData = useRouteLoaderData<Loader>("root")
 
-  console.log("user", user)
-  const [supabase] = useState(createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY));
+  const [supabase] = useState(createClient(loaderData?.env.SUPABASE_URL as '', loaderData?.env.SUPABASE_ANON_KEY as ''));
 
   async function handleLogout() {
     try {
@@ -129,10 +123,10 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
       <SidebarFooter>
         <Menu>
           <Menu.Trigger className="group" aria-label="Profile">
-            <Avatar shape="square" src="/images/jucian0.png" />
+            <Avatar shape="square" src={loaderData?.user?.user_metadata?.avatar_url} alt={loaderData?.user?.user_metadata?.full_name} />
             <div className="in-data-[sidebar-collapsible=dock]:hidden text-sm">
-              <SidebarLabel>Jucian0</SidebarLabel>
-              <span className="-mt-0.5 block text-muted-fg">juciano@outlook.com.br</span>
+              <SidebarLabel>{loaderData?.user?.user_metadata?.full_name}</SidebarLabel>
+
             </div>
             <IconChevronLgDown
               data-slot="chevron"
@@ -145,8 +139,8 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
           >
             <Menu.Section>
               <Menu.Header separator>
-                <span className="block">Jucian0</span>
-                <span className="font-normal text-muted-fg">@jucian0</span>
+                <span className="block">{loaderData?.user?.user_metadata?.full_name}</span>
+                <span className="font-normal text-muted-fg">@{loaderData?.user?.user_metadata?.email}</span>
               </Menu.Header>
             </Menu.Section>
 
