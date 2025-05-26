@@ -5,6 +5,7 @@ import { themeSessionResolver } from "./routes/set-theme/server"
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "./routes/set-theme/provider"
 import { createServerSupabase } from "./modules/supabase/supabase-server"
 
+export type Loader = typeof loader
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request)
   const { supabase } = createServerSupabase(request);
@@ -13,7 +14,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   return {
     theme: getTheme(),
-    user: currentUser.data,
+    user: currentUser.data.user,
     env: {
       SUPABASE_URL: process.env.SUPABASE_URL,
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
