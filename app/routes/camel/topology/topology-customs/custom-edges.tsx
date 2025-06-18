@@ -55,7 +55,7 @@ function CustomEdge({ sourceX, sourceY, targetX, targetY, sourcePosition, target
 					<Tooltip delay={0}>
 						<Button aria-label="Add step" onPress={handleClick} className={"h-4 w-4 p-0 rounded"}><IconPlus /></Button>
 						<Tooltip.Content>
-							Add step between {sourceNode?.data.label.toLocaleUpperCase()} and {targetNode?.data.label.toLocaleUpperCase()}
+							Add step between {<code className="px-1 border rounded italic bg-sidebar">{sourceNode?.data.label}</code>} and {<code className="px-1 border rounded italic bg-sidebar">{targetNode?.data.label}</code>}
 						</Tooltip.Content>
 					</Tooltip>
 				</div>}
