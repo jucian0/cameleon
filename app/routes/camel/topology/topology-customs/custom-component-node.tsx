@@ -8,6 +8,7 @@ import { useLayer } from "../topology-layer/topology-layer";
 import { IconPencilBox, IconTrash } from "@intentui/icons";
 import { Menu } from "components/ui/menu";
 import { useTopologyStore } from "../topology-store";
+import { Tooltip } from "components/ui/tooltip";
 
 const eipListNames = [
 	'aggregate',
@@ -112,15 +113,20 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 	return (
 		<>
 			<Menu isOpen={isOpen} onOpenChange={setIsOpen}>
-				<Menu.Trigger data-slot="menu-trigger"
-					onPress={handleMenuOpen}
-					className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center">
-					{data.iconName && (
-						<img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
-					)}
-					{data.absolutePath !== 'route.from' && <BaseHandle type="target" position={targetPosition} />}
-					<BaseHandle type="source" position={sourcePosition} isConnectable={false} />
-				</Menu.Trigger>
+				<Tooltip delay={0}>
+					<Menu.Trigger data-slot="menu-trigger"
+						onPress={handleMenuOpen}
+						className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center">
+						{data.iconName && (
+							<img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
+						)}
+						{data.absolutePath !== 'route.from' && <BaseHandle type="target" position={targetPosition} />}
+						<BaseHandle type="source" position={sourcePosition} isConnectable={false} />
+					</Menu.Trigger>
+					<Tooltip.Content>
+						{data.label.toUpperCase()}
+					</Tooltip.Content>
+				</Tooltip>
 				<Menu.Content placement="bottom">
 					<Menu.Item onAction={handleClick} textValue={data.label}>
 						<IconPencilBox /> Edit
