@@ -5,10 +5,11 @@ import type { Node } from "../topology-types";
 import { BaseHandle } from "./custom-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
-import { IconPencilBox, IconTrash } from "@intentui/icons";
+import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
 import { Menu } from "components/ui/menu";
 import { useTopologyStore } from "../topology-store";
 import { Tooltip } from "components/ui/tooltip";
+import { ReplaceIcon } from "lucide-react";
 
 const eipListNames = [
 	'aggregate',
@@ -127,9 +128,12 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 						{data.label.toUpperCase()}
 					</Tooltip.Content>
 				</Tooltip>
-				<Menu.Content placement="bottom">
+				<Menu.Content placement="bottom" showArrow>
 					<Menu.Item onAction={handleClick} textValue={data.label}>
 						<IconPencilBox /> Edit
+					</Menu.Item>
+					<Menu.Item onAction={() => setIsOpen(true)} textValue={`Replace ${data.label}`}>
+						<IconRepeat /> Replace
 					</Menu.Item>
 					<Menu.Item isDanger onAction={() => setIsDeleteOpen(true)} textValue={`Delete ${data.label}`}>
 						<IconTrash /> Delete
