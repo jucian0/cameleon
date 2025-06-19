@@ -31,11 +31,11 @@ export function TopologyEditor() {
 			<Button size="extra-small" intent="secondary" >
 				<Code2Icon className="w-4 h-4" />
 			</Button>
-			<Sheet.Content classNames={{ content: "w-[800px]" }}  >
-				<Sheet.Body>
-					<div className="w-full h-full relative rounded-lg pr-4 py-3">
+			<Sheet.Content   >
+				<Sheet.Body className="p-0!">
+					<div className="w-full h-full relative rounded-lg py-11">
 						<MonacoEditor
-							className="w-full h-full bg-scroll"
+							className="w-full h-full"
 							language="yaml"
 							theme={theme[0] === "dark" ? "vs-dark" : "vs-light"}
 							//	value={code}

@@ -1,15 +1,15 @@
 import stylesheet from "@/root.css?url"
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData, useNavigate, type LinksFunction, type LoaderFunctionArgs } from "react-router"
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData, useNavigate, useRouteLoaderData, type LinksFunction, type LoaderFunctionArgs } from "react-router"
 import { RouterProvider } from "react-aria-components"
 import { themeSessionResolver } from "./routes/set-theme/server"
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "./routes/set-theme/provider"
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme, type Theme } from "./routes/set-theme/provider"
 import { createServerSupabase } from "./modules/supabase/supabase-server"
+import type { Route } from "./+types/root"
 
 export type Loader = typeof loader
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request)
   const { supabase } = createServerSupabase(request);
-
   const currentUser = await supabase.auth.getUser()
 
   return {
@@ -24,36 +24,47 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesheet }]
 
-export default function AppWithProviders() {
+function Providers({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>()
-  const navigate = useNavigate()
-
   return (
-    <RouterProvider navigate={navigate}>
-      <ThemeProvider specifiedTheme={data.theme} themeAction="set-theme">
-        <App />
-      </ThemeProvider>
-    </RouterProvider>
+    <ThemeProvider
+      specifiedTheme={data?.theme as Theme}
+      themeAction="/set-theme"
+    >
+      <Layout>{children}</Layout>
+    </ThemeProvider>
   )
 }
 
-function App() {
-  const loaderData = useLoaderData<typeof loader>()
+export default function App() {
+  return (
+    <Providers>
+      <Outlet />
+    </Providers>
+  )
+}
+
+
+function Layout({ children }: Readonly<React.PropsWithChildren>) {
+  const data = useRouteLoaderData<typeof loader>('root')
   const [theme] = useTheme()
 
   return (
-    <html lang='en' data-theme={theme ?? ""} className={theme ?? ""}>
+    <html lang="en" data-theme={theme} className={theme ?? ''}>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(loaderData.theme)} />
         <Links />
       </head>
-      <body className="font-sans antialiased min-h-svh">
+      <body
+        className="bg-white text-black dark:bg-black dark:text-white"
+        suppressHydrationWarning
+      >
+        {children}
         <ScrollRestoration />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme)} />
         <Scripts />
-        <Outlet />
       </body>
     </html>
   )
