@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesheet }]
 
-function Providers({ children }: { children: React.ReactNode }) {
+function Providers({ children }: Readonly<React.PropsWithChildren>) {
   const data = useLoaderData<typeof loader>()
   return (
     <ThemeProvider
@@ -58,7 +58,7 @@ function Layout({ children }: Readonly<React.PropsWithChildren>) {
         <Links />
       </head>
       <body
-        className="bg-white text-black dark:bg-black dark:text-white"
+        className="font-sans antialiased min-h-svh"
         suppressHydrationWarning
       >
         {children}

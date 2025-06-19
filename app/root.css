@@ -205,3 +205,18 @@
     border-radius: 4px;
   }
 }
+
+.decorationsOverviewRuler {
+  background-color: transparent;
+  width: 6px ! important;
+}
+
+.scrollbar {
+  width: 6px !important;
+  scrollbar-color: var(--border) transparent;
+}
+
+.slider {
+  width: 6px !important;
+  border-radius: 6px;
+}
