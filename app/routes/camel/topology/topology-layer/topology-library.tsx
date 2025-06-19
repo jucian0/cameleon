@@ -105,10 +105,10 @@ function CamelComponentsTab({ onSelectionChange }: { onSelectionChange: (node: a
     <Virtualizer
       layout={GridLayout}>
       <ListBox
-        className={""}
+        className={"-m-4"}
         selectionMode="single"
         onSelectionChange={handleSelectionChange}
-        renderEmptyState={() => <>No components to display</>}
+        renderEmptyState={() => <span className="m-4">No components to display</span>}
       >
         {components.items.map((item) => (
           <ListBoxItem
@@ -161,11 +161,11 @@ function CamelEIPsTab({ onSelectionChange }: Readonly<{ onSelectionChange: (node
     <Virtualizer
       layout={GridLayout}>
       <ListBox
-        className={""}
         selectionMode="single"
         onSelectionChange={handleSelectionChange}
         items={eips.items}
-        renderEmptyState={() => <>No EIPs to display</>}
+        renderEmptyState={() => <span className="m-4">No EIPs to display</span>}
+        className={"-m-4"}
       >
         {(item) => (
           <ListBoxItem
