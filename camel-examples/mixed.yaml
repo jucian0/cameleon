@@ -1,0 +1,143 @@
+- route:
+    id: choiceRoute
+    nodePrefixId: route-6ea
+    from:
+      id: from-cb27
+      uri: activemq
+      steps:
+        - choice:
+            id: choice-9857
+            when:
+              - id: when-9baf
+                expression:
+                  groovy:
+                    id: groovy-f8f9
+                steps:
+                  - log:
+                      id: log-125e
+                      message: ${body}
+              - id: when-2906
+                expression:
+                  groovy:
+                    id: groovy-7609
+                steps:
+                  - log:
+                      id: log-4c61
+                      message: ${body}
+            otherwise:
+              id: otherwise-3d2c
+              steps:
+                - log:
+                    id: log-d54c
+                    message: ${body}
+        - log:
+            id: log-3d41
+            message: ${body}
+
+- route:
+    id: splitRoute
+    nodePrefixId: route-b46
+    from:
+      id: from-82d2
+      uri: activemq
+      steps:
+        - split:
+            id: split-c00f
+            expression:
+              groovy:
+                id: groovy-6c3c
+                expression: body
+            steps:
+              - log:
+                  id: log-957c
+                  message: ${body}
+              - log:
+                  id: log-988e
+                  message: ${body}
+        - log:
+            id: log-f952
+            message: ${body}
+
+- route:
+    id: multicastRoute
+    nodePrefixId: route-b46
+    from:
+      id: from-82d2
+      uri: activemq
+      steps:
+        - multicast:
+            id: multicast-df0e
+            steps:
+              - log:
+                  id: log-8225
+                  message: ${body}
+              - log:
+                  id: log-65eb
+                  message: ${body}
+              - log:
+                  id: log-9afa
+                  message: ${body}
+        - log:
+            id: log-2e6c
+            message: ${body}
+
+- route:
+    id: loadBalanceRoute
+    nodePrefixId: route-540
+    from:
+      id: from-ce46
+      uri: activemq
+      steps:
+        - log:
+            id: log-4251
+            message: { body }
+        - loadBalance:
+            id: loadBalance-a52f
+            steps:
+              - log:
+                  id: log-c4d7
+                  message: { body }
+              - log:
+                  id: log-c4d7
+                  message: { body }
+              - loadBalance:
+                  id: loadBalance-a52f
+                  steps:
+                    - log:
+                        id: log-c4d7
+                        message: { body }
+                    - log:
+                        id: log-c4d7
+                        message: { body }
+        - log:
+            id: log-bcf2
+            message: { body }
+
+- route:
+    id: doTryRoute
+    nodePrefixId: route-764
+    from:
+      id: from-6034
+      uri: activemq
+      steps:
+        - doTry:
+            id: doTry-fbc2
+            doCatch:
+              - id: doCatch-fe2b
+                steps:
+                  - log:
+                      id: log-7835
+                      message: ${body}
+            doFinally:
+              id: doFinally-9d41
+              steps:
+                - log:
+                    id: log-fcb9
+                    message: ${body}
+            steps:
+              - log:
+                  id: log-7338
+                  message: ${body}
+        - log:
+            id: log-4e94
+            message: ${body}

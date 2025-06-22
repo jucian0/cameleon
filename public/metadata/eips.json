@@ -947,10 +947,10 @@
       }
     }
   },
-  "circuit-breaker": {
+  "circuitBreaker": {
     "model": {
       "kind": "model",
-      "name": "circuit-breaker",
+      "name": "circuitBreaker",
       "title": "Circuit Breaker",
       "description": "Route messages in a fault tolerance way using Circuit Breaker",
       "deprecated": false,
@@ -1206,10 +1206,10 @@
       }
     }
   },
-  "claim-check": {
+  "claimCheck": {
     "model": {
       "kind": "model",
-      "name": "claim-check",
+      "name": "claimCheck",
       "title": "Claim Check",
       "description": "The Claim Check EIP allows you to replace message content with a claim check (a unique key), which can be used to retrieve the message content at a later time.",
       "deprecated": false,
@@ -1338,10 +1338,10 @@
       }
     }
   },
-  "convert-body-to": {
+  "convertBodyTo": {
     "model": {
       "kind": "model",
-      "name": "convert-body-to",
+      "name": "convertBodyTo",
       "title": "Convert Body To",
       "description": "Converts the message body to another type",
       "deprecated": false,
@@ -1438,10 +1438,10 @@
       }
     }
   },
-  "convert-header-to": {
+  "convertHeaderTo": {
     "model": {
       "kind": "model",
-      "name": "convert-header-to",
+      "name": "convertHeaderTo",
       "title": "Convert Header To",
       "description": "Converts the message header to another type",
       "deprecated": false,
@@ -1564,10 +1564,10 @@
       }
     }
   },
-  "convert-variable-to": {
+  "convertVariableTo": {
     "model": {
       "kind": "model",
-      "name": "convert-variable-to",
+      "name": "convertVariableTo",
       "title": "Convert Variable To",
       "description": "Converts the variable to another type",
       "deprecated": false,
@@ -1833,10 +1833,10 @@
       }
     }
   },
-  "do-catch": {
+  "doCatch": {
     "model": {
       "kind": "model",
-      "name": "do-catch",
+      "name": "doCatch",
       "title": "Do Catch",
       "description": "Catches exceptions as part of a try, catch, finally block",
       "deprecated": false,
@@ -2046,7 +2046,7 @@
   "doFinally": {
     "model": {
       "kind": "model",
-      "name": "do-finally",
+      "name": "doFinally",
       "title": "Do Finally",
       "description": "Path traversed when a try, catch, finally block exits",
       "deprecated": false,
@@ -2229,7 +2229,7 @@
   "doTry": {
     "model": {
       "kind": "model",
-      "name": "do-try",
+      "name": "doTry",
       "title": "Do Try",
       "description": "Marks the beginning of a try, catch, finally block",
       "deprecated": false,
@@ -2371,10 +2371,10 @@
       }
     }
   },
-  "dynamic-router": {
+  "dynamicRouter": {
     "model": {
       "kind": "model",
-      "name": "dynamic-router",
+      "name": "dynamicRouter",
       "title": "Dynamic Router",
       "description": "Route messages based on dynamic rules",
       "deprecated": false,
@@ -2983,10 +2983,10 @@
       }
     }
   },
-  "idempotent-consumer": {
+  "idempotentConsumer": {
     "model": {
       "kind": "model",
-      "name": "idempotent-consumer",
+      "name": "idempotentConsumer",
       "title": "Idempotent Consumer",
       "description": "Filters out duplicate messages",
       "deprecated": false,
@@ -3256,10 +3256,10 @@
       }
     }
   },
-  "load-balance": {
+  "loadBalance": {
     "model": {
       "kind": "model",
-      "name": "load-balance",
+      "name": "loadBalance",
       "title": "Load Balance",
       "description": "Balances message processing among a number of nodes",
       "deprecated": false,
@@ -4539,10 +4539,10 @@
       }
     }
   },
-  "poll-enrich": {
+  "pollEnrich": {
     "model": {
       "kind": "model",
-      "name": "poll-enrich",
+      "name": "pollEnrich",
       "title": "Poll Enrich",
       "description": "Enriches messages with data polled from a secondary resource",
       "deprecated": false,
@@ -4850,10 +4850,10 @@
       }
     }
   },
-  "recipient-list": {
+  "recipientList": {
     "model": {
       "kind": "model",
-      "name": "recipient-list",
+      "name": "recipientList",
       "title": "Recipient List",
       "description": "Route messages to a number of dynamically specified recipients",
       "deprecated": false,
@@ -5190,10 +5190,10 @@
       }
     }
   },
-  "remove-header": {
+  "removeHeader": {
     "model": {
       "kind": "model",
-      "name": "remove-header",
+      "name": "removeHeader",
       "title": "Remove Header",
       "description": "Removes a named header from the message",
       "deprecated": false,
@@ -5261,10 +5261,10 @@
       }
     }
   },
-  "remove-headers": {
+  "removeHeaders": {
     "model": {
       "kind": "model",
-      "name": "remove-headers",
+      "name": "removeHeaders",
       "title": "Remove Headers",
       "description": "Removes message headers whose name matches a specified pattern",
       "deprecated": false,
@@ -5346,10 +5346,10 @@
       }
     }
   },
-  "remove-properties": {
+  "removeProperties": {
     "model": {
       "kind": "model",
-      "name": "remove-properties",
+      "name": "removeProperties",
       "title": "Remove Properties",
       "description": "Removes message exchange properties whose name matches a specified pattern",
       "deprecated": false,
@@ -5431,10 +5431,10 @@
       }
     }
   },
-  "remove-property": {
+  "removeProperty": {
     "model": {
       "kind": "model",
-      "name": "remove-property",
+      "name": "removeProperty",
       "title": "Remove Property",
       "description": "Removes a named property from the message exchange",
       "deprecated": false,
@@ -5502,10 +5502,10 @@
       }
     }
   },
-  "remove-variable": {
+  "removeVariable": {
     "model": {
       "kind": "model",
-      "name": "remove-variable",
+      "name": "removeVariable",
       "title": "Remove Variable",
       "description": "Removes a named variable",
       "deprecated": false,
@@ -5884,10 +5884,10 @@
       }
     }
   },
-  "routing-slip": {
+  "routingSlip": {
     "model": {
       "kind": "model",
-      "name": "routing-slip",
+      "name": "routingSlip",
       "title": "Routing Slip",
       "description": "Routes a message through a series of steps that are pre-determined (the slip)",
       "deprecated": false,
@@ -6490,10 +6490,10 @@
       }
     }
   },
-  "set-body": {
+  "setBody": {
     "model": {
       "kind": "model",
-      "name": "set-body",
+      "name": "setBody",
       "title": "Set Body",
       "description": "Sets the contents of the message body",
       "deprecated": false,
@@ -6589,10 +6589,10 @@
       }
     }
   },
-  "set-exchange-pattern": {
+  "setExchangePattern": {
     "model": {
       "kind": "model",
-      "name": "set-exchange-pattern",
+      "name": "setExchangePattern",
       "title": "Set Exchange Pattern",
       "description": "Sets the exchange pattern on the message exchange",
       "deprecated": false,
@@ -6664,10 +6664,10 @@
       }
     }
   },
-  "set-header": {
+  "setHeader": {
     "model": {
       "kind": "model",
-      "name": "set-header",
+      "name": "setHeader",
       "title": "Set Header",
       "description": "Sets the value of a message header",
       "deprecated": false,
@@ -6776,10 +6776,10 @@
       }
     }
   },
-  "set-headers": {
+  "setHeaders": {
     "model": {
       "kind": "model",
-      "name": "set-headers",
+      "name": "setHeaders",
       "title": "Set Headers",
       "description": "Allows setting multiple headers on the message at the same time.",
       "deprecated": false,
@@ -6850,10 +6850,10 @@
       }
     }
   },
-  "set-property": {
+  "setProperty": {
     "model": {
       "kind": "model",
-      "name": "set-property",
+      "name": "setProperty",
       "title": "Set Property",
       "description": "Sets a named property on the message exchange",
       "deprecated": false,
@@ -6962,10 +6962,10 @@
       }
     }
   },
-  "set-variable": {
+  "setVariable": {
     "model": {
       "kind": "model",
-      "name": "set-variable",
+      "name": "setVariable",
       "title": "Set Variable",
       "description": "Sets the value of a variable",
       "deprecated": false,
@@ -7074,10 +7074,10 @@
       }
     }
   },
-  "set-variables": {
+  "setVariables": {
     "model": {
       "kind": "model",
-      "name": "set-variables",
+      "name": "setVariables",
       "title": "Set Variables",
       "description": "Allows setting multiple variables at the same time.",
       "deprecated": false,
@@ -8328,10 +8328,10 @@
       }
     }
   },
-  "throw-exception": {
+  "throwException": {
     "model": {
       "kind": "model",
-      "name": "throw-exception",
+      "name": "throwException",
       "title": "Throw Exception",
       "description": "Throws an exception",
       "deprecated": false,
@@ -8555,10 +8555,10 @@
       }
     }
   },
-  "to-d": {
+  "toD": {
     "model": {
       "kind": "model",
-      "name": "to-d",
+      "name": "toD",
       "title": "To D",
       "description": "Sends the message to a dynamic endpoint",
       "deprecated": false,
@@ -9395,10 +9395,10 @@
       }
     }
   },
-  "wire-tap": {
+  "wireTap": {
     "model": {
       "kind": "model",
-      "name": "wire-tap",
+      "name": "wireTap",
       "title": "Wire Tap",
       "description": "Routes a copy of a message (or creates a new message) to a secondary destination while continue routing the original message.",
       "deprecated": false,
