@@ -1,16 +1,29 @@
-import stylesheet from "@/root.css?url"
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData, useNavigate, useRouteLoaderData, type LinksFunction, type LoaderFunctionArgs } from "react-router"
-import { RouterProvider } from "react-aria-components"
-import { themeSessionResolver } from "./routes/set-theme/server"
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme, type Theme } from "./routes/set-theme/provider"
-import { createServerSupabase } from "./modules/supabase/supabase-server"
-import type { Route } from "./+types/root"
+import stylesheet from "@/root.css?url";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  useRouteLoaderData,
+  type LinksFunction,
+  type LoaderFunctionArgs,
+} from "react-router";
+import { themeSessionResolver } from "./routes/set-theme/server";
+import {
+  PreventFlashOnWrongTheme,
+  ThemeProvider,
+  useTheme,
+  type Theme,
+} from "./routes/set-theme/provider";
+import { createServerSupabase } from "./modules/supabase/supabase-server";
 
-export type Loader = typeof loader
+export type Loader = typeof loader;
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { getTheme } = await themeSessionResolver(request)
+  const { getTheme } = await themeSessionResolver(request);
   const { supabase } = createServerSupabase(request);
-  const currentUser = await supabase.auth.getUser()
+  const currentUser = await supabase.auth.getUser();
 
   return {
     theme: getTheme(),
@@ -18,14 +31,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
     env: {
       SUPABASE_URL: process.env.SUPABASE_URL,
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
-    }
-  }
+    },
+  };
 }
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesheet }]
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: stylesheet },
+];
 
 function Providers({ children }: Readonly<React.PropsWithChildren>) {
-  const data = useLoaderData<typeof loader>()
+  const data = useLoaderData<typeof loader>();
   return (
     <ThemeProvider
       specifiedTheme={data?.theme as Theme}
@@ -33,7 +48,7 @@ function Providers({ children }: Readonly<React.PropsWithChildren>) {
     >
       <Layout>{children}</Layout>
     </ThemeProvider>
-  )
+  );
 }
 
 export default function App() {
@@ -41,16 +56,15 @@ export default function App() {
     <Providers>
       <Outlet />
     </Providers>
-  )
+  );
 }
 
-
 function Layout({ children }: Readonly<React.PropsWithChildren>) {
-  const data = useRouteLoaderData<typeof loader>('root')
-  const [theme] = useTheme()
+  const data = useRouteLoaderData<typeof loader>("root");
+  const [theme] = useTheme();
 
   return (
-    <html lang="en" data-theme={theme} className={theme ?? ''}>
+    <html lang="en" data-theme={theme} className={theme ?? ""}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -67,5 +81,5 @@ function Layout({ children }: Readonly<React.PropsWithChildren>) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
