@@ -25,8 +25,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-      <Card className="w-full max-w-sm p-8 shadow-lg">
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <Card className="w-full max-w-sm p-8 shadow-lg bg-sidebar">
         <h1 className="text-2xl font-bold text-center mb-2">Sign in to Camelion</h1>
         <p className="text-center text-gray-500 mb-6">
           Use your GitHub account to continue
