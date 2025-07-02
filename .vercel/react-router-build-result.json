@@ -1,0 +1,138 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "root": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/auth-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/callback-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/home/home-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/camel/studio-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/set-theme/set-theme-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "app/root.tsx",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/auth/auth-page": {
+        "id": "routes/auth/auth-page",
+        "parentId": "root",
+        "file": "app/routes/auth/auth-page.tsx",
+        "path": "auth",
+        "config": {}
+      },
+      "routes/auth/callback-page": {
+        "id": "routes/auth/callback-page",
+        "parentId": "root",
+        "file": "app/routes/auth/callback-page.ts",
+        "path": "auth/callback",
+        "config": {}
+      },
+      "routes/layout": {
+        "id": "routes/layout",
+        "parentId": "root",
+        "file": "app/routes/layout.tsx",
+        "config": {}
+      },
+      "routes/home/home-page": {
+        "id": "routes/home/home-page",
+        "parentId": "routes/layout",
+        "file": "app/routes/home/home-page.tsx",
+        "index": true,
+        "config": {}
+      },
+      "routes/camel/studio-page": {
+        "id": "routes/camel/studio-page",
+        "parentId": "routes/layout",
+        "file": "app/routes/camel/studio-page.tsx",
+        "path": "camel/studio",
+        "config": {}
+      },
+      "routes/set-theme/set-theme-page": {
+        "id": "routes/set-theme/set-theme-page",
+        "parentId": "routes/layout",
+        "file": "app/routes/set-theme/set-theme-page.ts",
+        "path": "set-theme",
+        "config": {}
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/Users/jucianobarbosa/personal/engrafo-cms/app",
+    "basename": "/",
+    "buildDirectory": "/Users/jucianobarbosa/personal/engrafo-cms/build",
+    "future": {
+      "unstable_middleware": true,
+      "unstable_optimizeDeps": false,
+      "unstable_splitRouteModules": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "root.tsx"
+      },
+      "routes/auth/auth-page": {
+        "id": "routes/auth/auth-page",
+        "parentId": "root",
+        "file": "routes/auth/auth-page.tsx",
+        "path": "auth"
+      },
+      "routes/auth/callback-page": {
+        "id": "routes/auth/callback-page",
+        "parentId": "root",
+        "file": "routes/auth/callback-page.ts",
+        "path": "auth/callback"
+      },
+      "routes/layout": {
+        "id": "routes/layout",
+        "parentId": "root",
+        "file": "routes/layout.tsx"
+      },
+      "routes/home/home-page": {
+        "id": "routes/home/home-page",
+        "parentId": "routes/layout",
+        "file": "routes/home/home-page.tsx",
+        "index": true
+      },
+      "routes/camel/studio-page": {
+        "id": "routes/camel/studio-page",
+        "parentId": "routes/layout",
+        "file": "routes/camel/studio-page.tsx",
+        "path": "camel/studio"
+      },
+      "routes/set-theme/set-theme-page": {
+        "id": "routes/set-theme/set-theme-page",
+        "parentId": "routes/layout",
+        "file": "routes/set-theme/set-theme-page.ts",
+        "path": "set-theme"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
