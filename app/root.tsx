@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigate,
   useRouteLoaderData,
   type LinksFunction,
   type LoaderFunctionArgs,
@@ -18,6 +19,7 @@ import {
   type Theme,
 } from "./routes/set-theme/provider";
 import { createServerSupabase } from "./modules/supabase/supabase-server";
+import { RouterProvider } from "react-aria-components";
 
 export type Loader = typeof loader;
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -62,6 +64,7 @@ export default function App() {
 function Layout({ children }: Readonly<React.PropsWithChildren>) {
   const data = useRouteLoaderData<typeof loader>("root");
   const [theme] = useTheme();
+  const navigate = useNavigate();
 
   return (
     <html lang="en" data-theme={theme} className={theme ?? ""}>
@@ -75,7 +78,9 @@ function Layout({ children }: Readonly<React.PropsWithChildren>) {
         className="font-sans antialiased min-h-svh"
         suppressHydrationWarning
       >
-        {children}
+        <RouterProvider navigate={navigate}>
+          {children}
+        </RouterProvider>
         <ScrollRestoration />
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme)} />
         <Scripts />
