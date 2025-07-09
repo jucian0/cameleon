@@ -80,17 +80,13 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
                 <SidebarLabel>Apache Camel</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
-                <SidebarItem href="camel/studio" tooltip="Studio" isCurrent={pathname.includes('studio')}>
+                <SidebarItem href="/camel/studio" tooltip="Studio" isCurrent={pathname.includes('studio')}>
                   <StudioIcon className="size-4" />
                   <SidebarLabel>Studio</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="camel/processors" tooltip="Processors" isCurrent={pathname.includes('processors')}>
+                <SidebarItem href="/camel/library" tooltip="Library" isCurrent={pathname.includes('library')}>
                   <ProcessorIcon className="size-4" />
-                  <SidebarLabel>Processors</SidebarLabel>
-                </SidebarItem>
-                <SidebarItem href="camel/components" tooltip="Components" isCurrent={pathname.includes('components')}>
-                  <ComponentIcon className="size-4" />
-                  <SidebarLabel>Components</SidebarLabel>
+                  <SidebarLabel>Library</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem href="#presets" tooltip="Presets" isCurrent={pathname.includes('presets')}>
                   <PresetIcon className="size-4" />

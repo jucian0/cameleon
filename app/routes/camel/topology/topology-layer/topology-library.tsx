@@ -16,7 +16,7 @@ export function TopologyLibrary() {
   const { contains } = useFilter({ sensitivity: 'base' });
 
   function handleSelectionChange(selectedItem: Set<Key>) {
-    const [selectedItemKey] = Array.from(selectedItem as Set<Key>)
+    const [selectedItemKey] = Array.from(selectedItem)
 
     try {
       if (!selectedItem || !node?.absolutePath) return;
