@@ -2,6 +2,9 @@ import { Autocomplete, useFilter } from "react-aria-components";
 import { Tabs } from "components/ui/tabs";
 import { SearchField } from "components/ui/search-field";
 import { Outlet, useLocation, useSearchParams } from "react-router";
+import { PresetIcon } from "components/icons/preset";
+import { ProcessorIcon } from "components/icons/processor";
+import { ResourcesIcon } from "components/icons/resources";
 
 
 export default function TopologyLibrary() {
@@ -22,26 +25,19 @@ export default function TopologyLibrary() {
 
   return (
     <div className="m-6 flex flex-col gap-4">
-      <Autocomplete aria-label="Topology library" filter={contains}>
+      <Autocomplete aria-label="Topology library" filter={contains} defaultInputValue={filter.get('q') || ''} onInputChange={handleQueryChange}>
         <div className="flex items-center gap-2">
           <SearchField
             aria-label="Search by name"
             placeholder="Search"
             className="w-full"
-            defaultValue={filter.get('q') || ''}
-            onChange={handleQueryChange}
           />
         </div>
         <Tabs aria-label="Camel EIPs and Components" selectedKey={currentCamelRoute}>
           <Tabs.List>
-            <Tabs.Tab id="eips" href="/camel/library/eips" routerOptions={{
-              replace: true,
-              state: { scrollToTop: true }
-            }}>EIPs</Tabs.Tab>
-            <Tabs.Tab id="components" href="/camel/library/components" routerOptions={{
-              replace: true,
-              state: { scrollToTop: true }
-            }}>Components</Tabs.Tab>
+            <Tabs.Tab id="eips" href={`/camel/library/eips?${filter.toString()}`}><ProcessorIcon />EIPs </Tabs.Tab>
+            <Tabs.Tab id="components" href={`/camel/library/components?${filter.toString()}`}><ResourcesIcon /> Components</Tabs.Tab>
+            <Tabs.Tab id="presets" href={`/camel/library/presets?${filter.toString()}`}><PresetIcon /> Presets</Tabs.Tab>
           </Tabs.List>
           <Tabs.Panel id="eips">
           </Tabs.Panel>

@@ -11,6 +11,7 @@ export default [
         // index('routes/camel/library-eips-page.tsx'),
         route('eips', 'routes/camel/library-eips-page.tsx'),
         route('components', 'routes/camel/library-components-page.tsx'),
+        route('presets', 'routes/camel/library-presets-page.tsx'),
       ]),
     ]),
     route('set-theme', 'routes/set-theme/set-theme-page.ts'),

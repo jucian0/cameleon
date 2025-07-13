@@ -28,7 +28,6 @@ import {
 import { twMerge } from "tailwind-merge"
 import { CamelionIcon } from "./icons/camelion"
 import { StudioIcon } from "./icons/studio"
-import { ComponentIcon } from "./icons/component"
 import { CamelStudioIcon } from "./icons/camel-studio"
 import { ProcessorIcon } from "./icons/processor"
 import { PresetIcon } from "./icons/preset"
@@ -87,10 +86,6 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
                 <SidebarItem href="/camel/library" tooltip="Library" isCurrent={pathname.includes('library')}>
                   <ProcessorIcon className="size-4" />
                   <SidebarLabel>Library</SidebarLabel>
-                </SidebarItem>
-                <SidebarItem href="#presets" tooltip="Presets" isCurrent={pathname.includes('presets')}>
-                  <PresetIcon className="size-4" />
-                  <SidebarLabel>Presets</SidebarLabel>
                 </SidebarItem>
               </SidebarDisclosurePanel>
             </SidebarDisclosure>
