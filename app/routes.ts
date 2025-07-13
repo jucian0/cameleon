@@ -8,7 +8,7 @@ export default [
     ...prefix('camel', [
       route('studio', 'routes/camel/studio-page.tsx'),
       route('library', 'routes/camel/library-page.tsx', [
-        index('routes/camel/library-eips-page.tsx'),
+        // index('routes/camel/library-eips-page.tsx'),
         route('eips', 'routes/camel/library-eips-page.tsx'),
         route('components', 'routes/camel/library-components-page.tsx'),
       ]),
