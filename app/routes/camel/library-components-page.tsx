@@ -1,14 +1,25 @@
 import { tryCatch } from "@/utils/try-catch";
 import { useAsyncList, type Key, type Selection } from "react-stately";
 import { fetchComponentsMetadata } from "./data-requests/fetch-metadata";
-import { GridLayout, ListBox, ListBoxItem, Virtualizer } from "react-aria-components";
+import {
+  GridLayout,
+  ListBox,
+  ListBoxItem,
+  Virtualizer,
+} from "react-aria-components";
 import { Card } from "components/ui/card";
 
 type CamelComponentTabProps = {
   readonly onSelectionChange: (node: any) => void;
 };
 
-export default function CamelComponentsTab({ onSelectionChange }: CamelComponentTabProps) {
+export const handle = {
+  breadcrumb: () => "Components",
+};
+
+export default function CamelComponentsTab({
+  onSelectionChange,
+}: CamelComponentTabProps) {
   const components = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchComponentsMetadata());
@@ -16,25 +27,28 @@ export default function CamelComponentsTab({ onSelectionChange }: CamelComponent
         return { items: [] };
       }
       return { items: Object.values(data.data) };
-    }
+    },
   });
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
-      .map(key => components.items.find(item => item.component.name === key))
+      .map((key) =>
+        components.items.find((item) => item.component.name === key),
+      )
       .filter(Boolean);
     if (!selectedItem) return;
     onSelectionChange(selectedKeys);
   }
 
   return (
-    <Virtualizer
-      layout={GridLayout}>
+    <Virtualizer layout={GridLayout}>
       <ListBox
         className={"-m-4"}
         selectionMode="single"
         onSelectionChange={handleSelectionChange}
-        renderEmptyState={() => <span className="m-4">No components to display</span>}
+        renderEmptyState={() => (
+          <span className="m-4">No components to display</span>
+        )}
       >
         {components.items.map((item) => (
           <ListBoxItem
@@ -44,15 +58,12 @@ export default function CamelComponentsTab({ onSelectionChange }: CamelComponent
           >
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
-
                 <img
                   src={`/camel-icons/components/${item.component.name}.svg`}
                   alt={item.component.name}
                   className="h-8 w-8 rounded"
                 />
-                <div className="flex flex-col">
-                  {item.component.title}
-                </div>
+                <div className="flex flex-col">{item.component.title}</div>
               </Card.Header>
               <Card.Content className="p-2">
                 {item.component.description}
@@ -62,5 +73,5 @@ export default function CamelComponentsTab({ onSelectionChange }: CamelComponent
         ))}
       </ListBox>
     </Virtualizer>
-  )
+  );
 }

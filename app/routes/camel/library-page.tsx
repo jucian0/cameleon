@@ -6,6 +6,9 @@ import { PresetIcon } from "components/icons/preset";
 import { ProcessorIcon } from "components/icons/processor";
 import { ResourcesIcon } from "components/icons/resources";
 
+export const handle = {
+  breadcrumb: () => "Topology Library",
+};
 
 export default function TopologyLibrary() {
   const { pathname } = useLocation();
@@ -13,7 +16,7 @@ export default function TopologyLibrary() {
   const currentCamelRoute = pathname.split("/")[routeParts.length - 1];
 
   const [filter, setFilter] = useSearchParams();
-  const { contains } = useFilter({ sensitivity: 'base' });
+  const { contains } = useFilter({ sensitivity: "base" });
 
   function handleQueryChange(value: string) {
     if (value) {
@@ -25,7 +28,12 @@ export default function TopologyLibrary() {
 
   return (
     <div className="m-6 flex flex-col gap-4">
-      <Autocomplete aria-label="Topology library" filter={contains} defaultInputValue={filter.get('q') || ''} onInputChange={handleQueryChange}>
+      <Autocomplete
+        aria-label="Topology library"
+        filter={contains}
+        defaultInputValue={filter.get("q") || ""}
+        onInputChange={handleQueryChange}
+      >
         <div className="flex items-center gap-2">
           <SearchField
             aria-label="Search by name"
@@ -33,14 +41,32 @@ export default function TopologyLibrary() {
             className="w-full"
           />
         </div>
-        <Tabs aria-label="Camel EIPs and Components" selectedKey={currentCamelRoute}>
+        <Tabs
+          aria-label="Camel EIPs and Components"
+          selectedKey={currentCamelRoute}
+        >
           <Tabs.List>
-            <Tabs.Tab id="eips" href={`/camel/library/eips?${filter.toString()}`}><ProcessorIcon />EIPs </Tabs.Tab>
-            <Tabs.Tab id="components" href={`/camel/library/components?${filter.toString()}`}><ResourcesIcon /> Components</Tabs.Tab>
-            <Tabs.Tab id="presets" href={`/camel/library/presets?${filter.toString()}`}><PresetIcon /> Presets</Tabs.Tab>
+            <Tabs.Tab
+              id="eips"
+              href={`/camel/library/eips?${filter.toString()}`}
+            >
+              <ProcessorIcon />
+              EIPs{" "}
+            </Tabs.Tab>
+            <Tabs.Tab
+              id="components"
+              href={`/camel/library/components?${filter.toString()}`}
+            >
+              <ResourcesIcon /> Components
+            </Tabs.Tab>
+            <Tabs.Tab
+              id="presets"
+              href={`/camel/library/presets?${filter.toString()}`}
+            >
+              <PresetIcon /> Presets
+            </Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel id="eips">
-          </Tabs.Panel>
+          <Tabs.Panel id="eips"></Tabs.Panel>
           <Tabs.Panel id={currentCamelRoute}>
             <Outlet />
           </Tabs.Panel>
