@@ -1,10 +1,21 @@
 import { tryCatch } from "@/utils/try-catch";
 import { useAsyncList, type Key, type Selection } from "react-stately";
 import { fetchEIPsMetadata } from "./data-requests/fetch-metadata";
-import { GridLayout, ListBox, ListBoxItem, Virtualizer } from "react-aria-components";
+import {
+  GridLayout,
+  ListBox,
+  ListBoxItem,
+  Virtualizer,
+} from "react-aria-components";
 import { Card } from "components/ui/card";
 
-export default function CamelEIPsTab({ onSelectionChange }: Readonly<{ onSelectionChange: (node: any) => void }>) {
+export const handle = {
+  breadcrumb: () => "Presets",
+};
+
+export default function CamelEIPsTab({
+  onSelectionChange,
+}: Readonly<{ onSelectionChange: (node: any) => void }>) {
   const eips = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchEIPsMetadata());
@@ -12,19 +23,18 @@ export default function CamelEIPsTab({ onSelectionChange }: Readonly<{ onSelecti
         return { items: [] };
       }
       return { items: Object.values(data.data) };
-    }
+    },
   });
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
-      .map(key => eips.items.find(item => item.model.name === key))
+      .map((key) => eips.items.find((item) => item.model.name === key))
       .filter(Boolean);
     if (!selectedItem) return;
     onSelectionChange(selectedKeys);
   }
   return (
-    <Virtualizer
-      layout={GridLayout}>
+    <Virtualizer layout={GridLayout}>
       <ListBox
         selectionMode="single"
         onSelectionChange={handleSelectionChange}
@@ -45,9 +55,7 @@ export default function CamelEIPsTab({ onSelectionChange }: Readonly<{ onSelecti
                   alt={item.model.name}
                   className="h-8 w-8"
                 />
-                <div className="flex flex-col">
-                  {item.model.title}
-                </div>
+                <div className="flex flex-col">{item.model.title}</div>
               </Card.Header>
               <Card.Content className="p-2">
                 {item.model.description}
@@ -57,5 +65,5 @@ export default function CamelEIPsTab({ onSelectionChange }: Readonly<{ onSelecti
         )}
       </ListBox>
     </Virtualizer>
-  )
+  );
 }

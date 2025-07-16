@@ -1,6 +1,6 @@
-import { Avatar } from "./ui/avatar"
-import { Link } from "./ui/link"
-import { Menu } from "./ui/menu"
+import { Avatar } from "./ui/avatar";
+import { Link } from "./ui/link";
+import { Menu } from "./ui/menu";
 import {
   Sidebar,
   SidebarContent,
@@ -16,7 +16,7 @@ import {
   SidebarSection,
   SidebarSectionGroup,
   useSidebar,
-} from "./ui/sidebar"
+} from "./ui/sidebar";
 import {
   IconChevronLgDown,
   IconDashboard,
@@ -24,36 +24,43 @@ import {
   IconLogout,
   IconSettings,
   IconShield,
-} from "@intentui/icons"
-import { twMerge } from "tailwind-merge"
-import { CamelionIcon } from "./icons/camelion"
-import { StudioIcon } from "./icons/studio"
-import { CamelStudioIcon } from "./icons/camel-studio"
-import { ProcessorIcon } from "./icons/processor"
-import { PresetIcon } from "./icons/preset"
-import { SwaggerIcon } from "./icons/swagger"
-import { ThemeMenu } from "@/routes/set-theme/menu"
-import { useLocation, useNavigate, useRouteLoaderData } from "react-router"
-import { useState } from "react"
-import { createClient } from "@/modules/supabase/supabase-client"
-import type { Loader } from "./../app/root"
+} from "@intentui/icons";
+import { twMerge } from "tailwind-merge";
+import { CamelionIcon } from "./icons/camelion";
+import { StudioIcon } from "./icons/studio";
+import { CamelStudioIcon } from "./icons/camel-studio";
+import { ProcessorIcon } from "./icons/processor";
+import { PresetIcon } from "./icons/preset";
+import { SwaggerIcon } from "./icons/swagger";
+import { ThemeMenu } from "@/routes/set-theme/menu";
+import { useLocation, useNavigate, useRouteLoaderData } from "react-router";
+import { useState } from "react";
+import { createClient } from "@/modules/supabase/supabase-client";
+import type { Loader } from "./../app/root";
 
-export default function AppSidebar(props: Readonly<React.ComponentProps<typeof Sidebar>>) {
-  const { state } = useSidebar()
-  const { pathname } = useLocation()
-  const navigate = useNavigate()
+export default function AppSidebar(
+  props: Readonly<React.ComponentProps<typeof Sidebar>>,
+) {
+  const { state } = useSidebar();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
-  const loaderData = useRouteLoaderData<Loader>("root")
+  const loaderData = useRouteLoaderData<Loader>("root");
 
-  const [supabase] = useState(createClient(loaderData?.env.SUPABASE_URL as '', loaderData?.env.SUPABASE_ANON_KEY as ''));
+  const [supabase] = useState(
+    createClient(
+      loaderData?.env.SUPABASE_URL as "",
+      loaderData?.env.SUPABASE_ANON_KEY as "",
+    ),
+  );
 
   async function handleLogout() {
     try {
-      const { error } = await supabase.auth.signOut()
+      const { error } = await supabase.auth.signOut();
       if (error) {
-        throw new Error(error.message)
+        throw new Error(error.message);
       }
-      navigate("/auth")
+      navigate("/auth");
     } catch {
       navigate("/");
     }
@@ -79,32 +86,34 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
                 <SidebarLabel>Apache Camel</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
-                <SidebarItem href="/camel/studio" tooltip="Studio" isCurrent={pathname.includes('studio')}>
+                <SidebarItem
+                  href="/camel/studio"
+                  tooltip="Studio"
+                  isCurrent={pathname.includes("studio")}
+                >
                   <StudioIcon className="size-4" />
                   <SidebarLabel>Studio</SidebarLabel>
                 </SidebarItem>
-                <SidebarItem href="/camel/library" tooltip="Library" isCurrent={pathname.includes('library')}>
+                <SidebarItem
+                  href="/camel/library"
+                  tooltip="Library"
+                  isCurrent={pathname.includes("library")}
+                >
                   <ProcessorIcon className="size-4" />
                   <SidebarLabel>Library</SidebarLabel>
                 </SidebarItem>
               </SidebarDisclosurePanel>
             </SidebarDisclosure>
-            {/* <SidebarDisclosure id={2}>
-              <SidebarDisclosureTrigger>
-                <SwaggerIcon className="size-5" />
-                <SidebarLabel>Open API</SidebarLabel>
-              </SidebarDisclosureTrigger>
-              <SidebarDisclosurePanel>
-                <SidebarItem href="#" tooltip="Contracts" badge="Coming soon" isCurrent={pathname.includes('contracts')}>
-                  <ContractsIcon className="size-4" />
-                  <SidebarLabel>Contracts</SidebarLabel>
-                </SidebarItem>
-              </SidebarDisclosurePanel>
-            </SidebarDisclosure> */}
           </SidebarDisclosureGroup>
         </SidebarSectionGroup>
         <SidebarSection>
-          <SidebarItem href="#" tooltip="Contracts" badge="Coming soon" isCurrent={pathname.includes('contracts')} isDisabled>
+          <SidebarItem
+            href="#"
+            tooltip="Contracts"
+            badge="Coming soon"
+            isCurrent={pathname.includes("contracts")}
+            isDisabled
+          >
             <SwaggerIcon className="size-4" />
             <SidebarLabel>Open API</SidebarLabel>
           </SidebarItem>
@@ -114,10 +123,15 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
       <SidebarFooter>
         <Menu>
           <Menu.Trigger className="group" aria-label="Profile">
-            <Avatar shape="square" src={loaderData?.user?.user_metadata?.avatar_url} alt={loaderData?.user?.user_metadata?.full_name} />
+            <Avatar
+              shape="square"
+              src={loaderData?.user?.user_metadata?.avatar_url}
+              alt={loaderData?.user?.user_metadata?.full_name}
+            />
             <div className="in-data-[sidebar-collapsible=dock]:hidden text-sm">
-              <SidebarLabel>{loaderData?.user?.user_metadata?.full_name}</SidebarLabel>
-
+              <SidebarLabel>
+                {loaderData?.user?.user_metadata?.full_name}
+              </SidebarLabel>
             </div>
             <IconChevronLgDown
               data-slot="chevron"
@@ -126,12 +140,20 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
           </Menu.Trigger>
           <Menu.Content
             placement="bottom right"
-            className={twMerge(state === "expanded" ? "sm:min-w-(--trigger-width)" : "sm:min-w-60")}
+            className={twMerge(
+              state === "expanded"
+                ? "sm:min-w-(--trigger-width)"
+                : "sm:min-w-60",
+            )}
           >
             <Menu.Section>
               <Menu.Header separator>
-                <span className="block">{loaderData?.user?.user_metadata?.full_name}</span>
-                <span className="font-normal text-muted-fg">@{loaderData?.user?.user_metadata?.email}</span>
+                <span className="block">
+                  {loaderData?.user?.user_metadata?.full_name}
+                </span>
+                <span className="font-normal text-muted-fg">
+                  @{loaderData?.user?.user_metadata?.email}
+                </span>
               </Menu.Header>
             </Menu.Section>
 
@@ -164,5 +186,5 @@ export default function AppSidebar(props: Readonly<React.ComponentProps<typeof S
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

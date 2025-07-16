@@ -11,143 +11,151 @@ import { useTopologyStore } from "../topology-store";
 import { Tooltip } from "components/ui/tooltip";
 
 const eipListNames = [
-	'aggregate',
-	'bean',
-	'choice',
-	'circuitBreaker',
-	'claimCheck',
-	'convertBodyTo',
-	'convertHeaderTo',
-	'convertVariableTo',
-	'delay',
-	'doTry',
-	'doCatch',
-	'doFinally',
-	'dynamicRouter',
-	'enrich',
-	'filter',
-	'idempotentConsumer',
-	'loadBalancer',
-	'log',
-	'loop',
-	'marshal',
-	'multicast',
-	'pausable',
-	'policy',
-	'pollEnrich',
-	'process',
-	'recipientList',
-	'removeHeader',
-	'removeHeaders',
-	'removeProperties',
-	'removeProperty',
-	'removeVariable',
-	'resequence',
-	'resumable',
-	'routingSlip',
-	'saga',
-	'sample',
-	'script',
-	'setBody',
-	'setExchangePattern',
-	'setHeader',
-	'setHeaders',
-	'setVariable',
-	'setVariables',
-	'sort',
-	'split',
-	'step',
-	'stop',
-	'threads',
-	'throttle',
-	'throwException',
-	'to',
-	'toD',
-	'transacted',
-	'transform',
-	'unmarshal',
-	'validate',
-	'wireTap',
-	'claimCheck',
-	'convertVariableTo',
-	'convertHeaderTo',
-	'convertBodyTo',
+  "aggregate",
+  "bean",
+  "choice",
+  "circuitBreaker",
+  "claimCheck",
+  "convertBodyTo",
+  "convertHeaderTo",
+  "convertVariableTo",
+  "delay",
+  "doTry",
+  "doCatch",
+  "doFinally",
+  "dynamicRouter",
+  "enrich",
+  "filter",
+  "idempotentConsumer",
+  "loadBalancer",
+  "log",
+  "loop",
+  "marshal",
+  "multicast",
+  "pausable",
+  "policy",
+  "pollEnrich",
+  "process",
+  "recipientList",
+  "removeHeader",
+  "removeHeaders",
+  "removeProperties",
+  "removeProperty",
+  "removeVariable",
+  "resequence",
+  "resumable",
+  "routingSlip",
+  "saga",
+  "sample",
+  "script",
+  "setBody",
+  "setExchangePattern",
+  "setHeader",
+  "setHeaders",
+  "setVariable",
+  "setVariables",
+  "sort",
+  "split",
+  "step",
+  "stop",
+  "threads",
+  "throttle",
+  "throwException",
+  "to",
+  "toD",
+  "transacted",
+  "transform",
+  "unmarshal",
+  "validate",
+  "wireTap",
+  "claimCheck",
+  "convertVariableTo",
+  "convertHeaderTo",
+  "convertBodyTo",
 
+  // EIPs complements
 
-	// EIPs complements 
-
-	'when',
-	'otherwise',
-	'do-while',
-	'do-finally',
-	'do-catch'
-]
-
+  "when",
+  "otherwise",
+  "do-while",
+  "do-finally",
+  "do-catch",
+];
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
-	const { canvas } = useTopologyStore()
-	const { direction } = canvas
-	const targetPosition = direction === "LR" ? Position.Left : Position.Top;
-	const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
+  const { canvas } = useTopologyStore();
+  const { direction } = canvas;
+  const targetPosition = direction === "LR" ? Position.Left : Position.Top;
+  const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
 
-	const iconPath = React.useMemo(() => {
-		if (eipListNames.includes(data.iconName)) {
-			return `/camel-icons/eips/${data.iconName}.svg`;
-		} else {
-			return `/camel-icons/components/${data.iconName}.svg`;
-		}
-	}, [data.iconName]);
+  const iconPath = React.useMemo(() => {
+    if (eipListNames.includes(data.iconName)) {
+      return `/camel-icons/eips/${data.iconName}.svg`;
+    } else {
+      return `/camel-icons/components/${data.iconName}.svg`;
+    }
+  }, [data.iconName]);
 
+  const { setNode } = useLayer();
 
-	const { setNode } = useLayer();
+  function handleClick() {
+    setNode({ ...data, ...props });
+  }
 
-	function handleClick() {
-		setNode({ ...data, ...props });
-	};
+  const [isOpen, setIsOpen] = React.useState(false);
+  const handleMenuOpen = () => {
+    setIsOpen(true);
+  };
 
-	const [isOpen, setIsOpen] = React.useState(false);
-	const handleMenuOpen = () => {
-		setIsOpen(true);
-	};
+  const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
 
-	const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
-
-	return (
-		<>
-			<Menu isOpen={isOpen} onOpenChange={setIsOpen}>
-				<Tooltip delay={0}>
-					<Menu.Trigger data-slot="menu-trigger"
-						onPress={handleMenuOpen}
-						className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center">
-						{data.iconName && (
-							<img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
-						)}
-						{data.absolutePath !== 'route.from' && <BaseHandle type="target" position={targetPosition} />}
-						<BaseHandle type="source" position={sourcePosition} isConnectable={false} />
-					</Menu.Trigger>
-					<Tooltip.Content>
-						{data.label.toUpperCase()}
-					</Tooltip.Content>
-				</Tooltip>
-				<Menu.Content placement="bottom" showArrow>
-					<Menu.Item onAction={handleClick} textValue={data.label}>
-						<IconPencilBox /> Edit
-					</Menu.Item>
-					<Menu.Item onAction={() => setIsOpen(true)} textValue={`Replace ${data.label}`}>
-						<IconRepeat /> Replace
-					</Menu.Item>
-					<Menu.Item isDanger onAction={() => setIsDeleteOpen(true)} textValue={`Delete ${data.label}`}>
-						<IconTrash /> Delete
-					</Menu.Item>
-				</Menu.Content>
-			</Menu>
-			<DeleteNodeModal
-				isOpen={isDeleteOpen}
-				onOpenChange={setIsDeleteOpen}
-				node={data}
-			/>
-		</>
-	);
+  return (
+    <>
+      <Menu isOpen={isOpen} onOpenChange={setIsOpen}>
+        <Tooltip delay={0}>
+          <Menu.Trigger
+            data-slot="menu-trigger"
+            onPress={handleMenuOpen}
+            className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center"
+          >
+            {data.iconName && (
+              <img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
+            )}
+            {data.absolutePath !== "route.from" && (
+              <BaseHandle type="target" position={targetPosition} />
+            )}
+            <BaseHandle
+              type="source"
+              position={sourcePosition}
+              isConnectable={false}
+            />
+          </Menu.Trigger>
+          <Tooltip.Content>{data.label.toUpperCase()}</Tooltip.Content>
+        </Tooltip>
+        <Menu.Content placement="bottom" showArrow>
+          <Menu.Item onAction={handleClick} textValue={data.label}>
+            <IconPencilBox /> Edit
+          </Menu.Item>
+          <Menu.Item
+            onAction={() => setIsOpen(true)}
+            textValue={`Replace ${data.label}`}
+          >
+            <IconRepeat /> Replace
+          </Menu.Item>
+          <Menu.Item
+            isDanger
+            onAction={() => setIsDeleteOpen(true)}
+            textValue={`Delete ${data.label}`}
+          >
+            <IconTrash /> Delete
+          </Menu.Item>
+        </Menu.Content>
+      </Menu>
+      <DeleteNodeModal
+        isOpen={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        node={data}
+      />
+    </>
+  );
 });
-
-
