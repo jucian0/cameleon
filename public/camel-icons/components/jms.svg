@@ -1,0 +1,6 @@
+<svg fill="hsl(181, 70%, 48%)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" aria-labelledby="title">
+  <title id="title">Server Icon</title>
+  <path d="M28 28H4a2.002 2.002 0 0 1-2-2v-5h2v5h24v-5h2v5a2.002 2.002 0 0 1-2 2Z"/>
+  <path d="M7 21h18v2H7zM7 16h18v2H7zM7 11h18v2H7zM7 6h18v2H7z"/>
+  <rect width="32" height="32" fill="none"/>
+</svg>
