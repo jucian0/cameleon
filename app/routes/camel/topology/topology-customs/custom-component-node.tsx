@@ -82,7 +82,28 @@ const eipListNames = [
   "do-catch",
 ];
 
+type FallbackImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+  src: string;
+  fallback: string;
+  alt: string;
+};
+
+function FallbackImage({ src, fallback, alt, ...props }: FallbackImageProps) {
+  const [imgSrc, setImgSrc] = React.useState(src);
+
+  return (
+    <img
+      key={imgSrc}
+      src={imgSrc}
+      alt={alt}
+      onError={() => setImgSrc(fallback)}
+      {...props}
+    />
+  );
+}
+
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
+  const [isOpen, setIsOpen] = React.useState(false);
   const { canvas } = useTopologyStore();
   const { direction } = canvas;
   const targetPosition = direction === "LR" ? Position.Left : Position.Top;
@@ -102,10 +123,9 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
     setNode({ ...data, ...props });
   }
 
-  const [isOpen, setIsOpen] = React.useState(false);
-  const handleMenuOpen = () => {
+  function handleMenuOpen() {
     setIsOpen(true);
-  };
+  }
 
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
 
@@ -119,7 +139,12 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
             className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center"
           >
             {data.iconName && (
-              <img alt={data.iconName} src={iconPath} className="w-6 h-auto" />
+              <FallbackImage
+                src={iconPath}
+                fallback="/camel-icons/components/generic.svg"
+                alt={data.iconName}
+                className="w-6 h-auto"
+              />
             )}
             {data.absolutePath !== "route.from" && (
               <BaseHandle type="target" position={targetPosition} />
