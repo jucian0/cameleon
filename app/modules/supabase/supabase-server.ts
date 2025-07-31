@@ -9,13 +9,17 @@ export type SupabaseClientRequest = {
 export function createServerSupabase(request: Request) {
   const response = new Response();
   const supabase = createServerClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
+    process.env.VITE_PUBLIC_SUPABASE_URL!,
+    process.env.VITE_PUBLIC_SUPABASE_ANON_KEY!,
+    { request, response },
   );
 
   return { supabase, response };
 }
 
-export type SupabaseClient = ReturnType<typeof createServerSupabase>["supabase"];
-export type SupabaseResponse = ReturnType<typeof createServerSupabase>["response"];
+export type SupabaseClient = ReturnType<
+  typeof createServerSupabase
+>["supabase"];
+export type SupabaseResponse = ReturnType<
+  typeof createServerSupabase
+>["response"];

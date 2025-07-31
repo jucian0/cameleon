@@ -31,8 +31,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     theme: getTheme(),
     user: currentUser.data.user,
     env: {
-      SUPABASE_URL: process.env.SUPABASE_URL,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+      VITE_PUBLIC_SUPABASE_URL: process.env.VITE_PUBLIC_SUPABASE_URL,
+      VITE_PUBLIC_SUPABASE_ANON_KEY: process.env.VITE_PUBLIC_SUPABASE_ANON_KEY,
     },
   };
 }
@@ -78,9 +78,7 @@ function Layout({ children }: Readonly<React.PropsWithChildren>) {
         className="font-sans antialiased min-h-svh"
         suppressHydrationWarning
       >
-        <RouterProvider navigate={navigate}>
-          {children}
-        </RouterProvider>
+        <RouterProvider navigate={navigate}>{children}</RouterProvider>
         <ScrollRestoration />
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme)} />
         <Scripts />
