@@ -9,6 +9,7 @@ import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
 import { Menu } from "components/ui/menu";
 import { useTopologyStore } from "../topology-store";
 import { Tooltip } from "components/ui/tooltip";
+import { FallbackImage } from "components/fallback-image";
 
 const eipListNames = [
   "aggregate",
@@ -81,26 +82,6 @@ const eipListNames = [
   "do-finally",
   "do-catch",
 ];
-
-type FallbackImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
-  src: string;
-  fallback: string;
-  alt: string;
-};
-
-function FallbackImage({ src, fallback, alt, ...props }: FallbackImageProps) {
-  const [imgSrc, setImgSrc] = React.useState(src);
-
-  return (
-    <img
-      key={imgSrc}
-      src={imgSrc}
-      alt={alt}
-      onError={() => setImgSrc(fallback)}
-      {...props}
-    />
-  );
-}
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const [isOpen, setIsOpen] = React.useState(false);

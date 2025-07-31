@@ -8,6 +8,7 @@ import {
   Virtualizer,
 } from "react-aria-components";
 import { Card } from "components/ui/card";
+import { FallbackImage } from "components/fallback-image";
 
 type CamelComponentTabProps = {
   readonly onSelectionChange: (node: any) => void;
@@ -58,10 +59,11 @@ export default function CamelComponentsTab({
           >
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
-                <img
+                <FallbackImage
                   src={`/camel-icons/components/${item.component.name}.svg`}
                   alt={item.component.name}
                   className="h-8 w-8 rounded"
+                  fallback="/camel-icons/components/generic.svg"
                 />
                 <div className="flex flex-col">{item.component.title}</div>
               </Card.Header>
