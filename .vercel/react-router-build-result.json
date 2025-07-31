@@ -15,6 +15,10 @@
       "routes/auth/callback-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/home/home-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/camel/studio-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/camel/library-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/camel/library-eips-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/camel/library-components-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/camel/library-presets-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/set-theme/set-theme-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
@@ -60,6 +64,34 @@
         "path": "camel/studio",
         "config": {}
       },
+      "routes/camel/library-page": {
+        "id": "routes/camel/library-page",
+        "parentId": "routes/layout",
+        "file": "app/routes/camel/library-page.tsx",
+        "path": "camel/library",
+        "config": {}
+      },
+      "routes/camel/library-eips-page": {
+        "id": "routes/camel/library-eips-page",
+        "parentId": "routes/camel/library-page",
+        "file": "app/routes/camel/library-eips-page.tsx",
+        "path": "eips",
+        "config": {}
+      },
+      "routes/camel/library-components-page": {
+        "id": "routes/camel/library-components-page",
+        "parentId": "routes/camel/library-page",
+        "file": "app/routes/camel/library-components-page.tsx",
+        "path": "components",
+        "config": {}
+      },
+      "routes/camel/library-presets-page": {
+        "id": "routes/camel/library-presets-page",
+        "parentId": "routes/camel/library-page",
+        "file": "app/routes/camel/library-presets-page.tsx",
+        "path": "presets",
+        "config": {}
+      },
       "routes/set-theme/set-theme-page": {
         "id": "routes/set-theme/set-theme-page",
         "parentId": "routes/layout",
@@ -70,9 +102,9 @@
     }
   },
   "reactRouterConfig": {
-    "appDirectory": "/Users/jucianobarbosa/personal/engrafo-cms/app",
+    "appDirectory": "/Users/jucianobarbosa/personal/camelion/app",
     "basename": "/",
-    "buildDirectory": "/Users/jucianobarbosa/personal/engrafo-cms/build",
+    "buildDirectory": "/Users/jucianobarbosa/personal/camelion/build",
     "future": {
       "unstable_middleware": true,
       "unstable_optimizeDeps": false,
@@ -114,6 +146,30 @@
         "parentId": "routes/layout",
         "file": "routes/camel/studio-page.tsx",
         "path": "camel/studio"
+      },
+      "routes/camel/library-page": {
+        "id": "routes/camel/library-page",
+        "parentId": "routes/layout",
+        "file": "routes/camel/library-page.tsx",
+        "path": "camel/library"
+      },
+      "routes/camel/library-eips-page": {
+        "id": "routes/camel/library-eips-page",
+        "parentId": "routes/camel/library-page",
+        "file": "routes/camel/library-eips-page.tsx",
+        "path": "eips"
+      },
+      "routes/camel/library-components-page": {
+        "id": "routes/camel/library-components-page",
+        "parentId": "routes/camel/library-page",
+        "file": "routes/camel/library-components-page.tsx",
+        "path": "components"
+      },
+      "routes/camel/library-presets-page": {
+        "id": "routes/camel/library-presets-page",
+        "parentId": "routes/camel/library-page",
+        "file": "routes/camel/library-presets-page.tsx",
+        "path": "presets"
       },
       "routes/set-theme/set-theme-page": {
         "id": "routes/set-theme/set-theme-page",
