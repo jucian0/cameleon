@@ -8,16 +8,13 @@ import { useRouteLoaderData } from "react-router";
 export default function AuthPage() {
   const { env } = useRouteLoaderData("root") as {
     env: {
-      VITE_PUBLIC_SUPABASE_URL: string;
-      VITE_PUBLIC_SUPABASE_ANON_KEY: string;
+      SUPABASE_URL: string;
+      SUPABASE_ANON_KEY: string;
     };
   };
 
   const [supabase] = useState(
-    createClient(
-      env.VITE_PUBLIC_SUPABASE_URL,
-      env.VITE_PUBLIC_SUPABASE_ANON_KEY,
-    ),
+    createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY),
   );
 
   async function handleGithubSignIn() {

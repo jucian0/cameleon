@@ -8,8 +8,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (code) {
     const supabaseClient = createServerClient(
-      process.env.VITE_PUBLIC_SUPABASE_URL!,
-      process.env.VITE_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_ANON_KEY!,
       { request, response },
     );
     await supabaseClient.auth.exchangeCodeForSession(code);

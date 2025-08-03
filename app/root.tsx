@@ -31,8 +31,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     theme: getTheme(),
     user: currentUser.data.user,
     env: {
-      VITE_PUBLIC_SUPABASE_URL: process.env.VITE_PUBLIC_SUPABASE_URL,
-      VITE_PUBLIC_SUPABASE_ANON_KEY: process.env.VITE_PUBLIC_SUPABASE_ANON_KEY,
+      SUPABASE_URL: process.env.SUPABASE_URL,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
     },
   };
 }
