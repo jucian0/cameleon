@@ -9,8 +9,8 @@ export type SupabaseClientRequest = {
 export function createServerSupabase(request: Request) {
   const response = new Response();
   const supabase = createServerClient<Database>(
-    process.env.VITE_PUBLIC_SUPABASE_URL!,
-    process.env.VITE_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     { request, response },
   );
 
