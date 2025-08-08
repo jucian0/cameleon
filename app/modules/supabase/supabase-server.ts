@@ -11,11 +11,15 @@ export function createServerSupabase(request: Request) {
   const supabase = createServerClient<Database>(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_ANON_KEY!,
-    { request, response }
+    { request, response },
   );
 
   return { supabase, response };
 }
 
-export type SupabaseClient = ReturnType<typeof createServerSupabase>["supabase"];
-export type SupabaseResponse = ReturnType<typeof createServerSupabase>["response"];
+export type SupabaseClient = ReturnType<
+  typeof createServerSupabase
+>["supabase"];
+export type SupabaseResponse = ReturnType<
+  typeof createServerSupabase
+>["response"];
