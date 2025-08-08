@@ -78,9 +78,7 @@ function Layout({ children }: Readonly<React.PropsWithChildren>) {
         className="font-sans antialiased min-h-svh"
         suppressHydrationWarning
       >
-        <RouterProvider navigate={navigate}>
-          {children}
-        </RouterProvider>
+        <RouterProvider navigate={navigate}>{children}</RouterProvider>
         <ScrollRestoration />
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme)} />
         <Scripts />
