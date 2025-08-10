@@ -1,10 +1,6 @@
 import axios from "axios";
-import type { ComponentDefinition, EPIDefinition } from "../topology/topology-types";
-
-export async function fetchComponentsMetadata() {
-  return axios.get<ComponentDefinition[]>("/metadata/components.json")
-}
+import type { EPIDefinition } from "../topology-lib/topology-types";
 
 export async function fetchEIPsMetadata() {
-  return axios.get<EPIDefinition[]>("/metadata/eips.json")
+  return axios.get<EPIDefinition[]>("/metadata/eips.json");
 }
