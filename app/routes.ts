@@ -13,14 +13,19 @@ export default [
     index("pages/home/home-page.tsx"),
     ...prefix("camel-studio", [
       route("configs", "pages/camel/configs-page/configs-page.tsx", [
-        route("studio", "pages/camel/configs-page/studio-page.tsx"),
-        route(":configId/studio", "pages/camel/configs-page/studio-page.tsx"),
+        route("studio", "pages/camel/configs-page/studio-page.tsx", {
+          id: "configs-create",
+        }),
+        route(":configId/studio", "pages/camel/configs-page/studio-page.tsx", {
+          id: "configd-edit",
+        }),
       ]),
-      route("library", "pages/camel/library-page/page.tsx", [
-        // index('routes/camel/library-eips-page.tsx'),
-        route("eips", "pages/camel/library-page/eips-page.tsx"),
-        route("components", "pages/camel/library-page/components-page.tsx"),
-        route("presets", "pages/camel/library-page/presets-page.tsx"),
+      ...prefix("library", [
+        layout("pages/camel/library-page/layout.tsx", [
+          route("eips", "pages/camel/library-page/eips-page.tsx"),
+          route("components", "pages/camel/library-page/components-page.tsx"),
+          route("presets", "pages/camel/library-page/presets-page.tsx"),
+        ]),
       ]),
     ]),
     route("set-theme", "pages/set-theme/set-theme-page.ts"),

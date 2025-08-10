@@ -88,13 +88,13 @@ export default function AppSidebar(
                 <SidebarItem
                   href="/camel-studio/configs"
                   tooltip="Studio"
-                  isCurrent={pathname.includes("studio")}
+                  isCurrent={pathname.includes("configs")}
                 >
                   <StudioIcon className="size-4" />
                   <SidebarLabel>Configs</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem
-                  href="/camel-studio/library"
+                  href="/camel-studio/library/eips"
                   tooltip="Library"
                   isCurrent={pathname.includes("library")}
                 >
