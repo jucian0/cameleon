@@ -82,19 +82,19 @@ export default function AppSidebar(
             <SidebarDisclosure id={1}>
               <SidebarDisclosureTrigger>
                 <CamelStudioIcon className="size-4" />
-                <SidebarLabel>Apache Camel</SidebarLabel>
+                <SidebarLabel>Camel Studio</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
                 <SidebarItem
-                  href="/camel/studio"
+                  href="/camel-studio/configs"
                   tooltip="Studio"
                   isCurrent={pathname.includes("studio")}
                 >
                   <StudioIcon className="size-4" />
-                  <SidebarLabel>Studio</SidebarLabel>
+                  <SidebarLabel>Configs</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem
-                  href="/camel/library"
+                  href="/camel-studio/library"
                   tooltip="Library"
                   isCurrent={pathname.includes("library")}
                 >
