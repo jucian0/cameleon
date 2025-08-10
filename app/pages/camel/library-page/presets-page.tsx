@@ -1,44 +1,49 @@
 import { tryCatch } from "@/utils/try-catch";
-import { useAsyncList, type Key, type Selection } from "react-stately";
-import { fetchEIPsMetadata } from "../data-requests/fetch-metadata";
 import {
   GridLayout,
   ListBox,
   ListBoxItem,
   Virtualizer,
+  type Key,
+  type Selection,
 } from "react-aria-components";
 import { Card } from "components/ui/card";
+import { type LoaderFunctionArgs } from "react-router";
+import type { EPIDefinition } from "../topology-lib/topology-types";
+import axios from "axios";
+import type { Route } from "./+types/presets-page";
 
 export const handle = {
   breadcrumb: () => "Presets",
 };
 
-export default function CamelEIPsTab({
-  onSelectionChange,
-}: Readonly<{ onSelectionChange: (node: any) => void }>) {
-  const eips = useAsyncList({
-    async load() {
-      const { data, error } = await tryCatch(fetchEIPsMetadata());
-      if (error) {
-        return { items: [] };
-      }
-      return { items: Object.values(data.data) };
-    },
-  });
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const eipsUrl = url.origin + "/metadata/eips.json";
+  const { data, error } = await tryCatch(axios.get<EPIDefinition[]>(eipsUrl));
+
+  return {
+    eips: error ? [] : Object.values(data?.data),
+  };
+}
+
+export default function CamelEIPsTab({ loaderData }: Route.ComponentProps) {
+  const { eips } = loaderData;
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
-      .map((key) => eips.items.find((item) => item.model.name === key))
+      .map((key) => eips.find((item) => item.model.name === key))
       .filter(Boolean);
     if (!selectedItem) return;
-    onSelectionChange(selectedKeys);
+    // onSelectionChange(selectedKeys);
   }
+
   return (
     <Virtualizer layout={GridLayout}>
       <ListBox
         selectionMode="single"
         onSelectionChange={handleSelectionChange}
-        items={eips.items}
+        items={eips}
         renderEmptyState={() => <span className="m-4">No EIPs to display</span>}
         className={"-m-4"}
       >
