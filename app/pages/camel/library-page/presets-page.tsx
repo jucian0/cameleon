@@ -1,6 +1,6 @@
 import { tryCatch } from "@/utils/try-catch";
 import { useAsyncList, type Key, type Selection } from "react-stately";
-import { fetchEIPsMetadata } from "./data-requests/fetch-metadata";
+import { fetchEIPsMetadata } from "../data-requests/fetch-metadata";
 import {
   GridLayout,
   ListBox,
@@ -10,7 +10,7 @@ import {
 import { Card } from "components/ui/card";
 
 export const handle = {
-  breadcrumb: () => "EIPs",
+  breadcrumb: () => "Presets",
 };
 
 export default function CamelEIPsTab({

@@ -1,6 +1,6 @@
 import React from "react";
-import { useTopologyStore } from "./topology/topology-store";
-import { TopologyBuilder } from "./topology/topology-builder/topology-builder";
+import { useTopologyStore } from "../topology-lib/topology-store";
+import { TopologyBuilder } from "../topology-lib/topology-builder/topology-builder";
 
 export const handle = {
   breadcrumb: () => "Camel Studio",

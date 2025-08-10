@@ -1,6 +1,5 @@
 import { tryCatch } from "@/utils/try-catch";
-import { useAsyncList, type Key, type Selection } from "react-stately";
-import { fetchComponentsMetadata } from "./data-requests/fetch-metadata";
+import { type Key, type Selection } from "react-stately";
 import {
   GridLayout,
   ListBox,
@@ -9,36 +8,38 @@ import {
 } from "react-aria-components";
 import { Card } from "components/ui/card";
 import { FallbackImage } from "components/fallback-image";
-
-type CamelComponentTabProps = {
-  readonly onSelectionChange: (node: any) => void;
-};
+import type { LoaderFunctionArgs } from "react-router";
+import type { ComponentDefinition } from "../topology-lib/topology-types";
+import axios from "axios";
+import type { Route } from "./+types/components-page";
 
 export const handle = {
   breadcrumb: () => "Components",
 };
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const componentsUrl = url.origin + "/metadata/components.json";
+  const { error, data } = await tryCatch(
+    axios.get<ComponentDefinition[]>(componentsUrl),
+  );
+
+  return {
+    components: error ? [] : Object.values(data?.data),
+  };
+}
+
 export default function CamelComponentsTab({
-  onSelectionChange,
-}: CamelComponentTabProps) {
-  const components = useAsyncList({
-    async load() {
-      const { data, error } = await tryCatch(fetchComponentsMetadata());
-      if (error) {
-        return { items: [] };
-      }
-      return { items: Object.values(data.data) };
-    },
-  });
+  loaderData,
+}: Route.ComponentProps) {
+  const { components } = loaderData;
 
   function handleSelectionChange(selectedKeys: Selection) {
     const [selectedItem] = Array.from(selectedKeys as Set<Key>)
-      .map((key) =>
-        components.items.find((item) => item.component.name === key),
-      )
+      .map((key) => components?.find((item) => item.component.name === key))
       .filter(Boolean);
     if (!selectedItem) return;
-    onSelectionChange(selectedKeys);
+    // onSelectionChange(selectedKeys);
   }
 
   return (
@@ -51,7 +52,7 @@ export default function CamelComponentsTab({
           <span className="m-4">No components to display</span>
         )}
       >
-        {components.items.map((item) => (
+        {components?.map((item) => (
           <ListBoxItem
             textValue={item.component.name}
             key={item.component.name}

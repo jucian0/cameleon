@@ -10,7 +10,7 @@ import {
   IconLogout,
   IconSettings,
 } from "@intentui/icons";
-import { ThemeMenu } from "@/routes/set-theme/menu";
+import { ThemeMenu } from "@/pages/set-theme/menu";
 import { useMatches, useRouteLoaderData } from "react-router";
 import type { Loader } from "@/root";
 import { Link } from "react-aria-components";
