@@ -11,8 +11,11 @@ export default [
   route("auth/callback", "pages/auth/callback-page.ts"),
   layout("pages/layout.tsx", [
     index("pages/home/home-page.tsx"),
-    ...prefix("camel", [
-      route("studio", "pages/camel/studio-page/page.tsx"),
+    ...prefix("camel-studio", [
+      route("configs", "pages/camel/configs-page/configs-page.tsx", [
+        route("studio", "pages/camel/configs-page/studio-page.tsx"),
+        route(":configId/studio", "pages/camel/configs-page/studio-page.tsx"),
+      ]),
       route("library", "pages/camel/library-page/page.tsx", [
         // index('routes/camel/library-eips-page.tsx'),
         route("eips", "pages/camel/library-page/eips-page.tsx"),

@@ -48,20 +48,20 @@ export default function TopologyLibrary() {
           <Tabs.List>
             <Tabs.Tab
               id="eips"
-              href={`/camel/library/eips?${filter.toString()}`}
+              href={`/camel-studio/library/eips?${filter.toString()}`}
             >
               <ProcessorIcon />
               EIPs{" "}
             </Tabs.Tab>
             <Tabs.Tab
               id="components"
-              href={`/camel/library/components?${filter.toString()}`}
+              href={`/camel-studio/library/components?${filter.toString()}`}
             >
               <ResourcesIcon /> Components
             </Tabs.Tab>
             <Tabs.Tab
               id="presets"
-              href={`/camel/library/presets?${filter.toString()}`}
+              href={`/camel-studio/library/presets?${filter.toString()}`}
             >
               <PresetIcon /> Presets
             </Tabs.Tab>
