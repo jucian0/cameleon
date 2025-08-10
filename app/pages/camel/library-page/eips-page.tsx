@@ -36,6 +36,7 @@ export default function CamelEIPsTab({ loaderData }: Route.ComponentProps) {
     if (!selectedItem) return;
     // onSelectionChange(selectedKeys);
   }
+
   return (
     <Virtualizer layout={GridLayout}>
       <ListBox
