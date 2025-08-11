@@ -2,33 +2,19 @@ import React, { useState } from "react"
 
 import type { SliderProps as SliderPrimitiveProps, SliderThumbProps } from "react-aria-components"
 import {
+  composeRenderProps,
   SliderOutput,
   Slider as SliderPrimitive,
   SliderStateContext,
   SliderThumb as SliderThumbPrimitive,
   SliderTrack as SliderTrackPrimitive,
   type SliderTrackProps,
-  composeRenderProps,
 } from "react-aria-components"
-import { tv } from "tailwind-variants"
-
-import { composeTailwindRenderProps } from "./primitive"
 import { twJoin, twMerge } from "tailwind-merge"
+import { tv } from "tailwind-variants"
+import { composeTailwindRenderProps } from "components/lib/primitive"
 import { Description, Label } from "./field"
 import { Tooltip } from "./tooltip"
-
-const sliderStyles = tv({
-  base: "group relative flex touch-none select-none flex-col",
-  variants: {
-    orientation: {
-      horizontal: "w-full min-w-56 gap-y-2",
-      vertical: "h-full min-h-56 w-1.5 items-center gap-y-2",
-    },
-    isDisabled: {
-      true: "disabled:opacity-50",
-    },
-  },
-})
 
 interface SliderProps extends SliderPrimitiveProps {
   output?: "inline" | "tooltip" | "none"
@@ -102,11 +88,24 @@ const Slider = ({
   return (
     <SliderPrimitive
       orientation={orientation}
-      className={composeRenderProps(className, (className, renderProps) =>
-        sliderStyles({ ...renderProps, className }),
+      className={composeRenderProps(className, (className, { orientation }) =>
+        twMerge([
+          "group relative flex touch-none select-none flex-col disabled:opacity-50",
+          orientation === "horizontal" && "w-full min-w-56 gap-y-2",
+          orientation === "vertical" && "h-full min-h-56 w-1.5 items-center gap-y-2",
+          className,
+        ]),
       )}
       {...props}
     >
+      <div className="flex text-fg">
+        {props.label && <Label>{props.label}</Label>}
+        {output === "inline" && (
+          <SliderOutput className="text-muted-fg text-sm tabular-nums data-[orientation=vertical]:mx-auto data-[orientation=horizontal]:ml-auto">
+            {({ state }) => state.values.map((_, i) => state.getThumbValueLabel(i)).join(" – ")}
+          </SliderOutput>
+        )}
+      </div>
       <SliderTrack>
         {({ state }) => (
           <>
@@ -130,7 +129,7 @@ const SliderTrack = ({ className, ...props }: SliderTrackProps) => {
         className,
         twJoin([
           "[--slider:color-mix(in_oklab,var(--color-muted)_90%,black_10%)] dark:[--slider:color-mix(in_oklab,var(--color-muted)_90%,white_10%)]",
-          "group/track relative cursor-pointer rounded-full bg-(--slider) disabled:cursor-default disabled:opacity-60",
+          "group/track relative cursor-default rounded-full bg-(--slider) disabled:cursor-default disabled:opacity-60",
           "grow group-data-[orientation=horizontal]:h-1.5 group-data-[orientation=horizontal]:w-full group-data-[orientation=vertical]:w-1.5 group-data-[orientation=vertical]:flex-1",
         ]),
       )}
@@ -173,7 +172,7 @@ const thumbStyles = tv({
   ],
   variants: {
     isFocusVisible: {
-      true: "border-primary outline-hidden ring-primary/20",
+      true: "border-primary outline-hidden ring-ring/20",
     },
     isDragging: {
       true: "size-[1.35rem] cursor-grabbing border-primary",

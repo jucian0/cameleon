@@ -1,24 +1,16 @@
 import { IconSearch, IconX } from "@intentui/icons"
-import {
-  SearchField as SearchFieldPrimitive,
-  type SearchFieldProps as SearchFieldPrimitiveProps,
-  type ValidationResult,
-} from "react-aria-components"
-
-import { Button } from "./button"
-import { Description, FieldError, FieldGroup, Input, Label } from "./field"
+import type { SearchFieldProps as SearchFieldPrimitiveProps } from "react-aria-components"
+import { Button, SearchField as SearchFieldPrimitive } from "react-aria-components"
+import { composeTailwindRenderProps } from "components/lib/primitive"
+import { Description, FieldError, FieldGroup, type FieldProps, Input, Label } from "./field"
 import { Loader } from "./loader"
-import { composeTailwindRenderProps } from "./primitive"
 
-interface SearchFieldProps extends SearchFieldPrimitiveProps {
-  label?: string
-  placeholder?: string
-  description?: string
-  errorMessage?: string | ((validation: ValidationResult) => string)
+interface SearchFieldProps extends SearchFieldPrimitiveProps, FieldProps {
   isPending?: boolean
 }
 
 const SearchField = ({
+  children,
   className,
   placeholder,
   label,
@@ -31,27 +23,32 @@ const SearchField = ({
     <SearchFieldPrimitive
       aria-label={placeholder ?? props["aria-label"] ?? "Search..."}
       {...props}
-      className={composeTailwindRenderProps(className, "group/search-field flex flex-col gap-y-1")}
+      className={composeTailwindRenderProps(
+        className,
+        "group/search-field relative flex flex-col gap-y-1 *:data-[slot=label]:font-medium",
+      )}
     >
-      {!props.children ? (
+      {(values) => (
         <>
           {label && <Label>{label}</Label>}
-          <FieldGroup>
-            {isPending ? <Loader variant="spin" /> : <IconSearch />}
-            <Input placeholder={placeholder ?? "Search..."} />
+          {typeof children === "function" ? (
+            children(values)
+          ) : children ? (
+            children
+          ) : (
+            <FieldGroup>
+              {isPending ? <Loader variant="spin" /> : <IconSearch />}
+              <Input placeholder={placeholder ?? "Search..."} />
 
-            <Button
-              intent="plain"
-              className="size-8 pressed:bg-transparent pressed:text-fg text-muted-fg hover:bg-transparent hover:text-fg group-data-empty/search-field:invisible"
-            >
-              <IconX />
-            </Button>
-          </FieldGroup>
+              <Button className="grid place-content-center pressed:text-fg text-muted-fg hover:text-fg group-empty/search-field:invisible">
+                <IconX />
+              </Button>
+            </FieldGroup>
+          )}
+
           {description && <Description>{description}</Description>}
           <FieldError>{errorMessage}</FieldError>
         </>
-      ) : (
-        props.children
       )}
     </SearchFieldPrimitive>
   )

@@ -1,5 +1,5 @@
 import { Autocomplete, useFilter } from "react-aria-components";
-import { Tabs } from "components/ui/tabs";
+import { Tab, TabList, TabPanel, Tabs } from "components/ui/tabs";
 import { SearchField } from "components/ui/search-field";
 import { Outlet, useLocation, useSearchParams } from "react-router";
 import { PresetIcon } from "components/icons/preset";
@@ -45,31 +45,31 @@ export default function TopologyLibrary() {
           aria-label="Camel EIPs and Components"
           selectedKey={currentCamelRoute}
         >
-          <Tabs.List>
-            <Tabs.Tab
+          <TabList>
+            <Tab
               id="eips"
               href={`/camel-studio/library/eips?${filter.toString()}`}
             >
               <ProcessorIcon />
               EIPs{" "}
-            </Tabs.Tab>
-            <Tabs.Tab
+            </Tab>
+            <Tab
               id="components"
               href={`/camel-studio/library/components?${filter.toString()}`}
             >
               <ResourcesIcon /> Components
-            </Tabs.Tab>
-            <Tabs.Tab
+            </Tab>
+            <Tab
               id="presets"
               href={`/camel-studio/library/presets?${filter.toString()}`}
             >
               <PresetIcon /> Presets
-            </Tabs.Tab>
-          </Tabs.List>
-          <Tabs.Panel id="eips"></Tabs.Panel>
-          <Tabs.Panel id={currentCamelRoute}>
+            </Tab>
+          </TabList>
+          <TabPanel id="eips"></TabPanel>
+          <TabPanel id={currentCamelRoute}>
             <Outlet />
-          </Tabs.Panel>
+          </TabPanel>
         </Tabs>
       </Autocomplete>
     </div>
