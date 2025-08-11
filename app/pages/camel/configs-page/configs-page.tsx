@@ -19,6 +19,9 @@ import { Grid2X2, List, Plus, Search, Settings2 } from "lucide-react";
 import { Input } from "components/ui/field";
 import { SearchField } from "components/ui/search-field";
 import type { Key } from "react-stately";
+import type { LoaderFunctionArgs } from "react-router";
+import { createServerSupabase } from "@/modules/supabase/supabase-server";
+import type { Route } from "./+types/configs-page";
 
 export type CamelConfig = {
   id: string;
@@ -127,7 +130,40 @@ function EnvBadge({ env }: { env: CamelConfig["environment"] }) {
   return <Badge intent={map[env]}>{env.toUpperCase()}</Badge>;
 }
 
-export default function CamelConfigs() {
+export async function loader({ params, request }: LoaderFunctionArgs) {
+  const { configId } = params;
+  const { supabase } = createServerSupabase(request);
+
+  const { data, error } = await supabase.from("camel_config_projects").select(`
+      id,
+      name,
+      owner,
+      tags,
+      environment,
+      latest_version:camel_config_latest_versions (
+        version,
+        status,
+        updated_at,
+        description,
+        content
+      )
+    `);
+
+  console.log({ data, error });
+  // if (error) {
+  //   console.error(error);
+  //   throw new Response("Failed to fetch config", { status: 500 });
+  // }
+
+  // if (!data) {
+  //   throw new Response("Config not found", { status: 404 });
+  // }
+
+  return {};
+}
+
+export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
+  const data = loaderData;
   const [query, setQuery] = useState("");
   const [view, setView] = useState<"cards" | "list">("cards");
   const [sort, setSort] = useState<"name" | "updatedAt">("updatedAt");
