@@ -1,9 +1,0 @@
-{
-  "ui": "components/ui",
-  "utils": "components/utils",
-  "gray": "zinc",
-  "css": "app/app.css",
-  "alias": "~",
-  "language": "typescript",
-  "$schema": "https://intentui.com/schema.json"
-}
