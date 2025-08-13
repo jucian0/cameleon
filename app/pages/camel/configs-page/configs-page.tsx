@@ -75,7 +75,7 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
   const [query, setQuery] = useState("");
   const [view, setView] = useState<"cards" | "list">("cards");
   const [sort, setSort] = useState<"name" | "updatedAt">("updatedAt");
-  console.log("CamelConfigs loaderData", items);
+
   return (
     <div className="m-6 flex flex-col gap-4">
       <form className="mb-6">
@@ -126,58 +126,42 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
       {view === "cards" ? (
         <section aria-label="Configs grid">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((c) => (
-              <Card
-                key={c.id}
-                className="transition shadow-sm hover:shadow-md focus-within:ring-2 ring-ring"
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg leading-tight">
-                      {c.name} <span>v{c.latest_version[0].version}</span>
-                    </CardTitle>
-                    <StatusBadge status={c.latest_version[0].status} />
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>
-                      {new Date(
-                        c.latest_version[0].updated_at,
-                      ).toLocaleDateString()}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {c.latest_version[0].description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {c.tags.slice(0, 3).map((t) => (
-                      <Badge key={t} intent="outline">
-                        #{t}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex gap-1 justify-end">
-                  <Link
-                    aria-label="Edit config"
-                    href={`/camel/configs/${c.id}`}
-                    className={buttonStyles({
-                      intent: "secondary",
-                      size: "sq-md",
-                    })}
-                  >
-                    <Workflow className=" h-4 w-4" />
-                  </Link>
-                  <Button
-                    intent="danger"
-                    size="sq-md"
-                    aria-label="Delete config"
-                  >
-                    <Trash className=" h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
+            {items?.map((c) => (
+              <Link href={`/camel/configs/${c.id}`} key={c.id}>
+                <Card
+                  key={c.id}
+                  className="transition shadow-sm hover:shadow-md focus-within:ring-2 ring-ring h-50"
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-lg leading-tight">
+                        {c.name} <span>v{c.latest_version[0].version}</span>
+                      </CardTitle>
+                      <StatusBadge status={c.latest_version[0].status} />
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>
+                        {new Date(
+                          c.latest_version[0].updated_at,
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {c.latest_version[0].description} description goes here.
+                      And not here...
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {c.tags.slice(0, 3).map((t) => (
+                        <Badge key={t} intent="outline">
+                          #{t}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </section>
