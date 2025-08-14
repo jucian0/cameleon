@@ -86,7 +86,7 @@ export default function AppSidebar(
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
                 <SidebarItem
-                  href="/camel-studio/configs"
+                  href="/camel/configs"
                   tooltip="Studio"
                   isCurrent={pathname.includes("configs")}
                 >
@@ -94,7 +94,7 @@ export default function AppSidebar(
                   <SidebarLabel>Configs</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem
-                  href="/camel-studio/library/eips"
+                  href="/camel/library/eips"
                   tooltip="Library"
                   isCurrent={pathname.includes("library")}
                 >

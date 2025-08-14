@@ -11,14 +11,18 @@ export default [
   route("auth/callback", "pages/auth/callback-page.ts"),
   layout("pages/layout.tsx", [
     index("pages/home/home-page.tsx"),
-    ...prefix("camel-studio", [
+    ...prefix("camel", [
+      route("studio", "pages/camel/configs-page/studio-page/page.tsx", {
+        id: "configs-create",
+      }),
       route("configs", "pages/camel/configs-page/configs-page.tsx", [
-        route("studio", "pages/camel/configs-page/studio-page.tsx", {
-          id: "configs-create",
-        }),
-        route(":configId/studio", "pages/camel/configs-page/studio-page.tsx", {
-          id: "configd-edit",
-        }),
+        route(
+          ":configId/studio",
+          "pages/camel/configs-page/studio-page/page.tsx",
+          {
+            id: "configd-edit",
+          },
+        ),
       ]),
       ...prefix("library", [
         layout("pages/camel/library-page/layout.tsx", [
