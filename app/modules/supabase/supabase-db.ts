@@ -72,3 +72,10 @@ export type Database = {
 
 export type CamelConfig =
   Database["public"]["Tables"]["camel_config_projects"]["Row"];
+
+export type ConfigVersion =
+  Database["public"]["Tables"]["camel_config_versions"]["Row"];
+
+export type CamelConfigView = CamelConfig & {
+  latest_version: ConfigVersion[];
+};
