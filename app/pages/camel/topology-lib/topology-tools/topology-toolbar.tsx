@@ -1,5 +1,11 @@
 import { forwardRef } from "react";
-import { Maximize, Minus, Plus, ArrowRightFromLine, Settings } from "lucide-react";
+import {
+  Maximize,
+  Minus,
+  Plus,
+  ArrowRightFromLine,
+  Settings,
+} from "lucide-react";
 
 import {
   Panel,
@@ -14,7 +20,6 @@ import { useTopologyStore } from "../topology-store";
 import { useMediaQuery } from "components/utils/use-media-query";
 import { Popover } from "components/ui/popover";
 import { TopologyToolbarActions } from "./topology-toolbar-actions";
-
 
 export const TopologyTools = forwardRef<
   HTMLDivElement,
@@ -42,14 +47,14 @@ export const TopologyTools = forwardRef<
         {...props}
       >
         <Popover>
-          <Button intent="secondary" size="extra-small" aria-label="Toolbar">
+          <Button intent="secondary" size="xs" aria-label="Toolbar">
             <Settings className="h-4 w-4" />
           </Button>
           <Popover.Content className="p-2 w-auto">
             <div className="flex items-center gap-1">
               <Button
                 intent="secondary"
-                size="extra-small"
+                size="xs"
                 onPress={() => zoomOut({ duration: 300 })}
                 aria-label="Zoom out"
               >
@@ -66,7 +71,7 @@ export const TopologyTools = forwardRef<
               />
               <Button
                 intent="secondary"
-                size="extra-small"
+                size="xs"
                 onPress={() => zoomIn({ duration: 300 })}
                 aria-label="Zoom in"
               >
@@ -74,7 +79,7 @@ export const TopologyTools = forwardRef<
               </Button>
               <Button
                 intent="secondary"
-                size="extra-small"
+                size="xs"
                 onPress={() => fitView({ duration: 300 })}
                 aria-label="Fit view"
               >
@@ -83,13 +88,12 @@ export const TopologyTools = forwardRef<
 
               <Button
                 intent="secondary"
-                size="extra-small"
+                size="xs"
                 onPress={() => setDirection(direction === "LR" ? "TB" : "LR")}
                 aria-label="Change direction"
               >
                 <ArrowRightFromLine
-                  className={`h-4 w-4 ${direction === "LR" ? "rotate-90" : ""
-                    }`}
+                  className={`h-4 w-4 ${direction === "LR" ? "rotate-90" : ""}`}
                 />
               </Button>
             </div>
@@ -97,7 +101,7 @@ export const TopologyTools = forwardRef<
         </Popover>
         <TopologyToolbarActions />
       </Panel>
-    )
+    );
   }
 
   return (
@@ -108,7 +112,7 @@ export const TopologyTools = forwardRef<
       <div className="flex items-center gap-1">
         <Button
           intent="secondary"
-          size="extra-small"
+          size="xs"
           aria-label="Zoom out"
           onPress={() => zoomOut({ duration: 300 })}
         >
@@ -122,10 +126,11 @@ export const TopologyTools = forwardRef<
           step={0.01}
           onChange={(values) => zoomTo((values as number[])[0])}
           aria-label="Zoom slider"
+          output="none"
         />
         <Button
           intent="secondary"
-          size="extra-small"
+          size="xs"
           aria-label="Zoom in"
           onPress={() => zoomIn({ duration: 300 })}
         >
@@ -134,7 +139,7 @@ export const TopologyTools = forwardRef<
         <Button
           className="min-w-20 tabular-nums"
           intent="secondary"
-          size="extra-small"
+          size="xs"
           aria-label="Zoom to 100%"
           onPress={() => zoomTo(1, { duration: 300 })}
         >
@@ -142,7 +147,7 @@ export const TopologyTools = forwardRef<
         </Button>
         <Button
           intent="secondary"
-          size="extra-small"
+          size="xs"
           aria-label="Fit view"
           onPress={() => fitView({ duration: 300 })}
         >
@@ -151,11 +156,13 @@ export const TopologyTools = forwardRef<
 
         <Button
           intent="secondary"
-          size="extra-small"
+          size="xs"
           aria-label="Change direction"
           onPress={() => setDirection(direction === "LR" ? "TB" : "LR")}
         >
-          <ArrowRightFromLine className={`h-4 w-4 ${direction === "LR" ? "rotate-90" : ""}`} />
+          <ArrowRightFromLine
+            className={`h-4 w-4 ${direction === "LR" ? "rotate-90" : ""}`}
+          />
         </Button>
       </div>
       <TopologyToolbarActions />
