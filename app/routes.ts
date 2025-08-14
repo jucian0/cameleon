@@ -15,15 +15,14 @@ export default [
       route("studio", "pages/camel/configs-page/studio-page/page.tsx", {
         id: "configs-create",
       }),
-      route("configs", "pages/camel/configs-page/configs-page.tsx", [
-        route(
-          ":configId/studio",
-          "pages/camel/configs-page/studio-page/page.tsx",
-          {
-            id: "configd-edit",
-          },
-        ),
-      ]),
+      route(
+        "configs/:configId/studio",
+        "pages/camel/configs-page/studio-page/page.tsx",
+        {
+          id: "configd-edit",
+        },
+      ),
+      route("configs", "pages/camel/configs-page/configs-page.tsx", []),
       ...prefix("library", [
         layout("pages/camel/library-page/layout.tsx", [
           route("eips", "pages/camel/library-page/eips-page.tsx"),

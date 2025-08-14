@@ -14,7 +14,7 @@ import {
 } from "../topology-operations";
 import { useLayer } from "./topology-layer";
 import { getDefaultConfig } from "../topology-templates";
-import { Tabs } from "components/ui/tabs";
+import { Tab, TabList, TabPanel, Tabs } from "components/ui/tabs";
 import { tryCatch } from "@/utils/try-catch";
 import { SearchField } from "components/ui/search-field";
 import { useTopologyStore } from "../topology-store";
@@ -82,16 +82,16 @@ export function TopologyLibrary() {
         />
       </div>
       <Tabs aria-label="Camel EIPs and Components" defaultSelectedKey="eips">
-        <Tabs.List>
-          <Tabs.Tab id="eips">EIPs</Tabs.Tab>
-          <Tabs.Tab id="components">Components</Tabs.Tab>
-        </Tabs.List>
-        <Tabs.Panel id="eips">
+        <TabList>
+          <Tab id="eips">EIPs</Tab>
+          <Tab id="components">Components</Tab>
+        </TabList>
+        <TabPanel id="eips">
           <CamelEIPsTab onSelectionChange={handleSelectionChange} />
-        </Tabs.Panel>
-        <Tabs.Panel id="components">
+        </TabPanel>
+        <TabPanel id="components">
           <CamelComponentsTab onSelectionChange={handleSelectionChange} />
-        </Tabs.Panel>
+        </TabPanel>
       </Tabs>
     </Autocomplete>
   );
