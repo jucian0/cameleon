@@ -62,7 +62,7 @@ function UserMenu() {
           alt={loaderData?.user?.user_metadata?.full_name}
         />
       </Menu.Trigger>
-      <Menu.Content placement="bottom" showArrow className="sm:min-w-64">
+      <Menu.Content placement="bottom" className="sm:min-w-64">
         <Menu.Section>
           <Menu.Header separator>
             <span className="block">
