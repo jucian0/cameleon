@@ -33,6 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     env: {
       SUPABASE_URL: process.env.SUPABASE_URL,
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+      ENV: process.env.NODE_ENV,
     },
   };
 }
