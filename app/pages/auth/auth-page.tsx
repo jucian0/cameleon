@@ -10,6 +10,7 @@ export default function AuthPage() {
     env: {
       SUPABASE_URL: string;
       SUPABASE_ANON_KEY: string;
+      ENV: string;
     };
   };
 
@@ -18,10 +19,14 @@ export default function AuthPage() {
   );
 
   async function handleGithubSignIn() {
+    console.log("handleGithubSignIn", env.ENV);
     await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo: "https://camelion.juciano.com/auth/callback",
+        redirectTo:
+          env.ENV === "development"
+            ? "http://localhost:3000/auth/callback"
+            : "https://camelion.juciano.com/auth/callback",
       },
     });
   }
