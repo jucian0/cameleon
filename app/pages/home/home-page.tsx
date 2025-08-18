@@ -1,9 +1,11 @@
 import { Button, buttonStyles } from "components/ui/button";
-import type { Route } from "./+types/page";
+import type { Route } from "./+types/home-page";
 import { IconFile, IconPlus } from "@intentui/icons";
 import { RestIcon } from "components/icons/rest";
 import { CamelStudioIcon } from "components/icons/camel-studio";
 import { Menu } from "components/ui/menu";
+import type { LoaderFunctionArgs } from "react-router";
+import { createServerSupabase } from "app/modules/supabase/supabase-server";
 
 export function meta(_: Route.MetaArgs) {
   return [
@@ -11,7 +13,6 @@ export function meta(_: Route.MetaArgs) {
     { name: "description", content: "Welcome to React Router!" },
   ];
 }
-
 
 const mockedProjects = [
   { id: 1, name: "E-commerce API", type: "REST", updatedAt: "2025-05-14" },
@@ -31,20 +32,30 @@ const presets = [
   { name: "User Service Schema", type: "GraphQL" },
 ];
 
-export default function HomePage() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = createServerSupabase(request);
+  const currentUser = await supabase.auth.getUser();
+
+  return {
+    user: currentUser.data.user,
+  };
+}
+
+export default function HomePage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="p-8 mx-auto space-y-10">
-
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Welcome back, Ana 👋</h1>
+        <h1 className="text-3xl font-bold">
+          Welcome back, {loaderData.user?.user_metadata.name} 👋
+        </h1>
         <Menu>
-          <Menu.Trigger className={buttonStyles({ intent: 'primary' })}>
+          <Menu.Trigger className={buttonStyles({ intent: "primary" })}>
             <IconPlus /> New Project
           </Menu.Trigger>
           <Menu.Content placement="bottom">
-            <Menu.Item>Camel</Menu.Item>
-            <Menu.Item>Rest API</Menu.Item>
+            <Menu.Item href="camel/studio">Camel</Menu.Item>
+            {/*<Menu.Item>Rest API</Menu.Item>*/}
           </Menu.Content>
         </Menu>
       </div>
@@ -69,20 +80,17 @@ export default function HomePage() {
       </section>
 
       {/* Quick Start */}
-      <section>
+      {/*<section>
         <h2 className="text-xl font-semibold mb-3">Quick Start</h2>
         <div className="flex flex-wrap gap-4">
           {quickStart.map((item) => (
-            <Button
-              key={item.label}
-              intent="secondary"
-            >
+            <Button key={item.label} intent="secondary">
               <span>{item.icon}</span>
               <span>{item.label}</span>
             </Button>
           ))}
         </div>
-      </section>
+      </section>*/}
 
       {/* Presets */}
       <section>
