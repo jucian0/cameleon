@@ -11,8 +11,7 @@ import { SearchField } from "components/ui/search-field";
 import { useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import type { Route } from "./+types/configs-page";
-import { CardView } from "./components/cards-view";
-import { ListView } from "./components/list-view";
+import { WorkflowCard } from "./components/cards-view";
 import { Link } from "components/ui/link";
 
 export const handle = {
@@ -36,7 +35,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
            content
          )
        `);
-
   return { data, error };
 }
 
@@ -73,16 +71,26 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
   }
 
   const filteredItems = filterItems(items ?? [], searchParams);
+  const totalWorkflows = filteredItems.length;
+  const viewMode = searchParams.get("view") || "cards";
 
   return (
     <div className="m-6 flex flex-col gap-4">
+      <div>
+        <p className="text-muted-foreground">
+          Organize and manage your workflow diagrams with names and descriptions
+        </p>
+        <p className="text-sm text-muted-foreground mt-1">
+          {totalWorkflows} workflow{totalWorkflows !== 1 ? "s" : ""} total
+        </p>
+      </div>
       <form className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 w-full">
+          <div className="flex items-center gap-2 w-1/2">
             <SearchField
               className="w-full max-w-96"
               aria-label="Search"
-              placeholder="Search"
+              placeholder="Search workflows by name"
               defaultValue={searchParams.get("query") || ""}
               onChange={(e) => handleSearchChange({ query: e })}
             />
@@ -125,18 +133,36 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
               })}
             >
               <Plus className="h-4 w-4" />
+              New Workflow
             </Link>
           </div>
         </div>
       </form>
-
-      {searchParams.get("view") === "cards" ? (
-        <CardView configs={filteredItems} />
-      ) : (
-        <section aria-label="Configs list">
-          <ListView configs={filteredItems} />
-        </section>
-      )}
+      <section aria-label="Configs grid">
+        <div
+          className={
+            viewMode === "cards"
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              : "space-y-4"
+          }
+        >
+          {filteredItems?.map((c) => (
+            <WorkflowCard
+              key={c.id}
+              id={c.id}
+              name={c.name}
+              description={c.latest_version[0].description}
+              lastModified={new Date(
+                c.latest_version[0].updated_at,
+              ).toLocaleDateString()}
+              nodeCount={c.latest_version[0].config_id ?? 10}
+              onEdit={() => console.log(`Edit ${c.id}`)}
+              onDuplicate={() => console.log(`Duplicate ${c.id}`)}
+              onShare={() => console.log(`Share ${c.id}`)}
+            />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

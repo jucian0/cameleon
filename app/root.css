@@ -59,6 +59,10 @@
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+
+    /* 🎨 Workflow colors */
+    --color-workflow-node: var(--workflow-node);
+    --color-workflow-connection: var(--workflow-connection);
 }
 
 @layer base {
@@ -114,6 +118,10 @@
         --radius-2xl: calc(var(--radius-lg) * 1.5);
         --radius-3xl: calc(var(--radius-lg) * 2);
         --radius-4xl: calc(var(--radius-lg) * 3);
+
+        /* 🎨 Theme-dependent (light mode) */
+        --workflow-node: hsl(220 13% 90%);
+        --workflow-connection: hsl(181 80% 40%);
     }
 
     .dark {
@@ -159,6 +167,10 @@
         --chart-3: var(--color-blue-400);
         --chart-4: var(--color-blue-300);
         --chart-5: var(--color-blue-200);
+
+        /* 🎨 Theme-dependent (light mode) */
+        --workflow-node: hsl(220 13% 14%);
+        --workflow-connection: hsl(181 80% 40%);
     }
 }
 
