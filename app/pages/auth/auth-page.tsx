@@ -5,6 +5,13 @@ import { Card } from "components/ui/card";
 import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
+export function meta() {
+  return [
+    { title: "Sign in to Camelion" },
+    { description: "Use your GitHub account to continue" },
+  ];
+}
+
 export default function AuthPage() {
   const { env } = useRouteLoaderData("root") as {
     env: {

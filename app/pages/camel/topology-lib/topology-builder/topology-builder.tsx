@@ -64,7 +64,6 @@ function Flow() {
 }
 
 export function TopologyBuilder() {
-  console.log("TopologyBuilder");
   return (
     <>
       <Flow />
