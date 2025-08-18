@@ -626,7 +626,7 @@ const SidebarDisclosurePanel = ({
       data-sidebar-disclosure-panel="true"
       className={composeTailwindRenderProps(
         className,
-        "col-span-full grid grid-cols-[auto_1fr] gap-y-0.5",
+        "col-span-full grid grid-cols-[auto_1fr] gap-y-0.5 mt-0.5",
       )}
       {...props}
     />
