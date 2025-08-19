@@ -10,7 +10,7 @@ import { Grid2X2, List, Plus } from "lucide-react";
 import { SearchField } from "components/ui/search-field";
 import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
-import type { Route } from "./+types/configs-page";
+import type { Route } from "./+types/workflows-page";
 import { CamelCard } from "./components/card";
 import { Link } from "components/ui/link";
 
@@ -61,7 +61,7 @@ const filterItems = (items: any[], searchParams: URLSearchParams) => {
     });
 };
 
-export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
+export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
   const items = loaderData.data;
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -125,7 +125,7 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
               </ToggleGroupItem>
             </ToggleGroup>
             <Link
-              href="/camel/configs/create"
+              href="/camel/workflows/create"
               aria-label="Settings"
               className={buttonStyles({
                 size: "md",
@@ -138,7 +138,7 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
       </form>
-      <section aria-label="Configs grid">
+      <section aria-label="Workflows grid">
         <div
           className={
             viewMode === "cards"
