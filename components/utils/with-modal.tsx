@@ -1,15 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router";
 
-// usage example
-//
-// const ModalPage = withModal((isOpen)=>{
-//
-// retrun (...)
-//})
+export type WithModalProps<E> = {
+  isOpen: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+} & E;
 
-export function withModal(WrappedComponent: React.ComponentType<any>) {
-  return function WithModal(props: any) {
+export function withModal<P>(
+  WrappedComponent: React.ComponentType<WithModalProps<P>>,
+) {
+  return function ModalPage(props: any) {
     const [isModalOpen, setIsModalOpen] = React.useState(true);
     const navigate = useNavigate();
 

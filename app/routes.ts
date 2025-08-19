@@ -23,7 +23,7 @@ export default [
         },
       ),
       route("workflows", "pages/camel/workflows-page/workflows-page.tsx", [
-        route("create", "pages/camel/workflows-page/studio-page/modal.tsx", {
+        route("create", "pages/camel/workflows-page/details-page/page.tsx", {
           id: "studio-create",
         }),
       ]),
