@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader } from "components/ui/card";
 import { Badge } from "components/ui/badge";
 import { Edit, Share2, Copy, MoreHorizontal } from "lucide-react";
-import { Button } from "components/ui/button";
+import { Button, buttonStyles } from "components/ui/button";
 import { Menu } from "components/ui/menu";
+import { Link } from "components/ui/link";
 
 interface CamelCardProps {
   id: string;
@@ -41,10 +42,13 @@ export const CamelCard = ({
           </div>
 
           <Menu>
-            <Menu.Trigger>
-              {/*<Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-2">*/}
-              <MoreHorizontal className="h-4 w-4" />
-              {/*</Button>*/}
+            <Menu.Trigger
+              className={buttonStyles({
+                intent: "plain",
+                size: "sq-sm",
+              })}
+            >
+              <MoreHorizontal size={16} />
             </Menu.Trigger>
             <Menu.Content className="justify-end">
               <Menu.Item onClick={() => onEdit(id)}>
@@ -75,14 +79,16 @@ export const CamelCard = ({
             </span>
           </div>
 
-          <Button
-            intent="plain"
-            size="sm"
-            onClick={() => onEdit(id)}
-            className="text-primary"
+          <Link
+            href={`/camel/workflows/${id}/studio`}
+            className={buttonStyles({
+              intent: "plain",
+              className: "text-primary",
+              size: "sm",
+            })}
           >
             Open
-          </Button>
+          </Link>
         </div>
 
         {/* Visual workflow preview */}
