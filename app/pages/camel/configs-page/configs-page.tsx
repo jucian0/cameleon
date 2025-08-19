@@ -8,10 +8,10 @@ import {
 } from "components/ui/select";
 import { Grid2X2, List, Plus } from "lucide-react";
 import { SearchField } from "components/ui/search-field";
-import { useSearchParams, type LoaderFunctionArgs } from "react-router";
+import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import type { Route } from "./+types/configs-page";
-import { WorkflowCard } from "./components/cards-view";
+import { CamelCard } from "./components/card";
 import { Link } from "components/ui/link";
 
 export const handle = {
@@ -109,6 +109,7 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
 
           <div className="flex items-center justify-end gap-2">
             <ToggleGroup
+              size="lg"
               selectionMode="single"
               defaultSelectedKeys={[searchParams.get("view") ?? "cards"]}
               onSelectionChange={(v) =>
@@ -123,9 +124,8 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
                 <List className="h-4 w-4" />
               </ToggleGroupItem>
             </ToggleGroup>
-
             <Link
-              href="/camel/studio"
+              href="/camel/configs/create"
               aria-label="Settings"
               className={buttonStyles({
                 size: "md",
@@ -147,7 +147,7 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
           }
         >
           {filteredItems?.map((c) => (
-            <WorkflowCard
+            <CamelCard
               key={c.id}
               id={c.id}
               name={c.name}
@@ -163,6 +163,7 @@ export default function CamelConfigs({ loaderData }: Route.ComponentProps) {
           ))}
         </div>
       </section>
+      <Outlet />
     </div>
   );
 }

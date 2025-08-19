@@ -22,7 +22,11 @@ export default [
           id: "configd-edit",
         },
       ),
-      route("configs", "pages/camel/configs-page/configs-page.tsx", []),
+      route("configs", "pages/camel/configs-page/configs-page.tsx", [
+        route("create", "pages/camel/configs-page/studio-page/modal.tsx", {
+          id: "studio-create",
+        }),
+      ]),
       ...prefix("library", [
         layout("pages/camel/library-page/layout.tsx", [
           route("eips", "pages/camel/library-page/eips-page.tsx"),
