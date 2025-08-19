@@ -21,13 +21,14 @@ export const handle = {
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
 
-  const { data, error } = await supabase.from("camel_config_projects").select(`
+  const { data, error } = await supabase.from("camel_workflow_projects")
+    .select(`
          id,
          name,
          owner,
          tags,
          environment,
-         latest_version:camel_config_latest_versions (
+         latest_version:camel_workflow_latest_versions (
            version,
            status,
            updated_at,

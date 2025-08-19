@@ -1,14 +1,41 @@
+import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import { Button } from "components/ui/button";
 import { Modal } from "components/ui/modal";
 import { TextField } from "components/ui/text-field";
 import { Textarea } from "components/ui/textarea";
 import { withModal } from "components/utils/with-modal";
 import { Save } from "lucide-react";
+import type { LoaderFunctionArgs } from "react-router";
+import type { Route } from "../details-page/+types/page";
 
-export default withModal(function ModalPage({ isOpen, closeModal }) {
-  function close() {
-    closeModal(false);
+export async function loader({ request }: LoaderFunctionArgs) {
+  const supabase = createServerSupabase(request);
+  const formData = (await request.formData()).entries();
+  const data = Object.fromEntries(formData);
+  const { data: workflow, error } = await supabase.supabase
+    .from("workflows")
+    .upsert({
+      name: data.name,
+      description: data.description,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw new Response(error.message, { status: 500 });
   }
+  return { workflow };
+}
+
+export default withModal<Route.ComponentProps>(function ModalPage({
+  isOpen,
+  closeModal,
+  loaderData,
+}) {
+  function close() {
+    closeModal();
+  }
+
   return (
     <Modal isOpen={isOpen} onOpenChange={closeModal}>
       <Modal.Content isBlurred>
