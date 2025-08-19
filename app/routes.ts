@@ -12,18 +12,18 @@ export default [
   layout("pages/layout.tsx", [
     index("pages/home/home-page.tsx"),
     ...prefix("camel", [
-      route("studio", "pages/camel/configs-page/studio-page/page.tsx", {
-        id: "configs-create",
+      route("studio", "pages/camel/workflows-page/studio-page/page.tsx", {
+        id: "workflows-create",
       }),
       route(
-        "configs/:configId/studio",
-        "pages/camel/configs-page/studio-page/page.tsx",
+        "workflows/:workflowsId/studio",
+        "pages/camel/workflows-page/studio-page/page.tsx",
         {
-          id: "configd-edit",
+          id: "workflow-edit",
         },
       ),
-      route("configs", "pages/camel/configs-page/configs-page.tsx", [
-        route("create", "pages/camel/configs-page/studio-page/modal.tsx", {
+      route("workflows", "pages/camel/workflows-page/workflows-page.tsx", [
+        route("create", "pages/camel/workflows-page/studio-page/modal.tsx", {
           id: "studio-create",
         }),
       ]),

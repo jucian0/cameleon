@@ -86,12 +86,12 @@ export default function AppSidebar(
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
                 <SidebarItem
-                  href="/camel/configs"
-                  tooltip="Studio"
-                  isCurrent={pathname.includes("configs")}
+                  href="/camel/workflows"
+                  tooltip="Workflows"
+                  isCurrent={pathname.includes("workflows")}
                 >
                   <StudioIcon className="size-4" />
-                  <SidebarLabel>Configs</SidebarLabel>
+                  <SidebarLabel>Workflows</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem
                   href="/camel/library/eips"
