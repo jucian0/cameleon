@@ -22,10 +22,17 @@ export default [
           id: "workflow-edit",
         },
       ),
-      route("workflows", "pages/camel/workflows-page/workflows-page.tsx", [
+      route("workflows", "pages/camel/workflows-page/page.tsx", [
         route("create", "pages/camel/workflows-page/details-page/page.tsx", {
           id: "studio-create",
         }),
+        route(
+          ":workflowsId/edit",
+          "pages/camel/workflows-page/details-page/page.tsx",
+          {
+            id: "studio-edit",
+          },
+        ),
       ]),
       ...prefix("library", [
         layout("pages/camel/library-page/layout.tsx", [

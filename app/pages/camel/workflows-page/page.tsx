@@ -10,7 +10,7 @@ import { Grid2X2, List, Plus } from "lucide-react";
 import { SearchField } from "components/ui/search-field";
 import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
-import type { Route } from "./+types/workflows-page";
+import type { Route } from "./+types/page";
 import { CamelCard } from "./components/card";
 import { Link } from "components/ui/link";
 
@@ -21,21 +21,7 @@ export const handle = {
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
 
-  const { data, error } = await supabase.from("camel_workflow_projects")
-    .select(`
-         id,
-         name,
-         owner,
-         tags,
-         environment,
-         latest_version:camel_workflow_latest_versions (
-           version,
-           status,
-           updated_at,
-           description,
-           content
-         )
-       `);
+  const { data, error } = await supabase.from("workflows").select("*");
   return { data, error };
 }
 
@@ -53,10 +39,7 @@ const filterItems = (items: any[], searchParams: URLSearchParams) => {
         return a.name.localeCompare(b.name);
       }
       if (searchParams.get("sort") === "updatedAt") {
-        return (
-          new Date(a.latest_version[0].updated_at) -
-          new Date(b.latest_version[0].updated_at)
-        );
+        return Number(new Date(a.updated_at)) - Number(new Date(b.updated_at));
       }
       return 0;
     });
@@ -152,11 +135,9 @@ export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
               key={c.id}
               id={c.id}
               name={c.name}
-              description={c.latest_version[0].description}
-              lastModified={new Date(
-                c.latest_version[0].updated_at,
-              ).toLocaleDateString()}
-              nodeCount={c.latest_version[0].config_id ?? 10}
+              description={c.description}
+              lastModified={new Date(c.updated_at).toLocaleDateString()}
+              nodeCount={c.workflow_id ?? 10}
               onEdit={() => console.log(`Edit ${c.id}`)}
               onDuplicate={() => console.log(`Duplicate ${c.id}`)}
               onShare={() => console.log(`Share ${c.id}`)}
