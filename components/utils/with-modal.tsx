@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 export type WithModalProps<E> = {
   isOpen: boolean;
   openModal: () => void;
-  closeModal: () => void;
+  closeModal: (callbackUrl: string) => void;
 } & E;
 
 export function withModal<P>(
@@ -15,13 +15,16 @@ export function withModal<P>(
     const navigate = useNavigate();
 
     const openModal = () => setIsModalOpen(true);
-    const closeModal = () => {
+    const closeModal = (callbackUrl: string) => {
       setIsModalOpen(false);
+      setTimeout(() => {
+        navigate(callbackUrl);
+      }, 300);
     };
 
-    React.useEffect(() => {
-      if (!isModalOpen) navigate(-1);
-    }, [isModalOpen]);
+    // React.useEffect(() => {
+    //   if (!isModalOpen) navigate(-1);
+    // }, [isModalOpen]);
 
     return (
       <>
