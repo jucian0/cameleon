@@ -24,31 +24,48 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (workflow.error) {
       throw new Response(workflow.error.message, { status: 500 });
     }
+    const isClone = request.url.includes("clone");
+    if (isClone) workflow.data[0].name = `Clone of ${workflow.data?.[0].name}`;
     return { workflow: workflow.data?.[0] };
   }
 
   return { workflow: {} };
 }
 
+function mapSupabaseError(error: {
+  code?: string;
+  message: string;
+  details?: string;
+}) {
+  switch (error.code) {
+    case "23505": // unique_violation
+      return "A workflow with this name already exists.";
+    case "23503": // foreign_key_violation
+      return "Invalid reference to related data.";
+    case "22P02": // invalid_text_representation (like invalid UUID)
+      return "Invalid input format (check your IDs).";
+    default:
+      return error.message;
+  }
+}
+
 export async function action({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
   const formData = await request.formData();
-  const user = await supabase.auth.getSession();
+  const user = await supabase.auth.getUser();
+  const isEdit = request.url.includes("edit");
+  if (!isEdit) formData.delete("id");
+  formData.set("owner", user.data.user?.id || "");
 
-  const payload = {
-    name: formData.get("name"),
-    description: formData.get("description"),
-    owner: user.data.session?.user.id,
-  };
-  const id = formData.get("id");
-  if (id) {
-    payload.id = id;
-  }
-
-  const { error } = await supabase.from("workflows").upsert(payload);
-
+  const { error } = await supabase
+    .from("workflows")
+    .upsert(Object.fromEntries(formData))
+    .select();
+  console.log("Workflow upsert error:", error);
   if (error) {
-    throw new Response(error.message, { status: 500 });
+    return {
+      error: mapSupabaseError(error),
+    };
   }
   return redirect("/camel/workflows");
 }
@@ -57,6 +74,7 @@ export default withModal<Route.ComponentProps>(function ModalPage({
   isOpen,
   closeModal,
   loaderData,
+  actionData,
 }) {
   const navigation = useNavigation();
 
@@ -91,6 +109,9 @@ export default withModal<Route.ComponentProps>(function ModalPage({
               name="description"
               defaultValue={loaderData?.workflow?.description || ""}
             />
+            <span aria-label="error" className="text-red-500">
+              {actionData?.error}
+            </span>
           </Modal.Body>
           <Modal.Footer>
             <Button onPress={closeModal} intent="plain">
