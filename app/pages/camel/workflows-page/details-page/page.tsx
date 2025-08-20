@@ -5,8 +5,9 @@ import { TextField } from "components/ui/text-field";
 import { Textarea } from "components/ui/textarea";
 import { withModal } from "components/utils/with-modal";
 import { Save } from "lucide-react";
-import { redirect, type LoaderFunctionArgs } from "react-router";
+import { redirect, useNavigation, type LoaderFunctionArgs } from "react-router";
 import type { Route } from "../details-page/+types/page";
+import { ProgressCircle } from "components/ui/progress-circle";
 
 export const handle = {
   breadcrumb: () => "Create Workflow",
@@ -57,6 +58,8 @@ export default withModal<Route.ComponentProps>(function ModalPage({
   closeModal,
   loaderData,
 }) {
+  const navigation = useNavigation();
+
   return (
     <Modal isOpen={isOpen} onOpenChange={closeModal}>
       <Modal.Content isBlurred>
@@ -93,8 +96,21 @@ export default withModal<Route.ComponentProps>(function ModalPage({
             <Button onPress={closeModal} intent="plain">
               Cancel
             </Button>
-            <Button type="submit" intent="primary">
-              <Save size={16} /> Save workflow
+            <Button
+              type="submit"
+              intent="primary"
+              isPending={navigation.state === "submitting"}
+            >
+              {({ isPending }) => (
+                <>
+                  {isPending ? (
+                    <ProgressCircle isIndeterminate aria-label="Creating..." />
+                  ) : (
+                    <Save size={16} />
+                  )}
+                  {isPending ? "Saving workflow..." : "Save workflow"}
+                </>
+              )}
             </Button>
           </Modal.Footer>
         </form>

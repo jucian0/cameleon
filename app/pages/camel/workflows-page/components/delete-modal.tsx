@@ -1,5 +1,6 @@
 import { Button } from "components/ui/button";
 import { Modal } from "components/ui/modal";
+import { ProgressCircle } from "components/ui/progress-circle";
 import { useNavigation, useSubmit } from "react-router";
 
 export function DeleteModal({
@@ -39,7 +40,14 @@ export function DeleteModal({
             onPress={deleteAction}
             isPending={navigation.state === "submitting"}
           >
-            Confirm
+            {({ isPending }) => (
+              <>
+                {isPending && (
+                  <ProgressCircle isIndeterminate aria-label="Creating..." />
+                )}
+                {isPending ? "Deleting..." : "Delete"}
+              </>
+            )}
           </Button>
         </Modal.Footer>
       </Modal.Content>
