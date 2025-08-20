@@ -33,6 +33,13 @@ export default [
             id: "studio-edit",
           },
         ),
+        route(
+          ":workflowsId/clone",
+          "pages/camel/workflows-page/details-page/page.tsx",
+          {
+            id: "studio-clone",
+          },
+        ),
       ]),
       ...prefix("library", [
         layout("pages/camel/library-page/layout.tsx", [

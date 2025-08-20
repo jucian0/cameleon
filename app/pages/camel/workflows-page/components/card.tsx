@@ -54,9 +54,9 @@ export const CamelCard = ({
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Details
               </Menu.Item>
-              <Menu.Item>
+              <Menu.Item href={`/camel/workflows/${id}/clone`}>
                 <Copy className="h-4 w-4 mr-2" />
-                Duplicate
+                Clone
               </Menu.Item>
               <Menu.Item>
                 <Share2 className="h-4 w-4 mr-2" />
