@@ -1,16 +1,12 @@
 import { Card, CardContent, CardHeader } from "components/ui/card";
 import { Badge } from "components/ui/badge";
-import {
-  Edit,
-  Share2,
-  Copy,
-  MoreHorizontal,
-  Delete,
-  Trash,
-} from "lucide-react";
+import { Edit, Share2, Copy, MoreHorizontal, Trash } from "lucide-react";
 import { buttonStyles } from "components/ui/button";
 import { Menu } from "components/ui/menu";
 import { Link } from "components/ui/link";
+import { useSubmit } from "react-router";
+import React from "react";
+import { DeleteModal } from "./delete-modal";
 
 interface CamelCardProps {
   id: string;
@@ -18,9 +14,6 @@ interface CamelCardProps {
   description: string;
   lastModified: string;
   nodeCount: number;
-  onEdit: (id: string) => void;
-  onDuplicate: (id: string) => void;
-  onShare: (id: string) => void;
 }
 
 export const CamelCard = ({
@@ -29,10 +22,9 @@ export const CamelCard = ({
   description,
   lastModified,
   nodeCount,
-  onEdit,
-  onDuplicate,
-  onShare,
 }: CamelCardProps) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
+
   return (
     <Card className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card hover:-translate-y-0.5">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -66,16 +58,12 @@ export const CamelCard = ({
                 <Copy className="h-4 w-4 mr-2" />
                 Duplicate
               </Menu.Item>
-              <Menu.Item onClick={() => onShare(id)}>
+              <Menu.Item>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Menu.Item>
               <Menu.Separator />
-              <Menu.Item
-                isDanger
-                onClick={() => console.log(`Delete ${id}`)}
-                className="text-destructive"
-              >
+              <Menu.Item isDanger onPress={() => setIsDeleteModalOpen(true)}>
                 <Trash className="h-4 w-4 mr-2" />
                 Delete
               </Menu.Item>
@@ -120,6 +108,11 @@ export const CamelCard = ({
           </div>
         </div>
       </CardContent>
+      <DeleteModal
+        id={id}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </Card>
   );
 };

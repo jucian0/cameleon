@@ -20,9 +20,22 @@ export const handle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
-
   const { data, error } = await supabase.from("workflows").select("*");
   return { data, error };
+}
+
+export async function action({ request }: LoaderFunctionArgs) {
+  const { supabase } = createServerSupabase(request);
+  const formData = await request.formData();
+  const action = formData.get("action");
+  const id = formData.get("id");
+  if (action === "delete" && id) {
+    const { error } = await supabase.from("workflows").delete().eq("id", id);
+    if (error) {
+      throw new Error(`Failed to delete workflow: ${error.message}`);
+    }
+  }
+  return { success: true };
 }
 
 const filterItems = (items: any[], searchParams: URLSearchParams) => {
@@ -138,9 +151,6 @@ export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
               description={c.description}
               lastModified={new Date(c.updated_at).toLocaleDateString()}
               nodeCount={c.workflow_id ?? 10}
-              onEdit={() => console.log(`Edit ${c.id}`)}
-              onDuplicate={() => console.log(`Duplicate ${c.id}`)}
-              onShare={() => console.log(`Share ${c.id}`)}
             />
           ))}
         </div>
