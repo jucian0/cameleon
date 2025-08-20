@@ -15,29 +15,36 @@ export const handle = {
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
   const workflowId = params.workflowsId;
-  const workflow = await supabase
-    .from("workflows")
-    .select("*")
-    .eq("id", workflowId);
-
-  if (workflow.error) {
-    throw new Response(workflow.error.message, { status: 500 });
+  if (workflowId) {
+    const workflow = await supabase
+      .from("workflows")
+      .select("*")
+      .eq("id", workflowId);
+    if (workflow.error) {
+      throw new Response(workflow.error.message, { status: 500 });
+    }
+    return { workflow: workflow.data?.[0] };
   }
-  return {
-    workflow: workflow.data[0],
-  };
+
+  return { workflow: {} };
 }
 
 export async function action({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
   const formData = await request.formData();
   const user = await supabase.auth.getSession();
-  const { error } = await supabase.from("workflows").upsert({
+
+  const payload = {
     name: formData.get("name"),
     description: formData.get("description"),
     owner: user.data.session?.user.id,
-    id: formData.get("id") || undefined,
-  });
+  };
+  const id = formData.get("id");
+  if (id) {
+    payload.id = id;
+  }
+
+  const { error } = await supabase.from("workflows").upsert(payload);
 
   if (error) {
     throw new Response(error.message, { status: 500 });
@@ -50,10 +57,6 @@ export default withModal<Route.ComponentProps>(function ModalPage({
   closeModal,
   loaderData,
 }) {
-  function close() {
-    closeModal();
-  }
-  console.log("ModalPage actionData:", loaderData);
   return (
     <Modal isOpen={isOpen} onOpenChange={closeModal}>
       <Modal.Content isBlurred>
@@ -87,7 +90,7 @@ export default withModal<Route.ComponentProps>(function ModalPage({
             />
           </Modal.Body>
           <Modal.Footer>
-            <Button onPress={close} intent="plain">
+            <Button onPress={closeModal} intent="plain">
               Cancel
             </Button>
             <Button type="submit" intent="primary">
