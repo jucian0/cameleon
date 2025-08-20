@@ -1,7 +1,14 @@
 import { Card, CardContent, CardHeader } from "components/ui/card";
 import { Badge } from "components/ui/badge";
-import { Edit, Share2, Copy, MoreHorizontal } from "lucide-react";
-import { Button, buttonStyles } from "components/ui/button";
+import {
+  Edit,
+  Share2,
+  Copy,
+  MoreHorizontal,
+  Delete,
+  Trash,
+} from "lucide-react";
+import { buttonStyles } from "components/ui/button";
 import { Menu } from "components/ui/menu";
 import { Link } from "components/ui/link";
 
@@ -51,17 +58,26 @@ export const CamelCard = ({
               <MoreHorizontal size={16} />
             </Menu.Trigger>
             <Menu.Content className="justify-end">
-              <Menu.Item onClick={() => onEdit(id)}>
+              <Menu.Item href={`/camel/workflows/${id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Details
               </Menu.Item>
-              <Menu.Item onClick={() => onDuplicate(id)}>
+              <Menu.Item>
                 <Copy className="h-4 w-4 mr-2" />
                 Duplicate
               </Menu.Item>
               <Menu.Item onClick={() => onShare(id)}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
+              </Menu.Item>
+              <Menu.Separator />
+              <Menu.Item
+                isDanger
+                onClick={() => console.log(`Delete ${id}`)}
+                className="text-destructive"
+              >
+                <Trash className="h-4 w-4 mr-2" />
+                Delete
               </Menu.Item>
             </Menu.Content>
           </Menu>
