@@ -24,8 +24,6 @@ import {
   type NodeChange,
 } from "@xyflow/react";
 import { jsonToTopologyBuilder } from "./topology-parser";
-import { tryCatch } from "@/utils/try-catch";
-import { fetchCamelConfig } from "../data-requests/fetch-camel-config";
 import { jsonToYaml } from "./yaml-json";
 import type { CamelConfig, Edge, Route, Node } from "./topology-types";
 
@@ -33,7 +31,6 @@ type TopologyStore = {
   camelConfig: CamelConfig;
   currentCamelRouteId: string;
   setCurrentCamelRouteId: (routeId: string) => void;
-  fetchCamelConfig: () => Promise<void>;
   setCamelConfig: (json: any) => void;
   setCurrentCamelRoute: (json: any) => void;
   getCurrentCamelRoute: () => Route | undefined;
@@ -56,23 +53,7 @@ const INITIAL_STATE = {
 export const useTopologyStore = create<TopologyStore>((set, get) => ({
   camelConfig: INITIAL_STATE,
   currentCamelRouteId: "",
-  fetchCamelConfig: async () => {
-    const response = await tryCatch(fetchCamelConfig());
-    if (response.error) {
-      return set({ camelConfig: INITIAL_STATE });
-    }
 
-    const firstRouteId = response.data.data?.[0]?.route?.id as string;
-    const { nodes, edges } = jsonToTopologyBuilder(
-      response.data.data ?? INITIAL_STATE.data,
-      firstRouteId,
-    );
-    return set({
-      camelConfig: response.data,
-      currentCamelRouteId: firstRouteId,
-      canvas: { ...get().canvas, nodes, edges },
-    });
-  },
   setCurrentCamelRouteId: (routeId) => {
     const { nodes, edges } = jsonToTopologyBuilder(
       get().camelConfig.data,
@@ -97,14 +78,14 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
       ...state.camelConfig,
       data: state.camelConfig.data
         ? state.camelConfig.data.map((route) => {
-            if (route.route?.id === state.currentCamelRouteId) {
-              return {
-                ...route,
-                ...json,
-              };
-            }
-            return route;
-          })
+          if (route.route?.id === state.currentCamelRouteId) {
+            return {
+              ...route,
+              ...json,
+            };
+          }
+          return route;
+        })
         : [json],
     };
     const { nodes, edges } = jsonToTopologyBuilder(

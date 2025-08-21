@@ -4,10 +4,16 @@ import { Select } from "components/ui/select";
 import { Button, buttonStyles } from "components/ui/button";
 import { IconCheck } from "@intentui/icons";
 import { TopologyEditor } from "../topology-editor/code-editor";
+import { useSubmit } from "react-router";
 
 export const TopologyToolbarActions = () => {
-  const { camelConfig, currentCamelRouteId, setCurrentCamelRouteId } =
+  const { camelConfig, currentCamelRouteId, setCurrentCamelRouteId, getCamelConfigYaml } =
     useTopologyStore();
+  const submit = useSubmit();
+
+  function handleSave() {
+    submit({ content: getCamelConfigYaml() }, { method: "post" })
+  }
 
   const camelRoutes = camelConfig?.data?.map((element) => {
     return {
@@ -27,7 +33,7 @@ export const TopologyToolbarActions = () => {
 
   return (
     <div className={`flex items-center gap-1`}>
-      <Button size="xs">
+      <Button size="xs" onPress={handleSave}>
         <IconCheck />
         Save
       </Button>
