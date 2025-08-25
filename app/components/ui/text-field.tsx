@@ -1,23 +1,26 @@
-import { IconEye, IconEyeClosed } from "@intentui/icons"
-import { useState } from "react"
-import type { InputProps, TextFieldProps as TextFieldPrimitiveProps } from "react-aria-components"
-import { TextField as TextFieldPrimitive } from "react-aria-components"
-import { composeTailwindRenderProps } from "components/lib/primitive"
-import type { FieldProps } from "./field"
-import { Description, FieldError, FieldGroup, Input, Label } from "./field"
-import { Loader } from "./loader"
+import { IconEye, IconEyeClosed } from "@intentui/icons";
+import { useState } from "react";
+import type {
+  InputProps,
+  TextFieldProps as TextFieldPrimitiveProps,
+} from "react-aria-components";
+import { TextField as TextFieldPrimitive } from "react-aria-components";
+import { composeTailwindRenderProps } from "app/components/lib/primitive";
+import type { FieldProps } from "./field";
+import { Description, FieldError, FieldGroup, Input, Label } from "./field";
+import { Loader } from "./loader";
 
-type InputType = Exclude<InputProps["type"], "password">
+type InputType = Exclude<InputProps["type"], "password">;
 
 interface BaseTextFieldProps extends TextFieldPrimitiveProps, FieldProps {
-  prefix?: React.ReactNode | string
-  suffix?: React.ReactNode | string
-  isPending?: boolean
+  prefix?: React.ReactNode | string;
+  suffix?: React.ReactNode | string;
+  isPending?: boolean;
 }
 
 type TextFieldProps =
   | (BaseTextFieldProps & { isRevealable: true; type: "password" })
-  | (BaseTextFieldProps & { isRevealable?: never; type?: InputType })
+  | (BaseTextFieldProps & { isRevealable?: never; type?: InputType });
 
 const TextField = ({
   placeholder,
@@ -32,11 +35,15 @@ const TextField = ({
   type,
   ...props
 }: TextFieldProps) => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const inputType = isRevealable ? (isPasswordVisible ? "text" : "password") : type
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const inputType = isRevealable
+    ? isPasswordVisible
+      ? "text"
+      : "password"
+    : type;
   const handleTogglePasswordVisibility = () => {
-    setIsPasswordVisible((prev) => !prev)
-  }
+    setIsPasswordVisible((prev) => !prev);
+  };
   return (
     <TextFieldPrimitive
       type={inputType}
@@ -87,8 +94,8 @@ const TextField = ({
         props.children
       )}
     </TextFieldPrimitive>
-  )
-}
+  );
+};
 
-export type { TextFieldProps }
-export { TextField }
+export type { TextFieldProps };
+export { TextField };

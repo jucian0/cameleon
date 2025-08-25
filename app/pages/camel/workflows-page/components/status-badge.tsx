@@ -1,4 +1,4 @@
-import { Badge } from "components/ui/badge";
+import { Badge } from "app/components/ui/badge";
 
 export function StatusBadge({ status }: { status: any }) {
   const variant =

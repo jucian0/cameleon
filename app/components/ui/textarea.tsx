@@ -1,10 +1,14 @@
-import { TextArea, TextField, type TextFieldProps } from "react-aria-components"
-import { twJoin } from "tailwind-merge"
-import { composeTailwindRenderProps } from "components/lib/primitive"
-import { Description, FieldError, type FieldProps, Label } from "./field"
+import {
+  TextArea,
+  TextField,
+  type TextFieldProps,
+} from "react-aria-components";
+import { twJoin } from "tailwind-merge";
+import { composeTailwindRenderProps } from "app/components/lib/primitive";
+import { Description, FieldError, type FieldProps, Label } from "./field";
 
 interface TextareaProps extends Omit<TextFieldProps, "className">, FieldProps {
-  className?: string | ((v: TextFieldProps) => string)
+  className?: string | ((v: TextFieldProps) => string);
 }
 
 const Textarea = ({
@@ -41,8 +45,8 @@ const Textarea = ({
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
     </TextField>
-  )
-}
+  );
+};
 
-export type { TextareaProps }
-export { Textarea }
+export type { TextareaProps };
+export { Textarea };

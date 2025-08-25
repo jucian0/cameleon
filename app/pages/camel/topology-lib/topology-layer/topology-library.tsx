@@ -14,15 +14,15 @@ import {
 } from "../topology-operations";
 import { useLayer } from "./topology-layer";
 import { getDefaultConfig } from "../topology-templates";
-import { Tab, TabList, TabPanel, Tabs } from "components/ui/tabs";
+import { Tab, TabList, TabPanel, Tabs } from "app/components/ui/tabs";
 import { tryCatch } from "@/utils/try-catch";
-import { SearchField } from "components/ui/search-field";
+import { SearchField } from "app/components/ui/search-field";
 import { useTopologyStore } from "../topology-store";
 import {
   fetchComponentsMetadata,
   fetchEIPsMetadata,
 } from "../../data-requests/fetch-metadata";
-import { Card } from "components/ui/card";
+import { Card } from "app/components/ui/card";
 
 export function TopologyLibrary() {
   const { node, setNode } = useLayer();
@@ -141,7 +141,7 @@ function CamelComponentsTab({
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
                 <img
-                  src={`/camel-icons/components/${item.component.name}.svg`}
+                  src={`/camel-icons/app/components/${item.component.name}.svg`}
                   alt={item.component.name}
                   className="h-8 w-8 rounded"
                 />

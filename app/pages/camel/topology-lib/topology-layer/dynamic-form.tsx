@@ -1,8 +1,8 @@
 import React from "react";
 //import Form, { type IChangeEvent } from "@rjsf/core";
 //import validator from "@rjsf/validator-ajv8";
-import { Button } from "components/ui/button";
-import { Sheet } from "components/ui/sheet";
+import { Button } from "app/components/ui/button";
+import { Sheet } from "app/components/ui/sheet";
 
 type Props = {
   schema: Record<string, any>;

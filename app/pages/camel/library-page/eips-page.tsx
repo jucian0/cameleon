@@ -6,7 +6,7 @@ import {
   ListBoxItem,
   Virtualizer,
 } from "react-aria-components";
-import { Card } from "components/ui/card";
+import { Card } from "app/components/ui/card";
 import axios from "axios";
 import type { EPIDefinition } from "../topology-lib/topology-types";
 import type { Route } from "./+types/eips-page";

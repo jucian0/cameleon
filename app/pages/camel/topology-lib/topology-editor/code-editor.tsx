@@ -2,8 +2,8 @@ import React from "react";
 import MonacoEditor from "@monaco-editor/react";
 import { useTopologyStore } from "../topology-store";
 import { yamlToJson } from "../yaml-json";
-import { Sheet } from "components/ui/sheet";
-import { Button } from "components/ui/button";
+import { Sheet } from "app/components/ui/sheet";
+import { Button } from "app/components/ui/button";
 import { Code2Icon } from "lucide-react";
 import { useTheme } from "remix-themes";
 

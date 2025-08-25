@@ -32,9 +32,9 @@ import {
   Button as Trigger,
 } from "react-aria-components";
 import { twJoin, twMerge } from "tailwind-merge";
-import { SheetContent } from "components/ui/sheet";
-import { useMediaQuery } from "hooks/use-media-query";
-import { composeTailwindRenderProps } from "components/lib/primitive";
+import { SheetContent } from "app/components/ui/sheet";
+import { useMediaQuery } from "app/components/utils/use-media-query";
+import { composeTailwindRenderProps } from "app/components/lib/primitive";
 import { Button } from "./button";
 import { Tooltip } from "./tooltip";
 

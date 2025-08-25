@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { IconBulletFill, IconCheck, IconChevronLgRight } from "@intentui/icons"
+import { IconBulletFill, IconCheck, IconChevronLgRight } from "@intentui/icons";
 import type {
   ButtonProps,
   MenuItemProps as MenuItemPrimitiveProps,
   MenuProps as MenuPrimitiveProps,
   MenuSectionProps as MenuSectionPrimitiveProps,
   MenuTriggerProps as MenuTriggerPrimitiveProps,
-} from "react-aria-components"
+} from "react-aria-components";
 import {
   Button,
   Collection,
@@ -18,10 +18,10 @@ import {
   MenuSection as MenuSectionPrimitive,
   MenuTrigger as MenuTriggerPrimitive,
   SubmenuTrigger as SubmenuTriggerPrimitive,
-} from "react-aria-components"
-import { twMerge } from "tailwind-merge"
-import type { VariantProps } from "tailwind-variants"
-import { composeTailwindRenderProps } from "components/lib/primitive"
+} from "react-aria-components";
+import { twMerge } from "tailwind-merge";
+import type { VariantProps } from "tailwind-variants";
+import { composeTailwindRenderProps } from "app/components/lib/primitive";
 import {
   DropdownDescription,
   DropdownKeyboard,
@@ -29,19 +29,21 @@ import {
   DropdownSeparator,
   dropdownItemStyles,
   dropdownSectionStyles,
-} from "./dropdown"
-import { PopoverContent, type PopoverContentProps } from "./popover"
+} from "./dropdown";
+import { PopoverContent, type PopoverContentProps } from "./popover";
 
-const Menu = (props: MenuTriggerPrimitiveProps) => <MenuTriggerPrimitive {...props} />
+const Menu = (props: MenuTriggerPrimitiveProps) => (
+  <MenuTriggerPrimitive {...props} />
+);
 
 const MenuSubMenu = ({ delay = 0, ...props }) => (
   <SubmenuTriggerPrimitive {...props} delay={delay}>
     {props.children}
   </SubmenuTriggerPrimitive>
-)
+);
 
 interface MenuTriggerProps extends ButtonProps {
-  ref?: React.Ref<HTMLButtonElement>
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
 const MenuTrigger = ({ className, ref, ...props }: MenuTriggerProps) => (
@@ -54,12 +56,12 @@ const MenuTrigger = ({ className, ref, ...props }: MenuTriggerProps) => (
     )}
     {...props}
   />
-)
+);
 
 interface MenuContentProps<T>
   extends MenuPrimitiveProps<T>,
     Pick<PopoverContentProps, "placement"> {
-  className?: string
+  className?: string;
   popover?: Pick<
     PopoverContentProps,
     | "showArrow"
@@ -72,7 +74,7 @@ interface MenuContentProps<T>
     | "isOpen"
     | "onOpenChange"
     | "shouldFlip"
-  >
+  >;
 }
 
 const MenuContent = <T extends object>({
@@ -96,29 +98,39 @@ const MenuContent = <T extends object>({
         {...props}
       />
     </PopoverContent>
-  )
+  );
+};
+
+interface MenuItemProps
+  extends MenuItemPrimitiveProps,
+    VariantProps<typeof dropdownItemStyles> {
+  isDanger?: boolean;
 }
 
-interface MenuItemProps extends MenuItemPrimitiveProps, VariantProps<typeof dropdownItemStyles> {
-  isDanger?: boolean
-}
-
-const MenuItem = ({ className, isDanger = false, children, ...props }: MenuItemProps) => {
-  const textValue = props.textValue || (typeof children === "string" ? children : undefined)
+const MenuItem = ({
+  className,
+  isDanger = false,
+  children,
+  ...props
+}: MenuItemProps) => {
+  const textValue =
+    props.textValue || (typeof children === "string" ? children : undefined);
   return (
     <MenuItemPrimitive
-      className={composeRenderProps(className, (className, { hasSubmenu, ...renderProps }) =>
-        dropdownItemStyles({
-          ...renderProps,
-          isDanger: isDanger,
-          className: hasSubmenu
-            ? twMerge(
-                "open:data-danger:bg-danger/10 open:data-danger:text-danger",
-                "open:bg-accent open:text-accent-fg open:*:data-[slot=icon]:text-accent-fg open:*:[.text-muted-fg]:text-accent-fg",
-                className,
-              )
-            : className,
-        }),
+      className={composeRenderProps(
+        className,
+        (className, { hasSubmenu, ...renderProps }) =>
+          dropdownItemStyles({
+            ...renderProps,
+            isDanger: isDanger,
+            className: hasSubmenu
+              ? twMerge(
+                  "open:data-danger:bg-danger/10 open:data-danger:text-danger",
+                  "open:bg-accent open:text-accent-fg open:*:data-[slot=icon]:text-accent-fg open:*:[.text-muted-fg]:text-accent-fg",
+                  className,
+                )
+              : className,
+          }),
       )}
       textValue={textValue}
       {...props}
@@ -136,7 +148,10 @@ const MenuItem = ({ className, isDanger = false, children, ...props }: MenuItemP
                 </span>
               )}
               {values.selectionMode === "multiple" && (
-                <IconCheck className="-mx-0.5 mr-2 size-4" data-slot="check-indicator" />
+                <IconCheck
+                  className="-mx-0.5 mr-2 size-4"
+                  data-slot="check-indicator"
+                />
               )}
             </>
           )}
@@ -144,19 +159,26 @@ const MenuItem = ({ className, isDanger = false, children, ...props }: MenuItemP
           {typeof children === "function" ? children(values) : children}
 
           {values.hasSubmenu && (
-            <IconChevronLgRight data-slot="chevron" className="absolute right-2 size-3.5" />
+            <IconChevronLgRight
+              data-slot="chevron"
+              className="absolute right-2 size-3.5"
+            />
           )}
         </>
       )}
     </MenuItemPrimitive>
-  )
-}
+  );
+};
 
 export interface MenuHeaderProps extends React.ComponentProps<typeof Header> {
-  separator?: boolean
+  separator?: boolean;
 }
 
-const MenuHeader = ({ className, separator = false, ...props }: MenuHeaderProps) => (
+const MenuHeader = ({
+  className,
+  separator = false,
+  ...props
+}: MenuHeaderProps) => (
   <Header
     className={twMerge(
       "col-span-full px-2.5 py-2 font-semibold text-base sm:text-sm",
@@ -165,41 +187,54 @@ const MenuHeader = ({ className, separator = false, ...props }: MenuHeaderProps)
     )}
     {...props}
   />
-)
+);
 
-const { section, header } = dropdownSectionStyles()
+const { section, header } = dropdownSectionStyles();
 
 interface MenuSectionProps<T> extends MenuSectionPrimitiveProps<T> {
-  ref?: React.Ref<HTMLDivElement>
-  title?: string
+  ref?: React.Ref<HTMLDivElement>;
+  title?: string;
 }
 
-const MenuSection = <T extends object>({ className, ref, ...props }: MenuSectionProps<T>) => {
+const MenuSection = <T extends object>({
+  className,
+  ref,
+  ...props
+}: MenuSectionProps<T>) => {
   return (
-    <MenuSectionPrimitive ref={ref} className={section({ className })} {...props}>
+    <MenuSectionPrimitive
+      ref={ref}
+      className={section({ className })}
+      {...props}
+    >
       {"title" in props && <Header className={header()}>{props.title}</Header>}
       <Collection items={props.items}>{props.children}</Collection>
     </MenuSectionPrimitive>
-  )
-}
+  );
+};
 
-const MenuSeparator = DropdownSeparator
-const MenuKeyboard = DropdownKeyboard
-const MenuLabel = DropdownLabel
-const MenuDescription = DropdownDescription
+const MenuSeparator = DropdownSeparator;
+const MenuKeyboard = DropdownKeyboard;
+const MenuLabel = DropdownLabel;
+const MenuDescription = DropdownDescription;
 
-Menu.Keyboard = MenuKeyboard
-Menu.Content = MenuContent
-Menu.Header = MenuHeader
-Menu.Item = MenuItem
-Menu.Section = MenuSection
-Menu.Separator = MenuSeparator
-Menu.Label = MenuLabel
-Menu.Description = MenuDescription
-Menu.Trigger = MenuTrigger
-Menu.Submenu = MenuSubMenu
+Menu.Keyboard = MenuKeyboard;
+Menu.Content = MenuContent;
+Menu.Header = MenuHeader;
+Menu.Item = MenuItem;
+Menu.Section = MenuSection;
+Menu.Separator = MenuSeparator;
+Menu.Label = MenuLabel;
+Menu.Description = MenuDescription;
+Menu.Trigger = MenuTrigger;
+Menu.Submenu = MenuSubMenu;
 
-export type { MenuContentProps, MenuTriggerProps, MenuItemProps, MenuSectionProps }
+export type {
+  MenuContentProps,
+  MenuTriggerProps,
+  MenuItemProps,
+  MenuSectionProps,
+};
 export {
   Menu,
   MenuKeyboard,
@@ -212,4 +247,4 @@ export {
   MenuDescription,
   MenuTrigger,
   MenuSubMenu,
-}
+};

@@ -1,13 +1,13 @@
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
-import { Button } from "components/ui/button";
-import { Modal } from "components/ui/modal";
-import { TextField } from "components/ui/text-field";
-import { Textarea } from "components/ui/textarea";
-import { withModal } from "components/utils/with-modal";
+import { Button } from "app/components/ui/button";
+import { Modal } from "app/components/ui/modal";
+import { TextField } from "app/components/ui/text-field";
+import { Textarea } from "app/components/ui/textarea";
+import { withModal } from "app/components/utils/with-modal";
 import { Save } from "lucide-react";
 import { redirect, useNavigation, type LoaderFunctionArgs } from "react-router";
 import type { Route } from "../details-page/+types/page";
-import { ProgressCircle } from "components/ui/progress-circle";
+import { ProgressCircle } from "app/components/ui/progress-circle";
 
 export const handle = {
   breadcrumb: () => "Create Workflow",

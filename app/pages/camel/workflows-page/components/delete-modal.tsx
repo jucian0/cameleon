@@ -1,6 +1,6 @@
-import { Button } from "components/ui/button";
-import { Modal } from "components/ui/modal";
-import { ProgressCircle } from "components/ui/progress-circle";
+import { Button } from "app/components/ui/button";
+import { Modal } from "app/components/ui/modal";
+import { ProgressCircle } from "app/components/ui/progress-circle";
 import { useNavigation, useSubmit } from "react-router";
 
 export function DeleteModal({

@@ -3,20 +3,20 @@ import type {
   TabPanelProps as TabPanelPrimitiveProps,
   TabProps as TabPrimitiveProps,
   TabsProps as TabsPrimitiveProps,
-} from "react-aria-components"
+} from "react-aria-components";
 import {
   composeRenderProps,
   TabList as TabListPrimitive,
   TabPanel as TabPanelPrimitive,
   Tab as TabPrimitive,
   Tabs as TabsPrimitive,
-} from "react-aria-components"
-import { twMerge } from "tailwind-merge"
+} from "react-aria-components";
+import { twMerge } from "tailwind-merge";
 
-import { composeTailwindRenderProps } from "components/lib/primitive"
+import { composeTailwindRenderProps } from "app/components/lib/primitive";
 
 interface TabsProps extends TabsPrimitiveProps {
-  ref?: React.RefObject<HTMLDivElement>
+  ref?: React.RefObject<HTMLDivElement>;
 }
 const Tabs = ({ className, ref, ...props }: TabsProps) => {
   return (
@@ -28,13 +28,17 @@ const Tabs = ({ className, ref, ...props }: TabsProps) => {
       ref={ref}
       {...props}
     />
-  )
-}
+  );
+};
 
 interface TabListProps<T extends object> extends TabListPrimitiveProps<T> {
-  ref?: React.RefObject<HTMLDivElement>
+  ref?: React.RefObject<HTMLDivElement>;
 }
-const TabList = <T extends object>({ className, ref, ...props }: TabListProps<T>) => {
+const TabList = <T extends object>({
+  className,
+  ref,
+  ...props
+}: TabListProps<T>) => {
   return (
     <TabListPrimitive
       ref={ref}
@@ -42,17 +46,18 @@ const TabList = <T extends object>({ className, ref, ...props }: TabListProps<T>
       className={composeRenderProps(className, (className, { orientation }) =>
         twMerge([
           "flex forced-color-adjust-none",
-          orientation === "horizontal" && "flex-row gap-x-5 border-border border-b",
+          orientation === "horizontal" &&
+            "flex-row gap-x-5 border-border border-b",
           orientation === "vertical" && "flex-col items-start gap-y-4 border-l",
           className,
         ]),
       )}
     />
-  )
-}
+  );
+};
 
 interface TabProps extends TabPrimitiveProps {
-  ref?: React.RefObject<HTMLDivElement>
+  ref?: React.RefObject<HTMLDivElement>;
 }
 const Tab = ({ children, className, ref, ...props }: TabProps) => {
   return (
@@ -84,11 +89,11 @@ const Tab = ({ children, className, ref, ...props }: TabProps) => {
         </>
       )}
     </TabPrimitive>
-  )
-}
+  );
+};
 
 interface TabPanelProps extends TabPanelPrimitiveProps {
-  ref?: React.RefObject<HTMLDivElement>
+  ref?: React.RefObject<HTMLDivElement>;
 }
 const TabPanel = ({ className, ref, ...props }: TabPanelProps) => {
   return (
@@ -100,8 +105,8 @@ const TabPanel = ({ className, ref, ...props }: TabPanelProps) => {
         "flex-1 text-fg text-sm focus-visible:outline-hidden",
       )}
     />
-  )
-}
+  );
+};
 
-export type { TabsProps, TabListProps, TabProps, TabPanelProps }
-export { Tabs, TabList, Tab, TabPanel }
+export type { TabsProps, TabListProps, TabProps, TabPanelProps };
+export { Tabs, TabList, Tab, TabPanel };

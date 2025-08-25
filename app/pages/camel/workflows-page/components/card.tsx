@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader } from "components/ui/card";
-import { Badge } from "components/ui/badge";
+import { Card, CardContent, CardHeader } from "app/components/ui/card";
+import { Badge } from "app/components/ui/badge";
 import { Edit, Share2, Copy, MoreHorizontal, Trash } from "lucide-react";
-import { buttonStyles } from "components/ui/button";
-import { Menu } from "components/ui/menu";
-import { Link } from "components/ui/link";
+import { buttonStyles } from "app/components/ui/button";
+import { Menu } from "app/components/ui/menu";
+import { Link } from "app/components/ui/link";
 import React from "react";
 import { DeleteModal } from "./delete-modal";
 

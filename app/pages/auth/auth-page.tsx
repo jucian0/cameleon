@@ -1,7 +1,7 @@
 import { createClient } from "@/modules/supabase/supabase-client";
 import { IconBrandGithub } from "@intentui/icons";
-import { Button } from "components/ui/button";
-import { Card } from "components/ui/card";
+import { Button } from "app/components/ui/button";
+import { Card } from "app/components/ui/card";
 import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 

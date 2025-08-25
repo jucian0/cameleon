@@ -1,6 +1,6 @@
-import AppSidebar from "components/app-sidebar";
-import AppSidebarNav from "components/app-sidebar-nav";
-import { SidebarProvider, SidebarInset } from "components/ui/sidebar";
+import AppSidebar from "app/components/app-sidebar";
+import AppSidebarNav from "app/components/app-sidebar-nav";
+import { SidebarProvider, SidebarInset } from "app/components/ui/sidebar";
 import { Outlet, redirect, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 

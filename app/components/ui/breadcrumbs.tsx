@@ -10,7 +10,7 @@ import {
   Breadcrumbs as BreadcrumbsPrimitive,
 } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
-import { composeTailwindRenderProps } from "components/lib/primitive";
+import { composeTailwindRenderProps } from "app/components/lib/primitive";
 import { Link } from "./link";
 
 type BreadcrumbsContextProps = { separator?: "chevron" | "slash" | boolean };
