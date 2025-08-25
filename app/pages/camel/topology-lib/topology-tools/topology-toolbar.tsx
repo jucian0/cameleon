@@ -14,11 +14,11 @@ import {
   useReactFlow,
   type PanelProps,
 } from "@xyflow/react";
-import { Button } from "components/ui/button";
-import { Slider } from "components/ui/slider";
+import { Button } from "app/components/ui/button";
+import { Slider } from "app/components/ui/slider";
 import { useTopologyStore } from "../topology-store";
-import { useMediaQuery } from "components/utils/use-media-query";
-import { Popover } from "components/ui/popover";
+import { useMediaQuery } from "app/components/utils/use-media-query";
+import { Popover } from "app/components/ui/popover";
 import { TopologyToolbarActions } from "./topology-toolbar-actions";
 
 export const TopologyTools = forwardRef<

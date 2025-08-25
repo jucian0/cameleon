@@ -1,32 +1,40 @@
-import { createContext, use } from "react"
+import { createContext, use } from "react";
 import {
   composeRenderProps,
   ToggleButton,
   ToggleButtonGroup,
   type ToggleButtonGroupProps,
   type ToggleButtonProps,
-} from "react-aria-components"
-import { twMerge } from "tailwind-merge"
-import { tv } from "tailwind-variants"
-import { composeTailwindRenderProps } from "components/lib/primitive"
+} from "react-aria-components";
+import { twMerge } from "tailwind-merge";
+import { tv } from "tailwind-variants";
+import { composeTailwindRenderProps } from "app/components/lib/primitive";
 
-type ToggleSize = "xs" | "sm" | "md" | "lg" | "sq-xs" | "sq-sm" | "sq-md" | "sq-lg"
+type ToggleSize =
+  | "xs"
+  | "sm"
+  | "md"
+  | "lg"
+  | "sq-xs"
+  | "sq-sm"
+  | "sq-md"
+  | "sq-lg";
 
 interface ToggleGroupContextValue
   extends Pick<ToggleButtonGroupProps, "selectionMode" | "orientation"> {
-  size?: ToggleSize
+  size?: ToggleSize;
 }
 
 const ToggleGroupContext = createContext<ToggleGroupContextValue>({
   size: "md",
   selectionMode: "single",
   orientation: "horizontal",
-})
+});
 
-const useToggleGroupContext = () => use(ToggleGroupContext)
+const useToggleGroupContext = () => use(ToggleGroupContext);
 
 interface ToggleGroupProps extends ToggleButtonGroupProps {
-  size?: ToggleSize
+  size?: ToggleSize;
 }
 
 const ToggleGroup = ({
@@ -48,8 +56,8 @@ const ToggleGroup = ({
         {...props}
       />
     </ToggleGroupContext.Provider>
-  )
-}
+  );
+};
 
 interface ToggleGroupItemProps extends ToggleButtonProps {}
 
@@ -136,10 +144,10 @@ const toggleGroupItemStyles = tv({
         "not-first:-mt-px first:rounded-t-[calc(var(--radius-lg)-2px)] last:rounded-b-[calc(var(--radius-lg)-2px)]",
     },
   ],
-})
+});
 
 const ToggleGroupItem = ({ className, ...props }: ToggleGroupItemProps) => {
-  const { size, selectionMode, orientation } = useToggleGroupContext()
+  const { size, selectionMode, orientation } = useToggleGroupContext();
 
   return (
     <ToggleButton
@@ -157,8 +165,8 @@ const ToggleGroupItem = ({ className, ...props }: ToggleGroupItemProps) => {
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
-export type { ToggleGroupProps, ToggleGroupItemProps }
-export { ToggleGroup, ToggleGroupItem }
+export type { ToggleGroupProps, ToggleGroupItemProps };
+export { ToggleGroup, ToggleGroupItem };

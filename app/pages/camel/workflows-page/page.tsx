@@ -1,18 +1,18 @@
-import { buttonStyles } from "components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "components/ui/toggle-group";
+import { buttonStyles } from "app/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "app/components/ui/toggle-group";
 import {
   Select,
   SelectList,
   SelectOption,
   SelectTrigger,
-} from "components/ui/select";
+} from "app/components/ui/select";
 import { Grid2X2, List, Plus } from "lucide-react";
-import { SearchField } from "components/ui/search-field";
+import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import type { Route } from "./+types/page";
+import { Link } from "app/components/ui/link";
 import { CamelCard } from "./components/card";
-import { Link } from "components/ui/link";
 
 export const handle = {
   breadcrumb: () => "Camel Studio",

@@ -6,10 +6,10 @@ import { BaseHandle } from "./custom-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
-import { Menu } from "components/ui/menu";
+import { Menu } from "app/components/ui/menu";
 import { useTopologyStore } from "../topology-store";
-import { Tooltip } from "components/ui/tooltip";
-import { FallbackImage } from "components/fallback-image";
+import { Tooltip } from "app/components/ui/tooltip";
+import { FallbackImage } from "app/components/fallback-image";
 
 const eipListNames = [
   "aggregate",
@@ -94,7 +94,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
     if (eipListNames.includes(data.iconName)) {
       return `/camel-icons/eips/${data.iconName}.svg`;
     } else {
-      return `/camel-icons/components/${data.iconName}.svg`;
+      return `/camel-icons/app/components/${data.iconName}.svg`;
     }
   }, [data.iconName]);
 
@@ -122,7 +122,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
             {data.iconName && (
               <FallbackImage
                 src={iconPath}
-                fallback="/camel-icons/components/generic.svg"
+                fallback="/camel-icons/app/components/generic.svg"
                 alt={data.iconName}
                 className="w-6 h-auto"
               />

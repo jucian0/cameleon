@@ -1,9 +1,9 @@
-import { Button, buttonStyles } from "components/ui/button";
+import { Button, buttonStyles } from "app/components/ui/button";
 import type { Route } from "./+types/home-page";
 import { IconFile, IconPlus } from "@intentui/icons";
-import { RestIcon } from "components/icons/rest";
-import { CamelStudioIcon } from "components/icons/camel-studio";
-import { Menu } from "components/ui/menu";
+import { RestIcon } from "app/components/icons/rest";
+import { CamelStudioIcon } from "app/components/icons/camel-studio";
+import { Menu } from "app/components/ui/menu";
 import type { LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "app/modules/supabase/supabase-server";
 

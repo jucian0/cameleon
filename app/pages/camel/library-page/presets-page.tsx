@@ -7,7 +7,7 @@ import {
   type Key,
   type Selection,
 } from "react-aria-components";
-import { Card } from "components/ui/card";
+import { Card } from "app/components/ui/card";
 import { type LoaderFunctionArgs } from "react-router";
 import type { EPIDefinition } from "../topology-lib/topology-types";
 import axios from "axios";

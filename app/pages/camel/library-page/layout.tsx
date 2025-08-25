@@ -1,10 +1,10 @@
 import { Autocomplete, useFilter } from "react-aria-components";
-import { Tab, TabList, TabPanel, Tabs } from "components/ui/tabs";
-import { SearchField } from "components/ui/search-field";
+import { Tab, TabList, TabPanel, Tabs } from "app/components/ui/tabs";
+import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useLocation, useSearchParams } from "react-router";
-import { PresetIcon } from "components/icons/preset";
-import { ProcessorIcon } from "components/icons/processor";
-import { ResourcesIcon } from "components/icons/resources";
+import { PresetIcon } from "app/components/icons/preset";
+import { ProcessorIcon } from "app/components/icons/processor";
+import { ResourcesIcon } from "app/components/icons/resources";
 
 export const handle = {
   breadcrumb: () => "Topology Library",

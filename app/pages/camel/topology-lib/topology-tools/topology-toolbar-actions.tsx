@@ -1,19 +1,23 @@
 import { useTopologyStore } from "../topology-store";
 import type { Key } from "react-stately";
-import { Select } from "components/ui/select";
-import { Button, buttonStyles } from "components/ui/button";
+import { Select } from "app/components/ui/select";
+import { Button, buttonStyles } from "app/components/ui/button";
 import { TopologyEditor } from "../topology-editor/code-editor";
 import { useNavigation, useSubmit } from "react-router";
-import { Loader } from "components/ui/loader";
+import { Loader } from "app/components/ui/loader";
 
 export const TopologyToolbarActions = () => {
-  const { camelConfig, currentCamelRouteId, setCurrentCamelRouteId, getCamelConfigYaml } =
-    useTopologyStore();
+  const {
+    camelConfig,
+    currentCamelRouteId,
+    setCurrentCamelRouteId,
+    getCamelConfigYaml,
+  } = useTopologyStore();
   const submit = useSubmit();
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   function handleSave() {
-    submit({ content: getCamelConfigYaml() }, { method: "post" })
+    submit({ content: getCamelConfigYaml() }, { method: "post" });
   }
 
   const camelRoutes = camelConfig?.data?.map((element) => {
@@ -34,10 +38,12 @@ export const TopologyToolbarActions = () => {
 
   return (
     <div className={`flex items-center gap-1`}>
-      <Button size="sm" onPress={handleSave} isPending={navigation.state === "submitting"}>
-        {
-          navigation.state === "submitting" && (<Loader />)
-        }
+      <Button
+        size="sm"
+        onPress={handleSave}
+        isPending={navigation.state === "submitting"}
+      >
+        {navigation.state === "submitting" && <Loader />}
         Save
       </Button>
       <Select
