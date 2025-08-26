@@ -1,7 +1,7 @@
 import React from "react";
 import MonacoEditor from "@monaco-editor/react";
-import { useTopologyStore } from "../topology-store";
-import { yamlToJson } from "../yaml-json";
+import { useTopologyStore } from "core";
+import { yamlToJson } from "core";
 import { Sheet } from "app/components/ui/sheet";
 import { Button } from "app/components/ui/button";
 import { Code2Icon } from "lucide-react";

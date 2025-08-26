@@ -9,5 +9,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.10.0"
+  "packageManager": "pnpm@10.10.0",
+  "dependencies": {
+    "uuid": "^11.1.0",
+    "yaml": "^2.7.1",
+    "zustand": "^5.0.4",
+    "dot-prop-immutable": "^2.1.1",
+    "js-base64": "^3.7.7"
+  },
+  "devDependencies": {
+    "@xyflow/react": "^12.6.0"
+  }
 }

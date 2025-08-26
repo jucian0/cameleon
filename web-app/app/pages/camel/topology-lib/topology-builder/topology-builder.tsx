@@ -4,8 +4,8 @@ import { TopologyLayer } from "../topology-layer/topology-layer";
 import dagre from "dagre";
 import { edgeTypes, nodeTypes } from "../topology-customs";
 import { TopologyTools } from "../topology-tools/topology-toolbar";
-import type { Edge, Node } from "../topology-types";
-import { useTopologyStore } from "../topology-store";
+import type { Edge, Node } from "core";
+import { useTopologyStore } from "core";
 
 const getLayoutedNodes = (nodes: Node[], edges: Edge[], direction: string) => {
   const g = new dagre.graphlib.Graph();

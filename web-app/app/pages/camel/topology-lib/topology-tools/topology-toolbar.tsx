@@ -16,7 +16,7 @@ import {
 } from "@xyflow/react";
 import { Button } from "app/components/ui/button";
 import { Slider } from "app/components/ui/slider";
-import { useTopologyStore } from "../topology-store";
+import { useTopologyStore } from "core";
 import { useMediaQuery } from "app/components/utils/use-media-query";
 import { Popover } from "app/components/ui/popover";
 import { TopologyToolbarActions } from "./topology-toolbar-actions";

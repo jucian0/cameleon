@@ -1,6 +1,6 @@
 import { Modal } from "app/components/ui/modal";
-import { removeStep } from "../topology-operations";
-import { useTopologyStore } from "../topology-store";
+import { removeStep } from "core";
+import { useTopologyStore } from "core";
 import { Button } from "app/components/ui/button";
 
 type Props = {
