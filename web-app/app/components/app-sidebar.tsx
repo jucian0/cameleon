@@ -26,7 +26,7 @@ import {
   IconShield,
 } from "@intentui/icons";
 import { twMerge } from "tailwind-merge";
-import { CamelionIcon } from "./icons/cameleon";
+import { CameleonIcon } from "./icons/cameleon";
 import { StudioIcon } from "./icons/studio";
 import { CamelStudioIcon } from "./icons/camel-studio";
 import { ProcessorIcon } from "./icons/processor";
@@ -71,7 +71,7 @@ export default function AppSidebar(
           className="flex items-center gap-x-2 group-data-[collapsible=dock]:size-10 group-data-[collapsible=dock]:justify-center"
           href="/"
         >
-          <CamelionIcon className="size-6 fill-primary" />
+          <CameleonIcon className="size-6 fill-primary" />
           <SidebarLabel className="font-medium">Cameleon</SidebarLabel>
         </Link>
       </SidebarHeader>
