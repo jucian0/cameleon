@@ -1,18 +1,64 @@
 
 
-> web-app@ build /Users/jucianobarbosa/personal/cameleon/web-app
+> web-app@ build /Users/jucianobarbosa/personal/camelion/web-app
 > react-router build
 
+[33mThe `define` option contains an object with "PATH" for "process.env" key. It looks like you may have passed the entire `process.env` object to `define`, which can unintentionally expose all environment variables. This poses a security risk and is discouraged.[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[33mThe `define` option contains an object with "PATH" for "process.env" key. It looks like you may have passed the entire `process.env` object to `define`, which can unintentionally expose all environment variables. This poses a security risk and is discouraged.[39m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[33mThe `define` option contains an object with "PATH" for "process.env" key. It looks like you may have passed the entire `process.env` object to `define`, which can unintentionally expose all environment variables. This poses a security risk and is discouraged.[39m [33m(x3)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[33mThe `define` option contains an object with "PATH" for "process.env" key. It looks like you may have passed the entire `process.env` object to `define`, which can unintentionally expose all environment variables. This poses a security risk and is discouraged.[39m [33m(x4)[39m
 [36mvite v6.3.5 [32mbuilding for production...[36m[39m
-[2K[1Gtransforming (1) [2m../node_modules/.pnpm/@react-router+dev@7.8.2_@react-router+serve@7.8.2_react-router@7.8.2_rea[2K[1G[2K[1Gtransforming (30) [2mapp/pages/auth/auth-page.tsx[22m[2K[1G[2K[1Gtransforming (46) [2m../node_modules/.pnpm/react-stately@3.41.0_react@19.1.1/node_modules/react-stately/dist/impor[2K[1Gtransforming (137) [2mapp/components/app-sidebar.tsx[22m[2K[1G[33mapp/components/ui/button.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1Gtransforming (278) [2m../node_modules/.pnpm/scheduler@0.26.0/node_modules/scheduler/cjs/scheduler.production.js[2[2K[1Gtransforming (514) [2m../node_modules/.pnpm/react-dom@19.1.1_react@19.1.1/node_modules/react-dom/client.js[22m[2K[1Gtransforming (617) [2m../node_modules/.pnpm/react-aria-components@1.12.0_react-dom@19.1.1_react@19.1.1__react@19.1[2K[1G[33mapp/components/ui/menu.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1Gtransforming (1225) [2mapp/components/icons/cameleon.tsx[22m[2K[1Gtransforming (1283) [2m../node_modules/.pnpm/@react-aria+interactions@3.25.5_react-dom@19.1.1_react@19.1.1__react@[2K[1G[33mapp/components/ui/tooltip.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1G[33mapp/components/lib/primitive.ts (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1Gtransforming (1) [2m../node_modules/.pnpm/@react-router+dev@7.8.2_@react-router+serve@7.8.2_react-router@7.8.2_rea[2K[1G[2K[1Gtransforming (30) [2mapp/pages/camel/library-page/eips-page.tsx[22m[2K[1G[2K[1Gtransforming (49) [2m../node_modules/.pnpm/@react-stately+calendar@3.8.4_react@19.1.1/node_modules/@react-stately/[2K[1Gtransforming (1039) [2m../node_modules/.pnpm/lucide-react@0.507.0_react@19.1.1/node_modules/lucide-react/dist/esm/[2K[1Gtransforming (1119) [2m../node_modules/.pnpm/lucide-react@0.507.0_react@19.1.1/node_modules/lucide-react/dist/esm/[2K[1G[33mapp/components/ui/button.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1Gtransforming (1886) [2m../node_modules/.pnpm/@react-stately+virtualizer@4.4.3_react-dom@19.1.1_react@19.1.1__react[2K[1Gtransforming (1893) [2m../node_modules/.pnpm/scheduler@0.26.0/node_modules/scheduler/cjs/scheduler.production.js[[2K[1G[33mapp/components/ui/menu.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1G[33mapp/components/ui/tooltip.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1G[33mapp/components/ui/popover.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1G[33mapp/components/ui/dialog.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
 [2K[1G[2K[1G[33mapp/components/ui/loader.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1Gtransforming (2047) [2m../node_modules/.pnpm/lucide-react@0.507.0_react@19.1.1/node_modules/lucide-react/dist/esm/[2K[1G[33mapp/components/ui/popover.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1Gtransforming (2299) [2m../node_modules/.pnpm/lucide-react@0.507.0_react@19.1.1/node_modules/lucide-react/dist/esm/[2K[1G[2K[1Gtransforming (2971) [2mapp/components/ui/badge.tsx[22m[2K[1G[33mapp/components/ui/keyboard.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1G[2K[1G[2K[1G[33mapp/components/ui/dialog.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1Gtransforming (3152) [2m../node_modules/.pnpm/lodash@4.17.21/node_modules/lodash/_listCacheClear.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1Gtransforming (3412) [2m../node_modules/.pnpm/lodash@4.17.21/node_modules/lodash/_Stack.js[22m[2K[1Gtransforming (3698) [2m../node_modules/.pnpm/d3-transition@3.0.1_d3-selection@3.0.0/node_modules/d3-transition/src[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 3717 modules transformed.
+[2K[1G[2K[1G[33mapp/components/lib/primitive.ts (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1Gtransforming (2161) [2mapp/pages/camel/topology-lib/topology-tools/topology-toolbar.tsx[22m[2K[1Gtransforming (2207) [2m../node_modules/.pnpm/@react-aria+utils@3.30.1_react-dom@19.1.1_react@19.1.1__react@19.1.1/[2K[1G[33mapp/components/ui/keyboard.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1Gtransforming (2813) [2m../node_modules/.pnpm/@react-aria+tabs@3.10.7_react-dom@19.1.1_react@19.1.1__react@19.1.1/n[2K[1Gtransforming (2985) [2m../node_modules/.pnpm/@swc+helpers@0.5.17/node_modules/@swc/helpers/esm/_class_private_fiel[2K[1G[2K[1G[2K[1Gtransforming (3151) [2m../node_modules/.pnpm/lodash@4.17.21/node_modules/lodash/isLength.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1Gtransforming (3403) [2m../node_modules/.pnpm/lodash@4.17.21/node_modules/lodash/_mapCacheClear.js[22m[2K[1G[2K[1Gtransforming (3614) [2m../node_modules/.pnpm/axios@1.11.0/node_modules/axios/lib/helpers/speedometer.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 3717 modules transformed.
 [2K[1G[33mGenerated an empty chunk: "callback-page".[39m
 [2K[1G[33mGenerated an empty chunk: "set-theme-page".[39m
 [2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1Grendering chunks (15)...[2K[1Grendering chunks (16)...[2K[1Grendering chunks (17)...[2K[1Grendering chunks (18)...[2K[1Grendering chunks (19)...[2K[1Grendering chunks (20)...[2K[1Grendering chunks (21)...[2K[1Grendering chunks (22)...[2K[1Grendering chunks (23)...[2K[1Grendering chunks (24)...[2K[1Grendering chunks (25)...[2K[1Grendering chunks (26)...[2K[1Grendering chunks (27)...[2K[1Grendering chunks (28)...[2K[1Grendering chunks (29)...[2K[1Grendering chunks (30)...[2K[1Grendering chunks (31)...[2K[1Grendering chunks (32)...[2K[1Grendering chunks (33)...[2K[1Grendering chunks (34)...[2K[1Grendering chunks (35)...[2K[1Grendering chunks (36)...[2K[1Grendering chunks (37)...[2K[1Grendering chunks (38)...[2K[1Grendering chunks (39)...[2K[1Grendering chunks (40)...[2K[1Grendering chunks (41)...[2K[1Grendering chunks (42)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1Gcomputing gzip size (4)...[2K[1Gcomputing gzip size (5)...[2K[1Gcomputing gzip size (6)...[2K[1Gcomputing gzip size (7)...[2K[1Gcomputing gzip size (8)...[2K[1Gcomputing gzip size (9)...[2K[1Gcomputing gzip size (10)...[2K[1Gcomputing gzip size (11)...[2K[1Gcomputing gzip size (12)...[2K[1Gcomputing gzip size (13)...[2K[1Gcomputing gzip size (14)...[2K[1Gcomputing gzip size (15)...[2K[1Gcomputing gzip size (16)...[2K[1Gcomputing gzip size (17)...[2K[1Gcomputing gzip size (18)...[2K[1Gcomputing gzip size (19)...[2K[1Gcomputing gzip size (20)...[2K[1Gcomputing gzip size (21)...[2K[1Gcomputing gzip size (22)...[2K[1Gcomputing gzip size (23)...[2K[1Gcomputing gzip size (24)...[2K[1Gcomputing gzip size (25)...[2K[1Gcomputing gzip size (26)...[2K[1Gcomputing gzip size (27)...[2K[1Gcomputing gzip size (28)...[2K[1Gcomputing gzip size (29)...[2K[1Gcomputing gzip size (30)...[2K[1Gcomputing gzip size (31)...[2K[1Gcomputing gzip size (32)...[2K[1Gcomputing gzip size (33)...[2K[1Gcomputing gzip size (34)...[2K[1Gcomputing gzip size (35)...[2K[1Gcomputing gzip size (36)...[2K[1Gcomputing gzip size (37)...[2K[1Gcomputing gzip size (38)...[2K[1Gcomputing gzip size (39)...[2K[1Gcomputing gzip size (40)...[2K[1Gcomputing gzip size (41)...[2K[1Gcomputing gzip size (42)...[2K[1Gcomputing gzip size (43)...[2K[1Gcomputing gzip size (44)...[2K[1Gcomputing gzip size (45)...[2K[1G[2mbuild/client/[22m[32m.vite/manifest.json                  [39m[1m[2m 16.20 kB[22m[1m[22m[2m │ gzip:   1.94 kB[22m
@@ -60,25 +106,41 @@
 [2mbuild/client/[22m[2massets/[22m[36msupabase-client-ByqB__1G.js   [39m[1m[2m132.10 kB[22m[1m[22m[2m │ gzip:  36.84 kB[22m
 [2mbuild/client/[22m[2massets/[22m[36mentry.client-CcNXQk_Q.js      [39m[1m[2m182.76 kB[22m[1m[22m[2m │ gzip:  58.26 kB[22m
 [2mbuild/client/[22m[2massets/[22m[36mpage-IRgB4gce.js              [39m[1m[2m468.88 kB[22m[1m[22m[2m │ gzip: 156.10 kB[22m
-[32m✓ built in 3.12s[39m
+[32m✓ built in 2.92s[39m
+[33mThe `define` option contains an object with "PATH" for "process.env" key. It looks like you may have passed the entire `process.env` object to `define`, which can unintentionally expose all environment variables. This poses a security risk and is discouraged.[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[33mThe `define` option contains an object with "PATH" for "process.env" key. It looks like you may have passed the entire `process.env` object to `define`, which can unintentionally expose all environment variables. This poses a security risk and is discouraged.[39m [33m(x2)[39m
 [36mvite v6.3.5 [32mbuilding SSR bundle for production...[36m[39m
-[2K[1Gtransforming (1) [2m virtual:react-router/server-build[22m[2K[1Gtransforming (18) [2mapp/modules/supabase/supabase-server.ts[22m[2K[1G[33mapp/components/ui/button.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1Gtransforming (1) [2m virtual:react-router/server-build[22m[2K[1G[33mapp/components/ui/button.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
 [2K[1G[2K[1G[33mapp/components/ui/menu.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1G[33mapp/components/ui/popover.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1Gtransforming (46) [2mapp/pages/set-theme/menu.tsx[22m[2K[1G[33mapp/components/ui/tooltip.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
 [2K[1G[2K[1G[33mapp/components/lib/primitive.ts (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[2K[1G[2K[1G[33mapp/components/ui/popover.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
 [2K[1G[2K[1G[33mapp/components/ui/loader.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
 [2K[1G[2K[1G[33mapp/components/ui/dialog.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1G[33mapp/components/ui/tooltip.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
 [2K[1G[2K[1G[33mapp/components/ui/keyboard.tsx (1:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
-[2K[1G[2K[1Gtransforming (132) [2m../node_modules/.pnpm/yaml@2.8.1/node_modules/yaml/dist/schema/yaml-1.1/merge.js[22m[2K[1G[2K[1G[2K[1G[33m"Theme" is imported from external module "remix-themes" but never used in "app/pages/set-theme/server.ts", "app/pages/set-theme/provider.ts", "app/pages/set-theme/menu.tsx" and "app/pages/camel/topology-lib/topology-editor/code-editor.tsx".[39m
+[2K[1G[2K[1Gtransforming (155) [2m../node_modules/.pnpm/yaml@2.8.1/node_modules/yaml/dist/nodes/Pair.js[22m[2K[1G[2K[1G[2K[1G[33m"Theme" is imported from external module "remix-themes" but never used in "app/pages/set-theme/server.ts", "app/pages/set-theme/menu.tsx", "app/pages/set-theme/provider.ts" and "app/pages/camel/topology-lib/topology-editor/code-editor.tsx".[39m
 [2K[1G[32m✓[39m 258 modules transformed.
 [2K[1Grendering chunks (1)...[2K[1G[2K[1G[2mbuild/server/[22m[32m.vite/manifest.json               [39m[1m[2m  0.47 kB[22m[1m[22m
 [2mbuild/server/[22m[2massets/[22m[35mserver-build-BZV40eAE.css  [39m[1m[2m 15.85 kB[22m[1m[22m
 [2mbuild/server/[22m[2massets/[22m[35mroot-9pWjVyow.css          [39m[1m[2m174.14 kB[22m[1m[22m
-[2mbuild/server/[22m[36mindex.js                          [39m[1m[2m484.65 kB[22m[1m[22m
+[2mbuild/server/[22m[36mindex.js                          [39m[1m[2m485.87 kB[22m[1m[22m
 
 [32m✓[39m 2 assets cleaned from React Router server build.
 [2mbuild/client/assets/root-9pWjVyow.css[22m
 [2mbuild/server/assets/server-build-BZV40eAE.css[22m
 
-[32m✓ built in 445ms[39m
+[32m✓ built in 435ms[39m
