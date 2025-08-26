@@ -4,8 +4,7 @@
   "tasks": {
     "build": {
       "outputs": ["build/**"],
-      "dependsOn": ["^build"],
-      "env": ["SUPABASE_URL", "SUPABASE_ANON_KEY"]
+      "dependsOn": ["^build"]
     },
     "dev": {
       "cache": false,
