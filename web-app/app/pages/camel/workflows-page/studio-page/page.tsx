@@ -41,10 +41,14 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 
 export default function CamelStudio({ loaderData }: Route.ComponentProps) {
   const { content } = loaderData;
-  const { setCamelConfig } = useTopologyStore();
+  const { setCamelConfig, setCurrentCamelRouteId } = useTopologyStore();
 
   React.useEffect(() => {
     setCamelConfig(content);
+
+    return () => {
+      setCurrentCamelRouteId("");
+    };
   }, [content, setCamelConfig]);
 
   return <TopologyBuilder />;

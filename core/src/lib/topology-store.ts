@@ -46,7 +46,15 @@ type TopologyStore = {
 };
 
 const INITIAL_STATE = {
-  data: [],
+  data: [
+    {
+      route: {
+        id: "route1",
+        nodePrefixId: "route1-",
+        from: { uri: "timer:foo", id: "1" },
+      },
+    },
+  ],
   comments: {},
 };
 
@@ -78,14 +86,14 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
       ...state.camelConfig,
       data: state.camelConfig.data
         ? state.camelConfig.data.map((route) => {
-          if (route.route?.id === state.currentCamelRouteId) {
-            return {
-              ...route,
-              ...json,
-            };
-          }
-          return route;
-        })
+            if (route.route?.id === state.currentCamelRouteId) {
+              return {
+                ...route,
+                ...json,
+              };
+            }
+            return route;
+          })
         : [json],
     };
     const { nodes, edges } = jsonToTopologyBuilder(

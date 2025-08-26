@@ -5,6 +5,7 @@ import { Button, buttonStyles } from "app/components/ui/button";
 import { TopologyEditor } from "../topology-editor/code-editor";
 import { useNavigation, useSubmit } from "react-router";
 import { Loader } from "app/components/ui/loader";
+import { useReactFlow } from "@xyflow/react";
 
 export const TopologyToolbarActions = () => {
   const {
@@ -15,6 +16,7 @@ export const TopologyToolbarActions = () => {
   } = useTopologyStore();
   const submit = useSubmit();
   const navigation = useNavigation();
+  const { fitView } = useReactFlow();
 
   function handleSave() {
     submit({ content: getCamelConfigYaml() }, { method: "post" });
@@ -32,6 +34,7 @@ export const TopologyToolbarActions = () => {
       (route) => route.route?.id === selectedRouteId,
     );
     if (nextCurrentRoute) {
+      fitView({ duration: 300 });
       setCurrentCamelRouteId(nextCurrentRoute.route?.id as string);
     }
   }

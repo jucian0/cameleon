@@ -8,6 +8,7 @@ import { Save } from "lucide-react";
 import { redirect, useNavigation, type LoaderFunctionArgs } from "react-router";
 import type { Route } from "../details-page/+types/page";
 import { ProgressCircle } from "app/components/ui/progress-circle";
+import { encode } from "js-base64";
 
 export const handle = {
   breadcrumb: () => "Create Workflow",
@@ -38,6 +39,7 @@ export async function action({ request }: LoaderFunctionArgs) {
   const user = await supabase.auth.getUser();
   const isEdit = request.url.includes("edit");
   if (!isEdit) formData.delete("id");
+
   formData.set("owner", user.data.user?.id || "");
 
   const { error } = await supabase
@@ -80,21 +82,26 @@ export default withModal<Route.ComponentProps>(function ModalPage({
             <input
               type="hidden"
               name="id"
-              value={loaderData?.workflow?.id || ""}
+              value={loaderData?.workflow?.id ?? ""}
+            />
+            <input
+              type="hidden"
+              name="content"
+              value={loaderData.workflow.content ?? ""}
             />
             <TextField
               autoFocus
               aria-label="Name"
               placeholder="Enter a name"
               name="name"
-              defaultValue={loaderData?.workflow?.name || ""}
+              defaultValue={loaderData?.workflow?.name ?? ""}
             />
             <Textarea
               className="mt-4"
               aria-label="Description"
               placeholder="Enter a description"
               name="description"
-              defaultValue={loaderData?.workflow?.description || ""}
+              defaultValue={loaderData?.workflow?.description ?? ""}
             />
             <span aria-label="error" className="text-red-500">
               {actionData?.error}
