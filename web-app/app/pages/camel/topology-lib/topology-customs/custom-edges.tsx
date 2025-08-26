@@ -4,9 +4,9 @@ import {
   EdgeLabelRenderer,
   getBezierPath,
 } from "@xyflow/react";
-import { type Node } from "./../topology-types";
+import { type Node } from "core";
 import { Button } from "app/components/ui/button";
-import { useTopologyStore } from "../topology-store";
+import { useTopologyStore } from "core";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 import { Tooltip } from "app/components/ui/tooltip";

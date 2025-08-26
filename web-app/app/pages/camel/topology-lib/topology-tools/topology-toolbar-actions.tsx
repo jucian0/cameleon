@@ -1,4 +1,4 @@
-import { useTopologyStore } from "../topology-store";
+import { useTopologyStore } from "core";
 import type { Key } from "react-stately";
 import { Select } from "app/components/ui/select";
 import { Button, buttonStyles } from "app/components/ui/button";

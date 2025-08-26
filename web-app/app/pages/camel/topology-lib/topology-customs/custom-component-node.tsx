@@ -1,13 +1,13 @@
 import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
 
-import type { Node } from "../topology-types";
+import type { Node } from "core";
 import { BaseHandle } from "./custom-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
 import { Menu } from "app/components/ui/menu";
-import { useTopologyStore } from "../topology-store";
+import { useTopologyStore } from "core";
 import { Tooltip } from "app/components/ui/tooltip";
 import { FallbackImage } from "app/components/fallback-image";
 
@@ -138,7 +138,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
           </Menu.Trigger>
           <Tooltip.Content>{data.label.toUpperCase()}</Tooltip.Content>
         </Tooltip>
-        <Menu.Content placement="bottom" showArrow>
+        <Menu.Content placement="bottom">
           <Menu.Item onAction={handleClick} textValue={data.label}>
             <IconPencilBox /> Edit
           </Menu.Item>

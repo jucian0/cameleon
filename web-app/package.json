@@ -1,5 +1,5 @@
 {
-  "name": "camelion",
+  "name": "web-app",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,9 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "js-base64": "^3.7.7",
+    "zustand": "^5.0.4",
+    "dot-prop-immutable": "^2.1.1",
     "@intentui/icons": "^1.11.0",
     "@monaco-editor/react": "4.7.0",
     "@radix-ui/react-scroll-area": "^1.2.9",
@@ -19,9 +22,7 @@
     "@xyflow/react": "^12.6.0",
     "axios": "^1.9.0",
     "dagre": "0.8.5",
-    "dot-prop-immutable": "^2.1.1",
     "isbot": "^5.1.27",
-    "js-base64": "^3.7.7",
     "lucide-react": "^0.507.0",
     "motion": "^12.10.0",
     "react": "^19.1.0",
@@ -34,9 +35,7 @@
     "tailwind-variants": "^2.1.0",
     "tailwindcss-react-aria-components": "^2.0.0",
     "tw-animate-css": "^1.3.6",
-    "uuid": "^11.1.0",
-    "yaml": "^2.7.1",
-    "zustand": "^5.0.4"
+    "core": "workspace:^"
   },
   "devDependencies": {
     "@react-router/dev": "^7.7.1",

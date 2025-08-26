@@ -7,17 +7,13 @@ import {
   Virtualizer,
   GridLayout,
 } from "react-aria-components";
-import {
-  addNewRoute,
-  addStepAfter,
-  addStepBetween,
-} from "../topology-operations";
+import { addNewRoute, addStepAfter, addStepBetween } from "core";
 import { useLayer } from "./topology-layer";
-import { getDefaultConfig } from "../topology-templates";
+import { getDefaultConfig } from "core";
 import { Tab, TabList, TabPanel, Tabs } from "app/components/ui/tabs";
 import { tryCatch } from "@/utils/try-catch";
 import { SearchField } from "app/components/ui/search-field";
-import { useTopologyStore } from "../topology-store";
+import { useTopologyStore } from "core";
 import {
   fetchComponentsMetadata,
   fetchEIPsMetadata,

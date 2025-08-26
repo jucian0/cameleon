@@ -1,7 +1,7 @@
 import { TopologyLibrary } from "./topology-library";
 import { Form } from "./topology-form";
 import { create } from "zustand";
-import type { Node } from "../topology-types";
+import type { Node } from "core";
 import { Sheet } from "app/components/ui/sheet";
 
 export function TopologyLayer() {

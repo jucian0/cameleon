@@ -59,7 +59,7 @@ export const CustomHandle = ({
         <div className="nodrag nopan pointer-events-auto">
           <Button
             aria-label="Add child node"
-            size="extra-small"
+            size="xs"
             intent="outline"
             className="h-8 rounded-full flex items-center justify-center"
           >
