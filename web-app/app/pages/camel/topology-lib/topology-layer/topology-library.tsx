@@ -137,7 +137,7 @@ function CamelComponentsTab({
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
                 <img
-                  src={`/camel-icons/app/components/${item.component.name}.svg`}
+                  src={`/camel-icons/components/${item.component.name}.svg`}
                   alt={item.component.name}
                   className="h-8 w-8 rounded"
                 />

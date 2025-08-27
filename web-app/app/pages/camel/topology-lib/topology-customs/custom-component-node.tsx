@@ -94,7 +94,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
     if (eipListNames.includes(data.iconName)) {
       return `/camel-icons/eips/${data.iconName}.svg`;
     } else {
-      return `/camel-icons/app/components/${data.iconName}.svg`;
+      return `/camel-icons/components/${data.iconName}.svg`;
     }
   }, [data.iconName]);
 
@@ -122,7 +122,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
             {data.iconName && (
               <FallbackImage
                 src={iconPath}
-                fallback="/camel-icons/app/components/generic.svg"
+                fallback="/camel-icons/components/generic.svg"
                 alt={data.iconName}
                 className="w-6 h-auto"
               />
