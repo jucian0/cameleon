@@ -5,10 +5,22 @@ import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
 import { withModal } from "app/components/utils/with-modal";
 import { Save } from "lucide-react";
-import { redirect, useNavigation, type LoaderFunctionArgs } from "react-router";
+import {
+  redirect,
+  useLocation,
+  useNavigation,
+  type LoaderFunctionArgs,
+  type MetaArgs,
+} from "react-router";
 import type { Route } from "../details-page/+types/page";
 import { ProgressCircle } from "app/components/ui/progress-circle";
-import { encode } from "js-base64";
+
+export function meta({ data }: MetaArgs<typeof loader>) {
+  return [
+    { title: `${data?.workflow.name || "Create a workflow"} | Cameleon` },
+    { description: `Create, edit or clone workflows.` },
+  ];
+}
 
 export const handle = {
   breadcrumb: () => "Create Workflow",
@@ -62,6 +74,12 @@ export default withModal<Route.ComponentProps>(function ModalPage({
   actionData,
 }) {
   const navigation = useNavigation();
+  const location = useLocation();
+  const pageAction = location.pathname.includes("edit")
+    ? "Edit"
+    : location.pathname.includes("clone")
+      ? "Clone"
+      : "Create";
 
   function handleClose() {
     closeModal("/camel/workflows");
@@ -72,7 +90,7 @@ export default withModal<Route.ComponentProps>(function ModalPage({
       <Modal.Content isBlurred>
         <form method="post">
           <Modal.Header>
-            <Modal.Title>Create new workflow</Modal.Title>
+            <Modal.Title>{pageAction} Workflow</Modal.Title>
             <Modal.Description>
               Enter a name and description for your new workflow. You can change
               it later.

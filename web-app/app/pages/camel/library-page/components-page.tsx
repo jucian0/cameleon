@@ -9,9 +9,16 @@ import {
 import { Card } from "app/components/ui/card";
 import { FallbackImage } from "app/components/fallback-image";
 import type { LoaderFunctionArgs } from "react-router";
-import type { ComponentDefinition } from "../topology-lib/topology-types";
+import type { ComponentDefinition } from "core";
 import axios from "axios";
 import type { Route } from "./+types/components-page";
+
+export function meta() {
+  return [
+    { title: "Components | Cameleon" },
+    { description: "See all your components here." },
+  ];
+}
 
 export const handle = {
   breadcrumb: () => "Components",

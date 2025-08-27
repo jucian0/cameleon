@@ -8,9 +8,16 @@ import {
 } from "react-aria-components";
 import { Card } from "app/components/ui/card";
 import axios from "axios";
-import type { EPIDefinition } from "../topology-lib/topology-types";
+import type { EPIDefinition } from "core";
 import type { Route } from "./+types/eips-page";
 import type { LoaderFunctionArgs } from "react-router";
+
+export function meta() {
+  return [
+    { title: "EIPs | Cameleon" },
+    { description: "See all your EIPs here." },
+  ];
+}
 
 export const handle = {
   breadcrumb: () => "EIPs",

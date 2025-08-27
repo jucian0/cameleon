@@ -9,9 +9,16 @@ import {
 } from "react-aria-components";
 import { Card } from "app/components/ui/card";
 import { type LoaderFunctionArgs } from "react-router";
-import type { EPIDefinition } from "../topology-lib/topology-types";
+import type { EPIDefinition } from "core";
 import axios from "axios";
 import type { Route } from "./+types/presets-page";
+
+export function meta() {
+  return [
+    { title: "Presets | Cameleon" },
+    { description: "See all your presets here." },
+  ];
+}
 
 export const handle = {
   breadcrumb: () => "Presets",

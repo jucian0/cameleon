@@ -14,6 +14,13 @@ import type { Route } from "./+types/page";
 import { Link } from "app/components/ui/link";
 import { CamelCard } from "./components/card";
 
+export function meta() {
+  return [
+    { title: "Workflows | Chameleon" },
+    { description: "List all yours workflows." },
+  ];
+}
+
 export const handle = {
   breadcrumb: () => "Camel Studio",
 };

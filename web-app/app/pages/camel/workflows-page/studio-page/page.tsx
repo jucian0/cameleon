@@ -1,11 +1,18 @@
 import { useTopologyStore } from "core";
 import { TopologyBuilder } from "../../topology-lib/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
-import type { LoaderFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, MetaArgs } from "react-router";
 import type { Route } from "../studio-page/+types/page";
 import { decode, encode } from "js-base64";
 import { yamlToJson } from "core";
 import React from "react";
+
+export function meta({ data }: MetaArgs<typeof loader>) {
+  return [
+    { title: `${data?.name || "Workflow"} | Cameleon` },
+    { description: "Create workflows." },
+  ];
+}
 
 export const handle = {
   breadcrumb: () => "Camel Studio",
@@ -23,7 +30,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const decodedData = decode(data[0].content ?? "");
-  return { content: yamlToJson(decodedData) };
+  return { content: yamlToJson(decodedData), name: data[0].name };
 }
 
 export async function action({ request, params }: LoaderFunctionArgs) {
