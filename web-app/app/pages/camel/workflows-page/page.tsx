@@ -14,11 +14,14 @@ import type { Route } from "./+types/page";
 import { Link } from "app/components/ui/link";
 import { CamelCard } from "./components/card";
 
+const metaData = {
+  title: "Workflows | Chameleon",
+  description:
+    "Organize and manage your workflow diagrams with names and descriptions.",
+};
+
 export function meta() {
-  return [
-    { title: "Workflows | Chameleon" },
-    { description: "List all yours workflows." },
-  ];
+  return [{ title: metaData.title }, { description: metaData.description }];
 }
 
 export const handle = {
@@ -81,9 +84,7 @@ export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
   return (
     <div className="m-6 flex flex-col gap-4">
       <div>
-        <p className="text-muted-foreground">
-          Organize and manage your workflow diagrams with names and descriptions
-        </p>
+        <p className="text-muted-foreground">{metaData.description}</p>
         <p className="text-sm text-muted-foreground mt-1">
           {totalWorkflows} workflow{totalWorkflows !== 1 ? "s" : ""} total
         </p>

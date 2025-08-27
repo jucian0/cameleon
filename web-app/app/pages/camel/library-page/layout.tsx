@@ -6,6 +6,12 @@ import { PresetIcon } from "app/components/icons/preset";
 import { ProcessorIcon } from "app/components/icons/processor";
 import { ResourcesIcon } from "app/components/icons/resources";
 
+const metaData = {
+  title: "Topology Library | Cameleon",
+  description:
+    "Explore the Camel Topology Library, including EIPs and Components.",
+};
+
 export const handle = {
   breadcrumb: () => "Topology Library",
 };
@@ -28,6 +34,9 @@ export default function TopologyLibrary() {
 
   return (
     <div className="m-6 flex flex-col gap-4">
+      <div>
+        <p className="text-muted-foreground">{metaData.description}</p>
+      </div>
       <Autocomplete
         aria-label="Topology library"
         filter={contains}
