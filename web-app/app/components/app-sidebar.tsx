@@ -31,11 +31,11 @@ import { StudioIcon } from "./icons/studio";
 import { CamelStudioIcon } from "./icons/camel-studio";
 import { ProcessorIcon } from "./icons/processor";
 import { SwaggerIcon } from "./icons/swagger";
-import { ThemeMenu } from "@/pages/set-theme/menu";
+import { ThemeMenu } from "@/pages/app/set-theme/menu";
 import { useLocation, useNavigate, useRouteLoaderData } from "react-router";
 import { useState } from "react";
 import { createClient } from "@/modules/supabase/supabase-client";
-import type { Loader } from "./../app/root";
+import type { Loader } from "@/root";
 
 export default function AppSidebar(
   props: Readonly<React.ComponentProps<typeof Sidebar>>,
@@ -59,9 +59,9 @@ export default function AppSidebar(
       if (error) {
         throw new Error(error.message);
       }
-      navigate("/auth");
-    } catch {
       navigate("/");
+    } catch {
+      navigate("/app");
     }
   }
   return (
@@ -69,7 +69,7 @@ export default function AppSidebar(
       <SidebarHeader>
         <Link
           className="flex items-center gap-x-2 group-data-[collapsible=dock]:size-10 group-data-[collapsible=dock]:justify-center"
-          href="/"
+          href="/app"
         >
           <CameleonIcon className="size-6 fill-primary" />
           <SidebarLabel className="font-medium">Cameleon</SidebarLabel>
@@ -86,7 +86,7 @@ export default function AppSidebar(
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
                 <SidebarItem
-                  href="/camel/workflows"
+                  href="/app/camel/workflows"
                   tooltip="Workflows"
                   isCurrent={pathname.includes("workflows")}
                 >
@@ -94,7 +94,7 @@ export default function AppSidebar(
                   <SidebarLabel>Workflows</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem
-                  href="/camel/library/eips"
+                  href="/app/camel/library/eips"
                   tooltip="Library"
                   isCurrent={pathname.includes("library")}
                 >
@@ -123,7 +123,6 @@ export default function AppSidebar(
         <Menu>
           <Menu.Trigger className="group" aria-label="Profile">
             <Avatar
-              shape="square"
               src={loaderData?.user?.user_metadata?.avatar_url}
               alt={loaderData?.user?.user_metadata?.full_name}
             />

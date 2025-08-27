@@ -7,48 +7,59 @@ import {
 } from "@react-router/dev/routes";
 
 export default [
-  route("auth", "pages/auth/auth-page.tsx"),
-  route("auth/callback", "pages/auth/callback-page.ts"),
-  layout("pages/layout.tsx", [
-    index("pages/home/home-page.tsx"),
-    ...prefix("camel", [
-      route("studio", "pages/camel/workflows-page/studio-page/page.tsx", {
-        id: "workflows-create",
-      }),
-      route(
-        "workflows/:workflowsId/studio",
-        "pages/camel/workflows-page/studio-page/page.tsx",
-        {
-          id: "workflow-edit",
-        },
-      ),
-      route("workflows", "pages/camel/workflows-page/page.tsx", [
-        route("create", "pages/camel/workflows-page/details-page/page.tsx", {
-          id: "studio-create",
+  route("", "pages/landing/page.tsx"),
+
+  ...prefix("app", [
+    route("auth", "pages/app/auth/auth-page.tsx"),
+    route("auth/callback", "pages/app/auth/callback-page.ts"),
+    layout("pages/app/layout.tsx", [
+      index("pages/app/home/home-page.tsx"),
+      ...prefix("camel", [
+        route("studio", "pages/app/camel/workflows-page/studio-page/page.tsx", {
+          id: "workflows-create",
         }),
         route(
-          ":workflowsId/edit",
-          "pages/camel/workflows-page/details-page/page.tsx",
+          "workflows/:workflowsId/studio",
+          "pages/app/camel/workflows-page/studio-page/page.tsx",
           {
-            id: "studio-edit",
+            id: "workflow-edit",
           },
         ),
-        route(
-          ":workflowsId/clone",
-          "pages/camel/workflows-page/details-page/page.tsx",
-          {
-            id: "studio-clone",
-          },
-        ),
-      ]),
-      ...prefix("library", [
-        layout("pages/camel/library-page/layout.tsx", [
-          route("eips", "pages/camel/library-page/eips-page.tsx"),
-          route("components", "pages/camel/library-page/components-page.tsx"),
-          route("presets", "pages/camel/library-page/presets-page.tsx"),
+        route("workflows", "pages/app/camel/workflows-page/page.tsx", [
+          route(
+            "create",
+            "pages/app/camel/workflows-page/details-page/page.tsx",
+            {
+              id: "studio-create",
+            },
+          ),
+          route(
+            ":workflowsId/edit",
+            "pages/app/camel/workflows-page/details-page/page.tsx",
+            {
+              id: "studio-edit",
+            },
+          ),
+          route(
+            ":workflowsId/clone",
+            "pages/app/camel/workflows-page/details-page/page.tsx",
+            {
+              id: "studio-clone",
+            },
+          ),
+        ]),
+        ...prefix("library", [
+          layout("pages/app/camel/library-page/layout.tsx", [
+            route("eips", "pages/app/camel/library-page/eips-page.tsx"),
+            route(
+              "components",
+              "pages/app/camel/library-page/components-page.tsx",
+            ),
+            route("presets", "pages/app/camel/library-page/presets-page.tsx"),
+          ]),
         ]),
       ]),
+      route("set-theme", "pages/app/set-theme/set-theme-page.ts"),
     ]),
-    route("set-theme", "pages/set-theme/set-theme-page.ts"),
   ]),
 ] satisfies RouteConfig;

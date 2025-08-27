@@ -12,7 +12,7 @@ import {
   type LoaderFunctionArgs,
   type MetaArgs,
 } from "react-router";
-import type { Route } from "../details-page/+types/page";
+import type { Route } from "./+types/page";
 import { ProgressCircle } from "app/components/ui/progress-circle";
 
 export function meta({ data }: MetaArgs<typeof loader>) {
@@ -64,7 +64,7 @@ export async function action({ request }: LoaderFunctionArgs) {
       error: error.details || "Failed to save workflow. Please try again.",
     };
   }
-  return redirect("/camel/workflows");
+  return redirect("/app/camel/workflows");
 }
 
 export default withModal<Route.ComponentProps>(function ModalPage({
@@ -82,7 +82,7 @@ export default withModal<Route.ComponentProps>(function ModalPage({
       : "Create";
 
   function handleClose() {
-    closeModal("/camel/workflows");
+    closeModal("/app/camel/workflows");
   }
 
   return (

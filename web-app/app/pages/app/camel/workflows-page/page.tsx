@@ -130,7 +130,7 @@ export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
               </ToggleGroupItem>
             </ToggleGroup>
             <Link
-              href="/camel/workflows/create"
+              href="/app/camel/workflows/create"
               aria-label="Settings"
               className={buttonStyles({
                 size: "md",

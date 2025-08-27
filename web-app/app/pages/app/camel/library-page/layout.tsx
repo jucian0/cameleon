@@ -55,19 +55,22 @@ export default function TopologyLibrary() {
           selectedKey={currentCamelRoute}
         >
           <TabList>
-            <Tab id="eips" href={`/camel/library/eips?${filter.toString()}`}>
+            <Tab
+              id="eips"
+              href={`/app/camel/library/eips?${filter.toString()}`}
+            >
               <ProcessorIcon />
               EIPs{" "}
             </Tab>
             <Tab
               id="components"
-              href={`/camel/library/components?${filter.toString()}`}
+              href={`/app/camel/library/components?${filter.toString()}`}
             >
               <ResourcesIcon /> Components
             </Tab>
             <Tab
               id="presets"
-              href={`/camel/library/presets?${filter.toString()}`}
+              href={`/app/camel/library/presets?${filter.toString()}`}
             >
               <PresetIcon /> Presets
             </Tab>

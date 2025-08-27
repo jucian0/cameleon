@@ -8,7 +8,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
   const { data, error } = await supabase.auth.getUser();
   if (!data.user || error) {
-    throw redirect("/auth");
+    throw redirect("/app/auth");
   }
   return null;
 }

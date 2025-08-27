@@ -32,8 +32,8 @@ export default function AuthPage() {
       options: {
         redirectTo:
           env.ENV === "development"
-            ? "http://localhost:3000/auth/callback"
-            : "https://cameleon.juciano.com/auth/callback",
+            ? "http://localhost:3000/app/auth/callback"
+            : "https://cameleon.juciano.com/app/auth/callback",
       },
     });
   }

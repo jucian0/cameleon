@@ -11,13 +11,13 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
 } from "react-router";
-import { themeSessionResolver } from "./pages/set-theme/server";
+import { themeSessionResolver } from "./pages/app/set-theme/server";
 import {
   PreventFlashOnWrongTheme,
   ThemeProvider,
   useTheme,
   type Theme,
-} from "./pages/set-theme/provider";
+} from "./pages/app/set-theme/provider";
 import { createServerSupabase } from "./modules/supabase/supabase-server";
 import { RouterProvider } from "react-aria-components";
 

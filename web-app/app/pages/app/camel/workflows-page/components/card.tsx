@@ -49,11 +49,11 @@ export const CamelCard = ({
               <MoreHorizontal size={16} />
             </Menu.Trigger>
             <Menu.Content className="justify-end">
-              <Menu.Item href={`/camel/workflows/${id}/edit`}>
+              <Menu.Item href={`/app/camel/workflows/${id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Details
               </Menu.Item>
-              <Menu.Item href={`/camel/workflows/${id}/clone`}>
+              <Menu.Item href={`/app/camel/workflows/${id}/clone`}>
                 <Copy className="h-4 w-4 mr-2" />
                 Clone
               </Menu.Item>
@@ -83,7 +83,7 @@ export const CamelCard = ({
           </div>
 
           <Link
-            href={`/camel/workflows/${id}/studio`}
+            href={`/app/camel/workflows/${id}/studio`}
             className={buttonStyles({
               intent: "plain",
               className: "text-primary",
