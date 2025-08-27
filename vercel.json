@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd web-app && pnpm build",
-  "installCommand": "pnpm install",
-  "outputDirectory": "web-app/build"
-}
