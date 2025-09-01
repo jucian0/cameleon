@@ -7,16 +7,20 @@ type Props = {
   node: any;
   onOpenChange: (isOpen: boolean) => void;
   isOpen: boolean;
+  routeId: string;
 };
 
 export function DeleteNodeModal(props: Readonly<Props>) {
-  const { getCurrentCamelRoute, setCurrentCamelRoute } = useTopologyStore();
+  const { camelConfig, updateCamelRoute } = useTopologyStore();
   const { node, onOpenChange, isOpen } = props;
 
   const handleRemoveStep = () => {
-    const selectedRoute = getCurrentCamelRoute();
+    const selectedRoute = camelConfig?.data?.find(
+      (route) => route.route?.id === node.routeId,
+    );
+    if (!selectedRoute) return;
     const updatedRoute = removeStep(selectedRoute, node.absolutePath);
-    setCurrentCamelRoute(updatedRoute);
+    updateCamelRoute(updatedRoute, props.routeId);
     onOpenChange(false);
   };
 

@@ -15,9 +15,9 @@ import {
 import type { Route } from "./+types/page";
 import { ProgressCircle } from "app/components/ui/progress-circle";
 
-export function meta({ data }: MetaArgs<typeof loader>) {
+export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
-    { title: `${data?.workflow.name || "Create a workflow"} | Cameleon` },
+    { title: `${loaderData?.workflow.name || "Create a workflow"} | Cameleon` },
     { description: `Create, edit or clone workflows.` },
   ];
 }

@@ -7,8 +7,13 @@ import { useTopologyStore } from "core";
 
 export function Form() {
   const { node } = useLayer();
-  const { getCurrentCamelRoute, setCurrentCamelRoute } = useTopologyStore();
-  const selectedRoute = getCurrentCamelRoute();
+  const { updateCamelRoute, camelConfig } = useTopologyStore();
+  const selectedRoute = camelConfig?.data.find(
+    (route: any) => route.route.id === "",
+  );
+
+  // fix it here
+  // getCurrentCamelRoute();
 
   const formData = React.useMemo(() => {
     return dot.get(selectedRoute, node?.absolutePath ?? "") ?? {};
@@ -33,7 +38,8 @@ export function Form() {
   function handleSubmit(formData: any) {
     if (node) {
       const updatedJson = dot.set(selectedRoute, node?.absolutePath, formData);
-      setCurrentCamelRoute(updatedJson);
+      //fix it here
+      updateCamelRoute(updatedJson, "");
     }
   }
 

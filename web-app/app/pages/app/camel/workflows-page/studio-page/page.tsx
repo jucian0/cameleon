@@ -1,15 +1,19 @@
 import { useTopologyStore } from "core";
 import { TopologyBuilder } from "../../topology-lib/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
-import type { LoaderFunctionArgs, MetaArgs } from "react-router";
+import {
+  useSearchParams,
+  type LoaderFunctionArgs,
+  type MetaArgs,
+} from "react-router";
 import type { Route } from "../studio-page/+types/page";
 import { decode, encode } from "js-base64";
 import { yamlToJson } from "core";
 import React from "react";
 
-export function meta({ data }: MetaArgs<typeof loader>) {
+export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
-    { title: `${data?.name || "Workflow"} | Cameleon` },
+    { title: `${loaderData?.name || "Workflow"} | Cameleon` },
     { description: "Create workflows." },
   ];
 }
@@ -48,14 +52,15 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 
 export default function CamelStudio({ loaderData }: Route.ComponentProps) {
   const { content } = loaderData;
-  const { setCamelConfig, setCurrentCamelRouteId } = useTopologyStore();
+  const { setCamelConfig, setCamelRoute } = useTopologyStore();
+  const [query] = useSearchParams();
 
   React.useEffect(() => {
     setCamelConfig(content);
-
-    return () => {
-      setCurrentCamelRouteId("");
-    };
+    const routeId = query.get("route");
+    if (routeId) {
+      setCamelRoute(routeId);
+    }
   }, [content, setCamelConfig]);
 
   return <TopologyBuilder />;

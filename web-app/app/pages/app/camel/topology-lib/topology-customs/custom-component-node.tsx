@@ -136,7 +136,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
               isConnectable={false}
             />
           </Menu.Trigger>
-          <Tooltip.Content>{data.label.toUpperCase()}</Tooltip.Content>
+          <Tooltip.Content>{data.label?.toUpperCase()}</Tooltip.Content>
         </Tooltip>
         <Menu.Content placement="bottom">
           <Menu.Item onAction={handleClick} textValue={data.label}>

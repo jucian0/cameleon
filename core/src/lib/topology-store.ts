@@ -12,7 +12,7 @@
  * Important:
  * - Do not modify the `canvas` (nodes and edges) directly.
  *   Any changes to the canvas should reflect in the `currentCamelRoute` configuration.
- * - To update the current Camel route, use `setCurrentCamelRoute`.
+ * - To update the current Camel route, use `updateCamelRoute`.
  * - To update the entire Camel configuration, use `setCamelConfig`.
  * - The nodes and edges are automatically laid out using Dagre, so their positions are set automatically.
  */
@@ -29,11 +29,9 @@ import type { CamelConfig, Edge, Route, Node } from "./topology-types";
 
 type TopologyStore = {
   camelConfig: CamelConfig;
-  currentCamelRouteId: string;
-  setCurrentCamelRouteId: (routeId: string) => void;
+  setCamelRoute: (routeId: string) => void;
   setCamelConfig: (json: any) => void;
-  setCurrentCamelRoute: (json: any) => void;
-  getCurrentCamelRoute: () => Route | undefined;
+  updateCamelRoute: (json: any, routeId: string) => void;
   getCamelConfigYaml: () => any;
   canvas: {
     direction: "LR" | "TB";
@@ -60,33 +58,38 @@ const INITIAL_STATE = {
 
 export const useTopologyStore = create<TopologyStore>((set, get) => ({
   camelConfig: INITIAL_STATE,
-  currentCamelRouteId: "",
 
-  setCurrentCamelRouteId: (routeId) => {
-    const { nodes, edges } = jsonToTopologyBuilder(
-      get().camelConfig.data,
-      routeId,
+  setCamelRoute: (routeId) => {
+    const currentRoute = get().camelConfig.data.find(
+      (route) => route.route?.id === routeId,
     );
+    const { nodes, edges } = jsonToTopologyBuilder(currentRoute ?? {});
     set({
       canvas: { ...get().canvas, nodes, edges },
-      currentCamelRouteId: routeId,
     });
   },
+
   setCamelConfig: (json) => {
     set({ camelConfig: json });
-    const { nodes, edges } = jsonToTopologyBuilder(
-      json.data,
-      get().currentCamelRouteId,
-    );
-    set({ canvas: { ...get().canvas, nodes, edges } });
+    const parsedCanvas = { nodes: [], edges: [] } as any;
+    for (const route of json.data) {
+      if (route.route) {
+        const { nodes, edges } = jsonToTopologyBuilder(route);
+        console.log("Processing route:", nodes, edges);
+        parsedCanvas.nodes.push(...nodes);
+        parsedCanvas.edges.push(...edges);
+      }
+    }
+    set({ canvas: { ...get().canvas, ...parsedCanvas } });
   },
-  setCurrentCamelRoute: (json) => {
+
+  updateCamelRoute: (json, routeId) => {
     const state = get();
     const updatedJson = {
       ...state.camelConfig,
       data: state.camelConfig.data
         ? state.camelConfig.data.map((route) => {
-            if (route.route?.id === state.currentCamelRouteId) {
+            if (route.route?.id === routeId) {
               return {
                 ...route,
                 ...json,
@@ -96,18 +99,10 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
           })
         : [json],
     };
-    const { nodes, edges } = jsonToTopologyBuilder(
-      updatedJson.data,
-      state.currentCamelRouteId,
-    );
-    set({ canvas: { ...get().canvas, nodes, edges } });
+    // set({ canvas: { ...get().canvas, nodes, edges } });
     set({ camelConfig: updatedJson });
   },
-  getCurrentCamelRoute: () => {
-    return get().camelConfig.data?.find(
-      (route) => route.route?.id === get().currentCamelRouteId,
-    );
-  },
+
   getCamelConfigYaml: () => {
     const state = get();
     return jsonToYaml(state.camelConfig);
@@ -117,7 +112,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
    * Canvas state
    * This state is used to manage canvas's nodes and edges.
    * Important: Do not modify the nodes and edges directly, it will reflect in the currentCamelRoute state automatically.
-   * Always change the Camel route state using `setCurrentCamelRoute`.
+   * Always change the Camel route state using `updateCamelRoute`.
    * The nodes and edges are layouted using Dagre, so the position of the nodes is set automatically.
    */
   canvas: {

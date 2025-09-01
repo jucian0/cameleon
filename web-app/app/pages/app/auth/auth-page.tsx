@@ -26,7 +26,6 @@ export default function AuthPage() {
   );
 
   async function handleGithubSignIn() {
-    console.log("handleGithubSignIn", env.ENV);
     await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {

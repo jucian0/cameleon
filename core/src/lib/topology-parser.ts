@@ -511,16 +511,13 @@ function processSteps(
 }
 
 // ==================== Main Export Function ====================
-export function jsonToTopologyBuilder(
-  routes: Route[],
-  routeId: string,
-): ParsedTopologyModel {
+export function jsonToTopologyBuilder(route: Route): ParsedTopologyModel {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   let lastNodeId: string | null = null;
   let initialAbsolutePath = "route.from";
 
-  if (!routeId) {
+  if (!route) {
     generatePlaceholderNodesAndEdges(
       nodes,
       edges,
@@ -531,10 +528,10 @@ export function jsonToTopologyBuilder(
     return { nodes, edges };
   }
 
-  const route = routes?.find((route) => route.route?.id === routeId);
-  if (!route) {
-    throw new Error(`Route with ID ${routeId} not found`);
-  }
+  // const route = routes?.find((route) => route.route?.id === routeId);
+  // if (!route) {
+  //   throw new Error(`Route with ID ${routeId} not found`);
+  // }
 
   const fromId = generateUniqueId("from");
   nodes.push(

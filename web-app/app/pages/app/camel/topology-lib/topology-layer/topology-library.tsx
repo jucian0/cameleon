@@ -22,7 +22,7 @@ import { Card } from "app/components/ui/card";
 
 export function TopologyLibrary() {
   const { node, setNode } = useLayer();
-  const { setCurrentCamelRoute, getCurrentCamelRoute, setCurrentCamelRouteId } =
+  const { updateCamelRoute, getCurrentCamelRoute, setCamelRouteId } =
     useTopologyStore();
   const { contains } = useFilter({ sensitivity: "base" });
 
@@ -39,8 +39,8 @@ export function TopologyLibrary() {
 
       if (!selectedRoute) {
         const route = addNewRoute(newStepConfig);
-        setCurrentCamelRoute(route);
-        setCurrentCamelRouteId(route.route.id);
+        updateCamelRoute(route);
+        setCamelRouteId(route.route.id);
         setNode();
         return;
       }
@@ -51,7 +51,7 @@ export function TopologyLibrary() {
           node.absolutePath,
           newStepConfig,
         );
-        setCurrentCamelRoute(updatedRoute);
+        updateCamelRoute(updatedRoute);
       }
 
       if (node.operation === "add-step-between") {
@@ -60,7 +60,7 @@ export function TopologyLibrary() {
           node.absolutePath,
           newStepConfig,
         );
-        setCurrentCamelRoute(updatedRoute);
+        updateCamelRoute(updatedRoute);
       }
       setNode();
     } catch (error) {
