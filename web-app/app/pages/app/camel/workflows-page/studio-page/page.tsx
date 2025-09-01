@@ -42,7 +42,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
   const workflowsId = params.workflowsId;
   const formData = await request.formData();
   const content = formData.get("content") ?? "";
-  const { data, error } = await supabase
+  await supabase
     .from("workflows")
     .update({
       content: encode(content as string),

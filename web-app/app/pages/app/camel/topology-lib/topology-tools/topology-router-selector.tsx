@@ -23,7 +23,8 @@ export function TopologyRouteSelector() {
     );
     if (nextCurrentRoute) {
       fitView({ duration: 300 });
-      setQuery(new URLSearchParams({ route: selectedRouteId as string }));
+      query.set("route", selectedRouteId as string);
+      setQuery(query);
     }
   }
 

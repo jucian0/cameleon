@@ -7,7 +7,6 @@ import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
 import { Menu } from "app/components/ui/menu";
-import { useTopologyStore } from "core";
 import { Tooltip } from "app/components/ui/tooltip";
 import { FallbackImage } from "app/components/fallback-image";
 import { useSearchParams } from "react-router";
@@ -86,7 +85,6 @@ const eipListNames = [
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const { canvas } = useTopologyStore();
   const [query] = useSearchParams();
   const direction = query.get("direction") || "LR";
   const targetPosition = direction === "LR" ? Position.Left : Position.Top;

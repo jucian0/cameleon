@@ -4,7 +4,6 @@ import type { Node } from "core";
 import { BaseHandle } from "./custom-handle";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
-import { useTopologyStore } from "core";
 import { Tooltip } from "app/components/ui/tooltip";
 import { Pressable } from "react-aria-components";
 import { useSearchParams } from "react-router";

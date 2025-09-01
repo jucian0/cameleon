@@ -1,11 +1,5 @@
 import { forwardRef } from "react";
-import {
-  Maximize,
-  Minus,
-  Plus,
-  ArrowRightFromLine,
-  Settings,
-} from "lucide-react";
+import { Settings } from "lucide-react";
 
 import {
   Panel,
@@ -15,7 +9,6 @@ import {
   type PanelProps,
 } from "@xyflow/react";
 import { Button } from "app/components/ui/button";
-import { useTopologyStore } from "core";
 import { useMediaQuery } from "app/components/utils/use-media-query";
 import { Popover } from "app/components/ui/popover";
 import { TopologyToolbarActions } from "./topology-toolbar-actions";
@@ -41,7 +34,8 @@ export const TopologyTools = forwardRef<
   );
 
   function setDirection(direction: "LR" | "TB" | "RL" | "BT") {
-    setQuery({ direction });
+    query.set("direction", direction);
+    setQuery(query);
   }
 
   const direction = query.get("direction") || "LR";
