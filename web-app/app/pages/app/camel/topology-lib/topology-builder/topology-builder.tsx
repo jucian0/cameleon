@@ -6,6 +6,7 @@ import { edgeTypes, nodeTypes } from "../topology-customs";
 import { TopologyTools } from "../topology-tools/topology-toolbar";
 import type { Edge, Node } from "core";
 import { useTopologyStore } from "core";
+import { useSearchParams } from "react-router";
 
 const getLayoutedNodes = (nodes: Node[], edges: Edge[], direction: string) => {
   const g = new dagre.graphlib.Graph();
@@ -42,13 +43,14 @@ const getLayoutedEdges = (nodes: Node[], edges: Edge[], direction: string) => {
 function Flow() {
   const { canvas } = useTopologyStore();
   const { nodes, edges, onNodesChange, onEdgesChange } = canvas;
-  const { direction } = canvas;
+  const [query] = useSearchParams();
+  const direction = query.get("direction") || "LR";
 
   return (
     <div className="h-[calc(100vh-52px)] relative">
       <ReactFlow
         fitView
-        key={canvas.direction}
+        key={direction}
         nodes={getLayoutedNodes(nodes, edges, direction)}
         edges={getLayoutedEdges(nodes, edges, direction)}
         nodeTypes={nodeTypes}

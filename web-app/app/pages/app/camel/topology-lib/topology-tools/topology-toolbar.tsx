@@ -21,6 +21,7 @@ import { Popover } from "app/components/ui/popover";
 import { TopologyToolbarActions } from "./topology-toolbar-actions";
 import { TopologyRouteSelector } from "./topology-router-selector";
 import { TopologyZoomControls } from "./topology-zoom-controls";
+import { useSearchParams } from "react-router";
 
 export const TopologyTools = forwardRef<
   HTMLDivElement,
@@ -28,7 +29,8 @@ export const TopologyTools = forwardRef<
 >(({ className, ...props }, ref) => {
   const { zoom } = useViewport();
   const { zoomTo, zoomIn, zoomOut, fitView } = useReactFlow();
-  const query = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [query, setQuery] = useSearchParams();
 
   const { minZoom, maxZoom } = useStore(
     (state) => ({
@@ -38,8 +40,11 @@ export const TopologyTools = forwardRef<
     (a, b) => a.minZoom !== b.minZoom || a.maxZoom !== b.maxZoom,
   );
 
-  const { canvas } = useTopologyStore();
-  const { direction, setDirection } = canvas;
+  function setDirection(direction: "LR" | "TB" | "RL" | "BT") {
+    setQuery({ direction });
+  }
+
+  const direction = query.get("direction") || "LR";
 
   return (
     <Panel
@@ -47,7 +52,7 @@ export const TopologyTools = forwardRef<
       className={`flex items-center justify-between px-4 w-full gap-1 rounded-md bg-primary-foreground text-foreground ${className}`}
       {...props}
     >
-      {query ? (
+      {isMobile ? (
         <Popover>
           <Button intent="secondary" size="xs" aria-label="Toolbar">
             <Settings className="h-4 w-4" />

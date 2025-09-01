@@ -10,6 +10,7 @@ import { Menu } from "app/components/ui/menu";
 import { useTopologyStore } from "core";
 import { Tooltip } from "app/components/ui/tooltip";
 import { FallbackImage } from "app/components/fallback-image";
+import { useSearchParams } from "react-router";
 
 const eipListNames = [
   "aggregate",
@@ -86,7 +87,8 @@ const eipListNames = [
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { canvas } = useTopologyStore();
-  const { direction } = canvas;
+  const [query] = useSearchParams();
+  const direction = query.get("direction") || "LR";
   const targetPosition = direction === "LR" ? Position.Left : Position.Top;
   const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
 
@@ -161,6 +163,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
         isOpen={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
         node={data}
+        routeId=""
       />
     </>
   );

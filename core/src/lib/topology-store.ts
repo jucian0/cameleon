@@ -34,12 +34,10 @@ type TopologyStore = {
   updateCamelRoute: (json: any, routeId: string) => void;
   getCamelConfigYaml: () => any;
   canvas: {
-    direction: "LR" | "TB";
     nodes: Node[];
     edges: Edge[];
     onNodesChange: (nodes: NodeChange<Node>[]) => void;
     onEdgesChange: (edges: EdgeChange<Edge>[]) => void;
-    setDirection: (direction: "LR" | "TB") => void;
   };
 };
 
@@ -118,7 +116,6 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   canvas: {
     nodes: [],
     edges: [],
-    direction: "TB",
     onNodesChange: (nodes) => {
       const newNodes = applyNodeChanges(nodes, get().canvas.nodes);
       set({ canvas: { ...get().canvas, nodes: newNodes } });
@@ -126,9 +123,6 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     onEdgesChange: (edges) => {
       const newEdges = applyEdgeChanges(edges, get().canvas.edges);
       set({ canvas: { ...get().canvas, edges: newEdges } });
-    },
-    setDirection: (direction) => {
-      set({ canvas: { ...get().canvas, direction } });
     },
   },
 }));

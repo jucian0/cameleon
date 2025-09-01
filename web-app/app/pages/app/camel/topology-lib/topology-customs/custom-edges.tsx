@@ -10,7 +10,6 @@ import { useTopologyStore } from "core";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 import { Tooltip } from "app/components/ui/tooltip";
-import { Pressable } from "react-aria-components";
 
 const SHOULD_HIDE_IF_BEFORE = ["camel-step", "choice", "multicast", "doTry"];
 const SHOULD_HIDE_IF_TARGET = ["camel-step", "choice", "multicast", "merge"];
