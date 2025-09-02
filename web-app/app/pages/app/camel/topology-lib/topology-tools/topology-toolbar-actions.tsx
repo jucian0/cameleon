@@ -16,7 +16,7 @@ export const TopologyToolbarActions = () => {
   return (
     <div className={`flex items-center gap-1`}>
       <Button
-        size="xs"
+        size="sm"
         onPress={handleSave}
         isPending={navigation.state === "submitting"}
       >
