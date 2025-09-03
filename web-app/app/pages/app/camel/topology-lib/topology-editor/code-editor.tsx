@@ -1,18 +1,19 @@
-import React from "react";
 import MonacoEditor from "@monaco-editor/react";
-import { useTopologyStore } from "core";
+import { jsonToYaml, useTopologyStore } from "core";
 import { yamlToJson } from "core";
 import { Sheet } from "app/components/ui/sheet";
 import { Button } from "app/components/ui/button";
 import { Code2Icon } from "lucide-react";
 import { useTheme } from "remix-themes";
+import React from "react";
+import debounce from "debounce";
 
 export function TopologyEditor() {
-  const { getCamelConfigYaml, setCamelConfig } = useTopologyStore();
-  const [code, setCode] = React.useState<string | undefined>(
-    getCamelConfigYaml(),
-  );
+  const { setCamelConfig, camelConfig } = useTopologyStore();
   const theme = useTheme();
+  const [debouncedSetCamelConfig] = React.useState(() =>
+    debounce(setCamelConfig, 500),
+  );
 
   const editorDidMount = (editor: any, monaco: any) => {
     editor.focus();
@@ -20,7 +21,7 @@ export function TopologyEditor() {
 
   const onChange = (newValue: string | undefined, e: any) => {
     if (newValue !== undefined) {
-      setCamelConfig(yamlToJson(newValue));
+      debouncedSetCamelConfig(yamlToJson(newValue));
     }
   };
 
@@ -40,8 +41,7 @@ export function TopologyEditor() {
               className="w-full h-full"
               language="yaml"
               theme={theme[0] === "dark" ? "vs-dark" : "vs-light"}
-              //	value={code}
-              defaultValue={getCamelConfigYaml()}
+              defaultValue={jsonToYaml(camelConfig)}
               options={options}
               onChange={onChange}
               onMount={editorDidMount}

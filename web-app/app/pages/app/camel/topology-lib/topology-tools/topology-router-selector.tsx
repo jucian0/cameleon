@@ -18,14 +18,12 @@ export function TopologyRouteSelector() {
   });
 
   function handleRouteChange(selectedRouteId: Key | null) {
-    const nextCurrentRoute = camelConfig?.data?.find(
-      (route) => route.route?.id === selectedRouteId,
-    );
-    if (nextCurrentRoute) {
-      fitView({ duration: 300 });
-      query.set("route", selectedRouteId as string);
-      setQuery(query);
-    }
+    const nextValue = selectedRouteId === "all" ? "" : selectedRouteId;
+    fitView({ duration: 300 });
+    setQuery((query) => {
+      query.set("route", nextValue as string);
+      return query;
+    });
   }
 
   return (
@@ -33,7 +31,7 @@ export function TopologyRouteSelector() {
       aria-label="Select a route"
       onSelectionChange={handleRouteChange}
       placeholder="Select a route"
-      selectedKey={query.get("route") || undefined}
+      selectedKey={query.get("route") || "all"}
     >
       <Select.Trigger
         className={buttonStyles({
@@ -41,7 +39,7 @@ export function TopologyRouteSelector() {
           intent: "secondary",
         })}
       />
-      <Select.List items={camelRoutes}>
+      <Select.List items={camelRoutes.concat({ id: "all", label: "All" })}>
         {(item) => (
           <Select.Option id={item.id as string}>{item.label}</Select.Option>
         )}

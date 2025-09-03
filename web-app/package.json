@@ -35,7 +35,8 @@
     "tailwind-variants": "^2.1.0",
     "tailwindcss-react-aria-components": "^2.0.0",
     "tw-animate-css": "^1.3.6",
-    "core": "workspace:^"
+    "core": "workspace:^",
+    "debounce": "2.2.0"
   },
   "devDependencies": {
     "@react-router/dev": "^7.7.1",

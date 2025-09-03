@@ -533,7 +533,7 @@ export function jsonToTopologyBuilder(route: Route): ParsedTopologyModel {
   //   throw new Error(`Route with ID ${routeId} not found`);
   // }
 
-  const fromId = generateUniqueId("from");
+  const fromId = route.route?.id ? route.route.id : generateUniqueId("route");
   nodes.push(
     createNode(
       fromId,

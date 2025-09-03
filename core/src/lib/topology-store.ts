@@ -29,13 +29,13 @@ import type { CamelConfig, Edge, Route, Node } from "./topology-types";
 
 type TopologyStore = {
   camelConfig: CamelConfig;
-  setCamelRoute: (routeId: string) => void;
   setCamelConfig: (json: any) => void;
   updateCamelRoute: (json: any, routeId: string) => void;
   getCamelConfigYaml: () => any;
   canvas: {
     nodes: Node[];
     edges: Edge[];
+    setCanvas: (nodes: Node[], edges: Edge[]) => void;
     onNodesChange: (nodes: NodeChange<Node>[]) => void;
     onEdgesChange: (edges: EdgeChange<Edge>[]) => void;
   };
@@ -56,29 +56,19 @@ const INITIAL_STATE = {
 
 export const useTopologyStore = create<TopologyStore>((set, get) => ({
   camelConfig: INITIAL_STATE,
-
-  setCamelRoute: (routeId) => {
-    const currentRoute = get().camelConfig.data.find(
-      (route) => route.route?.id === routeId,
-    );
-    const { nodes, edges } = jsonToTopologyBuilder(currentRoute ?? {});
-    set({
-      canvas: { ...get().canvas, nodes, edges },
-    });
-  },
-
   setCamelConfig: (json) => {
     set({ camelConfig: json });
-    const parsedCanvas = { nodes: [], edges: [] } as any;
-    for (const route of json.data) {
-      if (route.route) {
-        const { nodes, edges } = jsonToTopologyBuilder(route);
-        console.log("Processing route:", nodes, edges);
-        parsedCanvas.nodes.push(...nodes);
-        parsedCanvas.edges.push(...edges);
-      }
-    }
-    set({ canvas: { ...get().canvas, ...parsedCanvas } });
+    // const parsedCanvas = { nodes: [], edges: [] } as any;
+    // for (const route of json.data) {
+    //   if (route.route) {
+    //     const { nodes, edges } = jsonToTopologyBuilder(route);
+    //     parsedCanvas.nodes.push(...nodes);
+    //     parsedCanvas.edges.push(...edges);
+    //   }
+    // }
+
+    //need to fix here, when save from code editor need to keep the current route if it exists
+    // set({ canvas: { ...get().canvas, ...parsedCanvas } });
   },
 
   updateCamelRoute: (json, routeId) => {
@@ -97,10 +87,12 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
           })
         : [json],
     };
-    // set({ canvas: { ...get().canvas, nodes, edges } });
-    set({ camelConfig: updatedJson });
+    const { nodes, edges } = jsonToTopologyBuilder(json);
+    set({
+      canvas: { ...get().canvas, nodes, edges },
+      camelConfig: updatedJson,
+    });
   },
-
   getCamelConfigYaml: () => {
     const state = get();
     return jsonToYaml(state.camelConfig);
@@ -116,6 +108,11 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   canvas: {
     nodes: [],
     edges: [],
+    setCanvas: (nodes, edges) => {
+      set({
+        canvas: { ...get().canvas, nodes, edges },
+      });
+    },
     onNodesChange: (nodes) => {
       const newNodes = applyNodeChanges(nodes, get().canvas.nodes);
       set({ canvas: { ...get().canvas, nodes: newNodes } });

@@ -109,9 +109,15 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   }
 
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
+  const isFirstNode = data.absolutePath === "route.from";
 
   return (
-    <>
+    <div className="flex flex-col items-center gap-1">
+      {isFirstNode && (
+        <div className="text-xs text-muted-foreground select-none absolute -top-6 w-max">
+          {props.id}
+        </div>
+      )}
       <Menu isOpen={isOpen} onOpenChange={setIsOpen}>
         <Tooltip delay={0}>
           <Menu.Trigger
@@ -127,7 +133,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
                 className="w-6 h-auto"
               />
             )}
-            {data.absolutePath !== "route.from" && (
+            {!isFirstNode && (
               <BaseHandle type="target" position={targetPosition} />
             )}
             <BaseHandle
@@ -163,6 +169,6 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
         node={data}
         routeId=""
       />
-    </>
+    </div>
   );
 });

@@ -75,6 +75,9 @@ importers:
       dagre:
         specifier: 0.8.5
         version: 0.8.5
+      debounce:
+        specifier: 2.2.0
+        version: 2.2.0
       dot-prop-immutable:
         specifier: ^2.1.1
         version: 2.1.1
@@ -1808,6 +1811,10 @@ packages:
   data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
     engines: {node: '>= 12'}
+
+  debounce@2.2.0:
+    resolution: {integrity: sha512-Xks6RUDLZFdz8LIdR6q0MTH44k7FikOmnh5xkSjMig6ch45afc8sjTjRQf3P6ax8dMgcQrYO/AR2RGWURrruqw==}
+    engines: {node: '>=18'}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -5030,6 +5037,8 @@ snapshots:
       lodash: 4.17.21
 
   data-uri-to-buffer@4.0.1: {}
+
+  debounce@2.2.0: {}
 
   debug@2.6.9:
     dependencies:
