@@ -114,16 +114,16 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   return (
     <div className="flex flex-col items-center gap-1">
       {isFirstNode && (
-        <div className="text-xs text-muted-foreground select-none absolute -top-6 w-max">
+        <div className="text-xs text-third select-none absolute -top-6 w-max border rounded px-2 bg-secondary">
           {props.id}
         </div>
       )}
       <Menu isOpen={isOpen} onOpenChange={setIsOpen}>
-        <Tooltip delay={0}>
+        <Tooltip>
           <Menu.Trigger
             data-slot="menu-trigger"
             onPress={handleMenuOpen}
-            className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center"
+            className={`cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center`}
           >
             {data.iconName && (
               <FallbackImage

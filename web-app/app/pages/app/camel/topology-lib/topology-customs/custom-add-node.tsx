@@ -26,9 +26,9 @@ export const CustomAddNode = React.memo(({ data }: NodeProps<Node>) => {
   }
 
   return (
-    <Tooltip delay={0}>
+    <Tooltip>
       <Pressable>
-        <div className="w-16 flex items-center justify-center">
+        <div className="w-10 flex items-center justify-center">
           <div
             aria-label="Add node"
             onClick={handleClick}

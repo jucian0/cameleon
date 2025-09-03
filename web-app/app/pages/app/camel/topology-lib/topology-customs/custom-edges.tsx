@@ -10,6 +10,7 @@ import { useTopologyStore } from "core";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 import { Tooltip } from "app/components/ui/tooltip";
+import { Plus } from "lucide-react";
 
 const SHOULD_HIDE_IF_BEFORE = ["camel-step", "choice", "multicast", "doTry"];
 const SHOULD_HIDE_IF_TARGET = ["camel-step", "choice", "multicast", "merge"];
@@ -63,7 +64,9 @@ function CustomEdge({
   //const buttonYPosition = targetStepType === "add-step" ? sourceY + 16 : labelY;
   const shouldShowLabel =
     !SHOULD_HIDE_IF_BEFORE.includes(sourceStepType) &&
-    !SHOULD_HIDE_IF_TARGET.includes(targetStepType);
+    !SHOULD_HIDE_IF_TARGET.includes(targetStepType) &&
+    sourceStepType !== "add-step" &&
+    targetStepType !== "add-step";
 
   return (
     <>
@@ -76,13 +79,13 @@ function CustomEdge({
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             }}
           >
-            <Tooltip delay={0}>
+            <Tooltip>
               <Button
                 aria-label="Add step"
                 onPress={handleClick}
-                className={"h-4 w-4 p-0 rounded"}
+                className={"p-0! rounded w-4 h-4"}
               >
-                <IconPlus />
+                <Plus size={16} />
               </Button>
               <Tooltip.Content>
                 Add step between{" "}

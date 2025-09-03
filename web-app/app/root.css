@@ -16,6 +16,7 @@
         "Geist Mono", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco",
         "Consolas", '"Liberation Mono"', '"Courier New"', "monospace";
 
+    --color-third: var(--third);
     --color-border: var(--border);
     --color-input: var(--input);
 
@@ -67,6 +68,7 @@
 
 @layer base {
     :root {
+        --third: #ef9234;
         --bg: var(--color-white);
         --fg: var(--color-zinc-950);
 
@@ -125,6 +127,7 @@
     }
 
     .dark {
+        --third: #ef9234;
         --bg: var(--color-zinc-950);
         --fg: var(--color-zinc-50);
 
