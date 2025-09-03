@@ -17,7 +17,7 @@ import { useTopologyStore } from "core";
 import {
   fetchComponentsMetadata,
   fetchEIPsMetadata,
-} from "../../data-requests/fetch-metadata";
+} from "../../../../data-requests/fetch-metadata";
 import { Card } from "app/components/ui/card";
 
 export function TopologyLibrary() {

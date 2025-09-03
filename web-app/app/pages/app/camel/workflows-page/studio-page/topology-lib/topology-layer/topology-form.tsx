@@ -8,7 +8,7 @@ import { useTopologyStore } from "core";
 export function Form() {
   const { node } = useLayer();
   const { updateCamelRoute, camelConfig } = useTopologyStore();
-  const selectedRoute = camelConfig?.data.find(
+  const selectedRoute = camelConfig?.data?.find(
     (route: any) => route.route.id === "",
   );
 

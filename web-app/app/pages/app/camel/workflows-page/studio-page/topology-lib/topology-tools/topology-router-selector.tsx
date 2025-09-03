@@ -39,7 +39,7 @@ export function TopologyRouteSelector() {
           intent: "secondary",
         })}
       />
-      <Select.List items={camelRoutes.concat({ id: "all", label: "All" })}>
+      <Select.List items={camelRoutes?.concat({ id: "all", label: "All" })}>
         {(item) => (
           <Select.Option id={item.id as string}>{item.label}</Select.Option>
         )}

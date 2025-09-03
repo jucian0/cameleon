@@ -1,5 +1,5 @@
-import { jsonToTopologyBuilder, useTopologyStore } from "core";
-import { TopologyBuilder } from "../../topology-lib/topology-builder/topology-builder";
+import { INITIAL_STATE, jsonToTopologyBuilder, useTopologyStore } from "core";
+import { TopologyBuilder } from "./topology-lib/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
   useSearchParams,
@@ -58,12 +58,12 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
 
   const workflowCanvas = React.useMemo(() => {
     if (routeId) {
-      const route = camelConfig.data.find((r) => r.route?.id === routeId);
+      const route = camelConfig?.data.find((r) => r.route?.id === routeId);
 
       return route ? jsonToTopologyBuilder(route) : { nodes: [], edges: [] };
     } else {
       const parsedCanvas = { nodes: [], edges: [] } as any;
-      for (const route of camelConfig.data) {
+      for (const route of camelConfig?.data ?? INITIAL_STATE.data) {
         if (route.route) {
           const { nodes, edges } = jsonToTopologyBuilder(route);
           parsedCanvas.nodes.push(...nodes);
