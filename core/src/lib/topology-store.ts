@@ -23,15 +23,15 @@ import {
   type EdgeChange,
   type NodeChange,
 } from "@xyflow/react";
-import { jsonToTopologyBuilder } from "./topology-parser";
+import { jsonToTopologyBuilder } from "./topology-parser/parser";
 import { jsonToYaml } from "./yaml-json";
 import type { CamelConfig, Edge, Route, Node } from "./topology-types";
 
 type TopologyStore = {
   camelConfig: CamelConfig;
-  setCamelConfig: (json: any) => void;
+  setCamelConfig: (json: CamelConfig) => void;
   // updateCamelRoute: (json: any, routeId: string) => void;
-  getCamelConfigYaml: () => any;
+  getCamelConfigYaml: () => string;
   canvas: {
     nodes: Node[];
     edges: Edge[];

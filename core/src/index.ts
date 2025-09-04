@@ -1,5 +1,5 @@
-export * from "./lib/topology-operations";
-export * from "./lib/topology-parser";
+export * from "./lib/topology-operations/topology-operations";
+export * from "./lib/topology-parser/parser";
 export * from "./lib/topology-store";
 export * from "./lib/topology-templates";
 export * from "./lib/topology-types";

@@ -11,57 +11,62 @@
  * - **ID Generation**: Automatically generate unique IDs for routes and steps.
  *
  */
-import dotProp from 'dot-prop-immutable';
-import { v4 as uuid } from 'uuid';
-import type { Route } from './topology-types';
-
+import dotProp from "dot-prop-immutable";
+import { v4 as uuid } from "uuid";
+import type { Route } from "../topology-types";
 
 export function addNewRoute(firstStep: object): any {
   const newRoute: Route = {
     route: {
-      id: generateStepId('route'),
-      nodePrefixId: generateStepId('node'),
+      id: generateStepId("route"),
+      nodePrefixId: generateStepId("node"),
       from: {
-        id: generateStepId('from'),
+        id: generateStepId("from"),
         uri: "direct:start",
-        steps: [firstStep]
-      }
-    }
+        steps: [firstStep],
+      },
+    },
   };
 
   return newRoute;
 }
 
-export function addStepAfter(route: any, absolutePath: string, newStep: object): any {
-  const isDefaultLastStep = absolutePath === 'route.from.steps';
+export function addStepAfter(
+  route: any,
+  absolutePath: string,
+  newStep: object,
+): any {
+  const isDefaultLastStep = absolutePath === "route.from.steps";
 
   if (isDefaultLastStep) {
     const currentSteps = dotProp.get(route, absolutePath, []);
     const newSteps = [...currentSteps, newStep];
     return dotProp.set(route, absolutePath, newSteps);
   } else {
-    const isWhenStep = absolutePath.endsWith('.choice');
+    const isWhenStep = absolutePath.endsWith(".choice");
     if (isWhenStep) {
       const whensPath = `${absolutePath}.when`;
       const whenList = dotProp.get(route, whensPath, []);
       const newWhen = {
-        id: generateStepId('when'),
-        steps: []
+        id: generateStepId("when"),
+        steps: [],
       };
       const newWhens = [...whenList, newWhen];
       return dotProp.set(route, whensPath, newWhens);
     }
 
-
-
-    const stepsPath = absolutePath.replace(/\.\d+$/, '');
+    const stepsPath = absolutePath.replace(/\.\d+$/, "");
     const currentSteps = dotProp.get(route, stepsPath);
     const newSteps = [...currentSteps, newStep];
     return dotProp.set(route, stepsPath, newSteps);
   }
 }
 
-export function addStepBetween(route: any, absolutePath: string, newStep: object): any {
+export function addStepBetween(
+  route: any,
+  absolutePath: string,
+  newStep: object,
+): any {
   const stepsPath = `${absolutePath}.steps`;
   const currentSteps = dotProp.get(route, stepsPath, []);
   const newSteps = [newStep, ...currentSteps];
@@ -79,7 +84,11 @@ export function removeStep(route: any, absolutePath: string): any {
   return updatedJson;
 }
 
-export function updateStep(route: any, absolutePath: string, newStep: object): any {
+export function updateStep(
+  route: any,
+  absolutePath: string,
+  newStep: object,
+): any {
   return dotProp.set(route, absolutePath, newStep);
 }
 

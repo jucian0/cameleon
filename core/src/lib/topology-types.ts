@@ -1,4 +1,4 @@
-import * as RFLow from "@xyflow/react";
+import type * as RFLow from "@xyflow/react";
 
 export type Node = RFLow.Node & {
   readonly data: {
@@ -15,12 +15,12 @@ export type NodeType = "add-step" | "camel-step" | "add-between";
 
 export type EPIDefinition = {
   properties: Readonly<Record<string, PropertyDefinition>>;
-  model: Record<string, any>;
+  model: Record<string, unknown>;
 };
 
 export type ComponentDefinition = {
   properties: Readonly<Record<string, PropertyDefinition>>;
-  component: Record<string, any>;
+  component: Record<string, unknown>;
 };
 
 export type PropertyDefinition = {
@@ -35,7 +35,56 @@ export type PropertyDefinition = {
 };
 
 export interface Step {
-  readonly [key: string]: any;
+  steps?: Step[];
+  choice?: {
+    when?: Step[];
+    otherwise?: Step;
+  };
+  split?: {
+    steps?: Step[];
+  };
+  join?: {
+    aggregationStrategyRef?: string;
+  };
+  aggregate?: {
+    correlationExpression?: string;
+    completionSize?: number;
+    completionTimeout?: number;
+    aggregationStrategyRef?: string;
+    steps?: Step[];
+  };
+  filter?: {
+    expression?: string;
+    steps?: Step[];
+  };
+  transform?: {
+    expression?: string;
+  };
+  custom?: {
+    componentType: string;
+    properties?: Record<string, unknown>;
+  };
+  doTry?: {
+    steps?: Step[];
+    doCatch?: Step[];
+    doFinally?: {
+      steps?: Step[];
+    };
+  };
+  multicast?: {
+    parallelProcessing?: boolean;
+    strategyRef?: string;
+    stopOnException?: boolean;
+    steps?: Step[];
+  };
+  loadBalance?: {
+    strategyRef?: string;
+    steps?: Step[];
+  };
+  log?: {
+    message?: string;
+    loggingLevel?: string;
+  };
 }
 
 export type Route = {
