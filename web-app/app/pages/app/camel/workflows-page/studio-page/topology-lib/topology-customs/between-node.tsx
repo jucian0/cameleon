@@ -1,17 +1,18 @@
 import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
 import type { Node } from "core";
-import { BaseHandle } from "./custom-handle";
+import { DefaultHandle } from "./default-handle";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 import { Tooltip } from "app/components/ui/tooltip";
 import { Pressable } from "react-aria-components";
 import { useSearchParams } from "react-router";
 
-export const CustomAddNode = React.memo(({ data }: NodeProps<Node>) => {
+export const AddBetweenNode = React.memo(({ data }: NodeProps<Node>) => {
   const [query] = useSearchParams();
   const direction = query.get("direction") || "LR";
   const targetPosition = direction === "LR" ? Position.Left : Position.Top;
+  const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
 
   const { setNode } = useLayer();
 
@@ -28,7 +29,7 @@ export const CustomAddNode = React.memo(({ data }: NodeProps<Node>) => {
   return (
     <Tooltip>
       <Pressable>
-        <div className="w-10 flex items-center justify-center">
+        <div className="w-10 h-10 flex items-center justify-center">
           <div
             aria-label="Add node"
             onClick={handleClick}
@@ -42,7 +43,12 @@ export const CustomAddNode = React.memo(({ data }: NodeProps<Node>) => {
                 <IconPlus className="text-primary" />
               </div>
             )}
-            <BaseHandle type="target" position={targetPosition} />
+            <DefaultHandle type="target" position={targetPosition} />
+            <DefaultHandle
+              type="source"
+              position={sourcePosition}
+              isConnectable={false}
+            />
           </div>
         </div>
       </Pressable>

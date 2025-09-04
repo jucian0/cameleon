@@ -1,12 +1,12 @@
 import React from "react";
 import type { NodeType } from "core";
-import { DefaultNode } from "./custom-component-node";
-import { CustomAddNode } from "./custom-add-node";
-import { CustomAddBetweenNode } from "./custom-add-between";
-export * from "./custom-edges";
+import { DefaultNode } from "./default-node";
+import { AddNode } from "./add-node";
+import { AddBetweenNode } from "./between-node";
+export * from "./default-edges";
 
 export const nodeTypes: Record<NodeType, React.ExoticComponent<any>> = {
   "camel-step": DefaultNode,
-  "add-step": CustomAddNode,
-  "add-between": CustomAddBetweenNode,
+  "add-step": AddNode,
+  "add-between": AddBetweenNode,
 };

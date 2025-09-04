@@ -2,7 +2,7 @@ import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
 
 import type { Node } from "core";
-import { BaseHandle } from "./custom-handle";
+import { DefaultHandle } from "./default-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
@@ -134,9 +134,9 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
               />
             )}
             {!isFirstNode && (
-              <BaseHandle type="target" position={targetPosition} />
+              <DefaultHandle type="target" position={targetPosition} />
             )}
-            <BaseHandle
+            <DefaultHandle
               type="source"
               position={sourcePosition}
               isConnectable={false}

@@ -1,8 +1,7 @@
 import { type EdgeProps, BaseEdge, getBezierPath } from "@xyflow/react";
-import { type Node } from "core";
 import { useTopologyStore } from "core";
 
-function CustomEdge({
+function DefaultEdge({
   sourceX,
   sourceY,
   targetX,
@@ -49,5 +48,5 @@ function CustomEdge({
 }
 
 export const edgeTypes = {
-  default: CustomEdge,
+  default: DefaultEdge,
 };

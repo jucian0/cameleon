@@ -19,7 +19,7 @@ const Base = React.forwardRef<HTMLDivElement, HandleProps>(
   },
 );
 
-export const BaseHandle = (props: HandleProps) => {
+export const DefaultHandle = (props: HandleProps) => {
   return (
     <Base {...props} style={{ background: "transparent", border: "none" }}>
       <div className="-left-0 -top-0 absolute h-[6px] w-[6px] rounded-full border border-primary bg-primary transition dark:border-primary dark:bg-primary" />
