@@ -1,19 +1,6 @@
-import {
-  type EdgeProps,
-  BaseEdge,
-  EdgeLabelRenderer,
-  getBezierPath,
-} from "@xyflow/react";
+import { type EdgeProps, BaseEdge, getBezierPath } from "@xyflow/react";
 import { type Node } from "core";
-import { Button } from "app/components/ui/button";
 import { useTopologyStore } from "core";
-import { useLayer } from "../topology-layer/topology-layer";
-import { IconPlus } from "@intentui/icons";
-import { Tooltip } from "app/components/ui/tooltip";
-import { Plus } from "lucide-react";
-
-const SHOULD_HIDE_IF_BEFORE = ["camel-step", "choice", "multicast", "doTry"];
-const SHOULD_HIDE_IF_TARGET = ["camel-step", "choice", "multicast", "merge"];
 
 function CustomEdge({
   sourceX,
@@ -49,62 +36,14 @@ function CustomEdge({
     ...style,
     stroke: "hsl(181, 70%, 48%)",
     strokeDasharray:
-      sourceStepType.includes("add") || targetStepType.includes("add")
+      sourceStepType.includes("add-step") || targetStepType.includes("add-step")
         ? "5, 3"
         : undefined,
   };
 
-  const { setNode } = useLayer();
-
-  function handleClick() {
-    setNode({ ...sourceNode?.data, type: "add-step" } as Node["data"]);
-  }
-
-  // if Bezier is used, this value should be replaced by labelY
-  //const buttonYPosition = targetStepType === "add-step" ? sourceY + 16 : labelY;
-  const shouldShowLabel =
-    !SHOULD_HIDE_IF_BEFORE.includes(sourceStepType) &&
-    !SHOULD_HIDE_IF_TARGET.includes(targetStepType) &&
-    sourceStepType !== "add-step" &&
-    targetStepType !== "add-step";
-
   return (
     <>
       <BaseEdge path={edgePath} style={edgeStyle} />
-      <EdgeLabelRenderer>
-        {shouldShowLabel && (
-          <div
-            className="nodrag nopan pointer-events-auto absolute"
-            style={{
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            }}
-          >
-            <Tooltip>
-              <Button
-                aria-label="Add step"
-                onPress={handleClick}
-                className={"p-0! rounded w-4 h-4"}
-              >
-                <Plus size={16} />
-              </Button>
-              <Tooltip.Content>
-                Add step between{" "}
-                {
-                  <code className="px-1 border rounded italic bg-sidebar">
-                    {sourceNode?.data.label}
-                  </code>
-                }{" "}
-                and{" "}
-                {
-                  <code className="px-1 border rounded italic bg-sidebar">
-                    {targetNode?.data.label}
-                  </code>
-                }
-              </Tooltip.Content>
-            </Tooltip>
-          </div>
-        )}
-      </EdgeLabelRenderer>
     </>
   );
 }

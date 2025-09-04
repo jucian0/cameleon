@@ -59,13 +59,20 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
   const workflowCanvas = React.useMemo(() => {
     if (routeId) {
       const route = camelConfig?.data.find((r) => r.route?.id === routeId);
-
-      return route ? jsonToTopologyBuilder(route) : { nodes: [], edges: [] };
+      const routeIndex = camelConfig?.data.findIndex(
+        (r) => r.route?.id === routeId,
+      );
+      return route
+        ? jsonToTopologyBuilder(route, routeIndex)
+        : { nodes: [], edges: [] };
     } else {
       const parsedCanvas = { nodes: [], edges: [] } as any;
       for (const route of camelConfig?.data ?? INITIAL_STATE.data) {
         if (route.route) {
-          const { nodes, edges } = jsonToTopologyBuilder(route);
+          const routeIndex = camelConfig?.data.findIndex(
+            (r) => r.route?.id === route.route?.id,
+          );
+          const { nodes, edges } = jsonToTopologyBuilder(route, routeIndex);
           parsedCanvas.nodes.push(...nodes);
           parsedCanvas.edges.push(...edges);
         }

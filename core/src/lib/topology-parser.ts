@@ -50,6 +50,7 @@ const BRANCHING_NODE_TYPES = new Set([
 ]);
 
 const ADD_NODE_TYPE = "add-step";
+const ADD_BETWEEN_NODE_TYPE = "add-between";
 const CAMEL_NODE_TYPE = "camel-step";
 
 // ==================== Utility Functions ====================
@@ -58,7 +59,9 @@ function generateUniqueId(prefix: string): string {
 }
 
 function resolveNodeType(type: NodeType): NodeType {
-  return type === ADD_NODE_TYPE ? type : CAMEL_NODE_TYPE;
+  return type === ADD_NODE_TYPE || type === ADD_BETWEEN_NODE_TYPE
+    ? type
+    : CAMEL_NODE_TYPE;
 }
 
 // ==================== Core Creation Functions ====================
@@ -76,7 +79,7 @@ function createNode(
       stepType,
       iconName: stepType,
       absolutePath,
-      operation: type === ADD_NODE_TYPE ? "add-step" : "add-step-between",
+      operation: type === ADD_NODE_TYPE ? "add-step" : "read",
       label: label || stepType,
     },
     position: { x: 0, y: 0 },
@@ -495,9 +498,12 @@ function processSteps(
       );
     }
 
-    // Add the node and edge
+    // Cria nó do step
     nodes.push(createNode(stepId, CAMEL_NODE_TYPE, nodeType, absolutePath));
-    edges.push(createEdge(generateUniqueId("edge"), previousStepId, stepId));
+
+    // Sempre adiciona um add-step entre o anterior e o atual
+    ensureAddBetween(nodes, edges, previousStepId, stepId, absolutePath);
+
     previousStepId = lastStepId;
   });
 
@@ -510,12 +516,65 @@ function processSteps(
   };
 }
 
+function ensureAddBetween(
+  nodes: Node[],
+  edges: Edge[],
+  sourceId: string,
+  targetId: string,
+  absolutePath: string,
+  label: string = "Add between",
+): string | null {
+  if (!sourceId || !targetId || sourceId === targetId) return null;
+
+  // Verifica se já existe add-between entre source e target
+  const outEdges = edges.filter((e) => e.source === sourceId);
+  for (const e of outEdges) {
+    const midNode = nodes.find((n) => n.id === e.target);
+    const isBetween =
+      midNode?.type === ADD_BETWEEN_NODE_TYPE ||
+      midNode?.data?.type === ADD_BETWEEN_NODE_TYPE;
+    if (
+      isBetween &&
+      edges.some((e2) => e2.source === midNode.id && e2.target === targetId)
+    ) {
+      return midNode.id; // já existe add-between
+    }
+  }
+
+  // Se existir edge direta source → target, substitui pelo add-between
+  const directIdx = edges.findIndex(
+    (e) => e.source === sourceId && e.target === targetId,
+  );
+  if (directIdx !== -1) {
+    edges.splice(directIdx, 1);
+  }
+
+  // Cria add-between
+  const betweenId = generateUniqueId("add-between");
+  nodes.push(
+    createNode(
+      betweenId,
+      ADD_BETWEEN_NODE_TYPE,
+      "add-between",
+      absolutePath,
+      label,
+    ),
+  );
+  edges.push(createEdge(generateUniqueId("edge"), sourceId, betweenId));
+  edges.push(createEdge(generateUniqueId("edge"), betweenId, targetId));
+
+  return betweenId;
+}
+
 // ==================== Main Export Function ====================
-export function jsonToTopologyBuilder(route: Route): ParsedTopologyModel {
+export function jsonToTopologyBuilder(
+  route: Route,
+  routeIndex: number,
+): ParsedTopologyModel {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   let lastNodeId: string | null = null;
-  let initialAbsolutePath = "route.from";
+  let initialAbsolutePath = `data.${routeIndex}.route.from`;
 
   if (!route) {
     generatePlaceholderNodesAndEdges(
@@ -562,9 +621,16 @@ export function jsonToTopologyBuilder(route: Route): ParsedTopologyModel {
         nodes,
         edges,
         lastNodeId,
-        `${initialAbsolutePath}.steps`,
+        `${initialAbsolutePath}.steps.${routeSteps.length}`,
       );
     }
   }
   return { nodes, edges };
 }
+/**
+ * Need a change to set the absolutePath from root of theobject and not from route.from.
+ * That is necessary to be able to make change in specific routes or in the whole camel config, depending on the visualization.
+ * In TopologyLibrary we use the absolutePath from route.from and it does not work when we have multiple routes.
+ * TopologyLibrary need to make all change in the camel config, not only in the route, so we can remove updateCamelRoute too.
+ * The selectedNode we also be just visualization resource not necessary on the camelStore.
+ */

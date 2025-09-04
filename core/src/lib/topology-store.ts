@@ -30,7 +30,7 @@ import type { CamelConfig, Edge, Route, Node } from "./topology-types";
 type TopologyStore = {
   camelConfig: CamelConfig;
   setCamelConfig: (json: any) => void;
-  updateCamelRoute: (json: any, routeId: string) => void;
+  // updateCamelRoute: (json: any, routeId: string) => void;
   getCamelConfigYaml: () => any;
   canvas: {
     nodes: Node[];
@@ -57,6 +57,7 @@ export const INITIAL_STATE = {
 export const useTopologyStore = create<TopologyStore>((set, get) => ({
   camelConfig: INITIAL_STATE,
   setCamelConfig: (json = INITIAL_STATE) => {
+    console.log("Setting Camel Config:", json);
     set({ camelConfig: json });
     // const parsedCanvas = { nodes: [], edges: [] } as any;
     // for (const route of json.data) {
@@ -71,28 +72,30 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     // set({ canvas: { ...get().canvas, ...parsedCanvas } });
   },
 
-  updateCamelRoute: (json, routeId) => {
-    const state = get();
-    const updatedJson = {
-      ...state.camelConfig,
-      data: state.camelConfig.data
-        ? state.camelConfig.data.map((route) => {
-            if (route.route?.id === routeId) {
-              return {
-                ...route,
-                ...json,
-              };
-            }
-            return route;
-          })
-        : [json],
-    };
-    const { nodes, edges } = jsonToTopologyBuilder(json);
-    set({
-      canvas: { ...get().canvas, nodes, edges },
-      camelConfig: updatedJson,
-    });
-  },
+  // updateCamelRoute: (json: any, routeId: string) => {
+  //   const state = get();
+  //   const { camelConfig, canvas } = state;
+
+  //   const data = camelConfig.data ?? [];
+
+  //   // Update or insert the route
+  //   const updatedData = data.some((r) => r.route?.id === routeId)
+  //     ? data.map((route) =>
+  //         route.route?.id === routeId ? { ...route, ...json } : route,
+  //       )
+  //     : [...data, json];
+
+  //   // Build topology based on the updated route position
+  //   const routeIndex = updatedData.findIndex((r) => r.route?.id === routeId);
+  //   const { nodes, edges } = jsonToTopologyBuilder(json, routeIndex);
+
+  //   // Commit new state
+  //   set({
+  //     camelConfig: { ...camelConfig, data: updatedData },
+  //     canvas: { ...canvas, nodes, edges },
+  //   });
+  // },
+
   getCamelConfigYaml: () => {
     const state = get();
     return jsonToYaml(state.camelConfig);

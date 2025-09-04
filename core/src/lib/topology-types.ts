@@ -6,12 +6,12 @@ export type Node = RFLow.Node & {
     stepType: string;
     absolutePath: string;
     iconName: string;
-    operation: "add-step" | "add-step-between" | "read";
+    operation: "add-step" | "read";
     label: string;
   };
 };
 export type Edge = RFLow.Edge;
-export type NodeType = "add-step" | "camel-step";
+export type NodeType = "add-step" | "camel-step" | "add-between";
 
 export type EPIDefinition = {
   properties: Readonly<Record<string, PropertyDefinition>>;
@@ -76,4 +76,5 @@ export type StepType =
   | "doTry"
   | "doFinally"
   | "multicast"
-  | "loadBalance";
+  | "loadBalance"
+  | "add-between";
