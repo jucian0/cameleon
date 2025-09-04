@@ -1,18 +1,19 @@
-import { generateUniqueId } from "./parser";
-import { createEdge, createNode } from "./parser";
-import { processSteps } from "./parser";
-import { ensureAddBetween } from "./parser";
-import { generatePlaceholderNodesAndEdges } from "./parser";
-import type { Node, Edge, Step } from "../topology-types";
-import { CAMEL_NODE_TYPE, ADD_NODE_TYPE } from "./parser";
+import type { Node, Edge, Step } from "../../topology-types";
+import {
+  ensurePlaceholderNext,
+  ensurePlaceholderBetween,
+} from "../add-placeholders";
+import { createNode, createEdge } from "../creation";
+import { generateUniqueId, CAMEL_NODE_TYPE, ADD_NODE_TYPE } from "../utils";
 
-export function processChoiceStep(
+export function parseChoiceStep(
   step: Step,
   stepId: string,
   nodes: Node[],
   edges: Edge[],
   nextStepId: string | null,
   initialAbsolutePath: string,
+  parseSteps: any,
 ): string {
   const branchEndIds: string[] = [];
   const { choice } = step;
@@ -26,7 +27,7 @@ export function processChoiceStep(
       nodes.push(createNode(whenId, CAMEL_NODE_TYPE, "when", absolutePath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, whenId));
 
-      const whenResult = processSteps(
+      const whenResult = parseSteps(
         when?.steps ?? [],
         nodes,
         edges,
@@ -38,7 +39,7 @@ export function processChoiceStep(
     }
 
     // Always add placeholder for 'when' branches
-    const placeholderResult = generatePlaceholderNodesAndEdges(
+    const placeholderResult = ensurePlaceholderNext(
       nodes,
       edges,
       stepId,
@@ -58,7 +59,7 @@ export function processChoiceStep(
     );
     edges.push(createEdge(generateUniqueId("edge"), stepId, otherwiseId));
 
-    const otherwiseResult = processSteps(
+    const otherwiseResult = parseSteps(
       choice.otherwise.steps,
       nodes,
       edges,
@@ -73,7 +74,13 @@ export function processChoiceStep(
   if (nextStepId && branchEndIds.length > 0) {
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
-      ensureAddBetween(nodes, edges, endId, nextStepId, initialAbsolutePath);
+      ensurePlaceholderBetween(
+        nodes,
+        edges,
+        endId,
+        nextStepId,
+        initialAbsolutePath,
+      );
     }
   } else {
     // Add placeholder to connect all branches to the next step

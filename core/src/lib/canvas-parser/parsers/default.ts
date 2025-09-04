@@ -1,7 +1,6 @@
-import type { Edge, Step, Node } from "../topology-types";
-import { processSteps } from "./parser";
+import type { Edge, Step, Node } from "../../topology-types";
 
-export function processDefaultSteps(
+export function parseDefaultSteps(
   step: Step,
   nodeType: string,
   nodes: Node[],
@@ -9,9 +8,10 @@ export function processDefaultSteps(
   stepId: string,
   lastStepId: string,
   absolutePath: string,
+  parseSteps: any,
 ): string {
   if (step[nodeType]?.steps) {
-    const stepResult = processSteps(
+    const stepResult = parseSteps(
       step[nodeType].steps,
       nodes,
       edges,

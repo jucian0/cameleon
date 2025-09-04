@@ -1,12 +1,17 @@
-import { generateUniqueId, type ProcessStepsResult } from "./parser";
-import { createEdge, createNode } from "./parser";
-import { processSteps } from "./parser";
-import { ensureAddBetween } from "./parser";
-import { generatePlaceholderNodesAndEdges } from "./parser";
-import type { Node, Edge, Step, StepType } from "../topology-types";
-import { CAMEL_NODE_TYPE, ADD_NODE_TYPE, BRANCHING_NODE_TYPES } from "./parser";
+import type { Node, Edge, Step } from "../../topology-types";
+import {
+  ensurePlaceholderNext,
+  ensurePlaceholderBetween,
+} from "../add-placeholders";
+import { createNode, createEdge } from "../creation";
+import {
+  generateUniqueId,
+  CAMEL_NODE_TYPE,
+  ADD_NODE_TYPE,
+  BRANCHING_NODE_TYPES,
+} from "../utils";
 
-export function processMulticastOrLoadBalanceStep(
+export function parseMulticastOrLoadBalanceStep(
   step: Step,
   nodeType: "multicast" | "loadBalance",
   stepId: string,
@@ -14,12 +19,13 @@ export function processMulticastOrLoadBalanceStep(
   edges: Edge[],
   nextStepId: string | null,
   absolutePath: string,
+  parseSteps: any,
 ): string {
   const steps = step[nodeType]?.steps || [];
   const branchEndIds: string[] = [];
 
   // Add initial placeholder
-  const placeholderResult = generatePlaceholderNodesAndEdges(
+  const placeholderResult = ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
@@ -39,9 +45,9 @@ export function processMulticastOrLoadBalanceStep(
       );
       edges.push(createEdge(generateUniqueId("edge"), stepId, branchNodeId));
 
-      let result: ProcessStepsResult | string;
+      let result: any;
       if (BRANCHING_NODE_TYPES.has(nodeType)) {
-        result = processMulticastOrLoadBalanceStep(
+        result = parseMulticastOrLoadBalanceStep(
           branchStep,
           nodeType,
           branchNodeId,
@@ -49,9 +55,10 @@ export function processMulticastOrLoadBalanceStep(
           edges,
           null,
           branchPath,
+          parseSteps,
         );
       } else {
-        result = processSteps(
+        result = parseSteps(
           branchStep[nodeType].steps,
           nodes,
           edges,
@@ -76,7 +83,7 @@ export function processMulticastOrLoadBalanceStep(
   if (nextStepId && branchEndIds.length > 0) {
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
-      ensureAddBetween(nodes, edges, endId, nextStepId, absolutePath);
+      ensurePlaceholderBetween(nodes, edges, endId, nextStepId, absolutePath);
     }
   } else {
     // Add placeholder to connect all branches to the next step

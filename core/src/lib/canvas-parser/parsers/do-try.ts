@@ -1,18 +1,19 @@
-import { generateUniqueId } from "./parser";
-import { createEdge, createNode } from "./parser";
-import { processSteps } from "./parser";
-import { ensureAddBetween } from "./parser";
-import { generatePlaceholderNodesAndEdges } from "./parser";
-import type { Node, Edge, Step } from "../topology-types";
-import { CAMEL_NODE_TYPE, ADD_NODE_TYPE } from "./parser";
+import type { Node, Edge, Step } from "../../topology-types";
+import {
+  ensurePlaceholderNext,
+  ensurePlaceholderBetween,
+} from "../add-placeholders";
+import { createNode, createEdge } from "../creation";
+import { generateUniqueId, CAMEL_NODE_TYPE, ADD_NODE_TYPE } from "../utils";
 
-export function processDoTryStep(
+export function parseDoTryStep(
   step: Step,
   stepId: string,
   nodes: Node[],
   edges: Edge[],
   nextStepId: string | null,
   initialAbsolutePath: string,
+  parseSteps: any,
 ): string {
   const branchEndIds: string[] = [];
   const { doTry } = step;
@@ -28,7 +29,7 @@ export function processDoTryStep(
       );
       edges.push(createEdge(generateUniqueId("edge"), stepId, doCatchId));
 
-      const doCatchResult = processSteps(
+      const doCatchResult = parseSteps(
         doCatch.steps ?? [],
         nodes,
         edges,
@@ -50,7 +51,7 @@ export function processDoTryStep(
     );
     edges.push(createEdge(generateUniqueId("edge"), stepId, doFinallyId));
 
-    const doFinallyResult = processSteps(
+    const doFinallyResult = parseSteps(
       doTry.doFinally.steps ?? [],
       nodes,
       edges,
@@ -66,7 +67,7 @@ export function processDoTryStep(
     const absolutePath = initialAbsolutePath;
     edges.push(createEdge(generateUniqueId("edge"), stepId, stepId));
 
-    const doTryResult = processSteps(
+    const doTryResult = parseSteps(
       doTry.steps,
       nodes,
       edges,
@@ -78,7 +79,7 @@ export function processDoTryStep(
   }
 
   // Always add placeholder for doCatch
-  const placeholderResult = generatePlaceholderNodesAndEdges(
+  const placeholderResult = ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
@@ -91,7 +92,13 @@ export function processDoTryStep(
   if (nextStepId && branchEndIds.length > 0) {
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
-      ensureAddBetween(nodes, edges, endId, nextStepId, initialAbsolutePath);
+      ensurePlaceholderBetween(
+        nodes,
+        edges,
+        endId,
+        nextStepId,
+        initialAbsolutePath,
+      );
     }
   } else {
     // Add placeholder to connect all branches to the next step
