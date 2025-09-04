@@ -205,6 +205,7 @@ function processChoiceStep(
   if (nextStepId && branchEndIds.length > 0) {
     branchEndIds.forEach((endId) => {
       edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
+      ensureAddBetween(nodes, edges, endId, nextStepId, initialAbsolutePath);
     });
   } else {
     // Add placeholder to connect all branches to the next step
@@ -314,6 +315,7 @@ function processDoTryStep(
   if (nextStepId && branchEndIds.length > 0) {
     branchEndIds.forEach((endId) => {
       edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
+      ensureAddBetween(nodes, edges, endId, nextStepId, initialAbsolutePath);
     });
   } else {
     // Add placeholder to connect all branches to the next step
@@ -406,6 +408,7 @@ function processMulticastOrLoadBalanceStep(
   if (nextStepId && branchEndIds.length > 0) {
     branchEndIds.forEach((endId) => {
       edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
+      ensureAddBetween(nodes, edges, endId, nextStepId, absolutePath);
     });
   } else {
     // Add placeholder to connect all branches to the next step
@@ -586,11 +589,6 @@ export function jsonToTopologyBuilder(
     );
     return { nodes, edges };
   }
-
-  // const route = routes?.find((route) => route.route?.id === routeId);
-  // if (!route) {
-  //   throw new Error(`Route with ID ${routeId} not found`);
-  // }
 
   const fromId = route.route?.id ? route.route.id : generateUniqueId("route");
   nodes.push(
