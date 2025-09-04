@@ -23,7 +23,7 @@ import {
   type EdgeChange,
   type NodeChange,
 } from "@xyflow/react";
-import { jsonToTopologyBuilder } from "./topology-parser/parser";
+import { jsonToCanvasBuilder } from "./canvas-parser/parser";
 import { jsonToYaml } from "./yaml-json";
 import type { CamelConfig, Edge, Route, Node } from "./topology-types";
 
@@ -62,7 +62,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     // const parsedCanvas = { nodes: [], edges: [] } as any;
     // for (const route of json.data) {
     //   if (route.route) {
-    //     const { nodes, edges } = jsonToTopologyBuilder(route);
+    //     const { nodes, edges } = jsonToCanvasBuilder(route);
     //     parsedCanvas.nodes.push(...nodes);
     //     parsedCanvas.edges.push(...edges);
     //   }
@@ -87,7 +87,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
 
   //   // Build topology based on the updated route position
   //   const routeIndex = updatedData.findIndex((r) => r.route?.id === routeId);
-  //   const { nodes, edges } = jsonToTopologyBuilder(json, routeIndex);
+  //   const { nodes, edges } = jsonToCanvasBuilder(json, routeIndex);
 
   //   // Commit new state
   //   set({

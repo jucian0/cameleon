@@ -1,4 +1,4 @@
-import { INITIAL_STATE, jsonToTopologyBuilder, useTopologyStore } from "core";
+import { INITIAL_STATE, jsonToCanvasBuilder, useTopologyStore } from "core";
 import { TopologyBuilder } from "./topology-lib/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
@@ -63,7 +63,7 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
         (r) => r.route?.id === routeId,
       );
       return route
-        ? jsonToTopologyBuilder(route, routeIndex)
+        ? jsonToCanvasBuilder(route, routeIndex)
         : { nodes: [], edges: [] };
     } else {
       const parsedCanvas = { nodes: [], edges: [] } as any;
@@ -72,7 +72,7 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
           const routeIndex = camelConfig?.data.findIndex(
             (r) => r.route?.id === route.route?.id,
           );
-          const { nodes, edges } = jsonToTopologyBuilder(route, routeIndex);
+          const { nodes, edges } = jsonToCanvasBuilder(route, routeIndex);
           parsedCanvas.nodes.push(...nodes);
           parsedCanvas.edges.push(...edges);
         }

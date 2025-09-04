@@ -1,4 +1,4 @@
-import { generateUniqueId, ProcessStepsResult } from "./parser";
+import { generateUniqueId, type ProcessStepsResult } from "./parser";
 import { createEdge, createNode } from "./parser";
 import { processSteps } from "./parser";
 import { ensureAddBetween } from "./parser";
@@ -8,7 +8,7 @@ import { CAMEL_NODE_TYPE, ADD_NODE_TYPE, BRANCHING_NODE_TYPES } from "./parser";
 
 export function processMulticastOrLoadBalanceStep(
   step: Step,
-  nodeType: string,
+  nodeType: "multicast" | "loadBalance",
   stepId: string,
   nodes: Node[],
   edges: Edge[],
@@ -29,7 +29,7 @@ export function processMulticastOrLoadBalanceStep(
 
   // Process each branch
   for (const [index, branchStep] of steps.entries()) {
-    const nodeType = Object.keys(branchStep)[0] as StepType;
+    const nodeType = Object.keys(branchStep)[0] as "multicast" | "loadBalance";
     const branchPath = `${absolutePath}.steps.${index}`;
 
     if (branchStep[nodeType]?.steps) {

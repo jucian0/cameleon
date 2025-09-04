@@ -284,7 +284,7 @@ export function ensureAddBetween(
 }
 
 // ==================== Main Export Function ====================
-export function jsonToTopologyBuilder(
+export function jsonToCanvasBuilder(
   route: Route,
   routeIndex: number,
 ): ParsedTopologyModel {
