@@ -1,7 +1,7 @@
 import { type EdgeProps, BaseEdge, getBezierPath } from "@xyflow/react";
 import { useTopologyStore } from "core";
 
-function DefaultEdge({
+export function DefaultEdge({
   sourceX,
   sourceY,
   targetX,
@@ -20,7 +20,7 @@ function DefaultEdge({
   );
 
   // not sure which one is better, smooth or bezier
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -46,7 +46,3 @@ function DefaultEdge({
     </>
   );
 }
-
-export const edgeTypes = {
-  default: DefaultEdge,
-};

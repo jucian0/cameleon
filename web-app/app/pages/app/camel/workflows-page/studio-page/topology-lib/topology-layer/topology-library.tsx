@@ -35,7 +35,7 @@ export function TopologyLibrary() {
         [selectedItemKey]: getDefaultConfig(selectedItemKey as string),
       };
 
-      console.log("New Step Config:", node, camelConfig);
+      console.log("New Step Config:", node);
 
       // const selectedRoute = camelConfig.data.find(
       //   (route) => route.route?.id === node.routeId,

@@ -3,11 +3,7 @@ import { parseChoiceStep } from "./choice";
 import { parseDoTryStep } from "./do-try";
 import { parseMulticastOrLoadBalanceStep } from "./multicast-load-balance";
 import { parseDefaultSteps } from "./default";
-import {
-  BRANCHING_NODE_TYPES,
-  CAMEL_NODE_TYPE,
-  generateUniqueId,
-} from "../utils";
+import { BRANCHING_NODE_TYPES, generateUniqueId } from "../utils";
 import { createNode } from "../creation";
 import { ensurePlaceholderBetween } from "../add-placeholders";
 
@@ -105,7 +101,7 @@ export function parseSteps(
       );
     }
 
-    nodes.push(createNode(stepId, CAMEL_NODE_TYPE, nodeType, absolutePath));
+    nodes.push(createNode(stepId, nodeType, absolutePath));
     ensurePlaceholderBetween(
       nodes,
       edges,

@@ -1,15 +1,15 @@
-import type { Node, Edge, Step } from "../../topology-types";
+import {
+  type Node,
+  type Edge,
+  type Step,
+  STEP_TYPE,
+} from "../../topology-types";
 import {
   ensurePlaceholderNext,
   ensurePlaceholderBetween,
 } from "../add-placeholders";
 import { createNode, createEdge } from "../creation";
-import {
-  generateUniqueId,
-  CAMEL_NODE_TYPE,
-  ADD_NODE_TYPE,
-  BRANCHING_NODE_TYPES,
-} from "../utils";
+import { generateUniqueId, BRANCHING_NODE_TYPES } from "../utils";
 
 export function parseMulticastOrLoadBalanceStep(
   step: Step,
@@ -40,9 +40,7 @@ export function parseMulticastOrLoadBalanceStep(
 
     if (branchStep[nodeType]?.steps) {
       const branchNodeId = generateUniqueId(`${nodeType}-${index}`);
-      nodes.push(
-        createNode(branchNodeId, CAMEL_NODE_TYPE, nodeType, branchPath),
-      );
+      nodes.push(createNode(branchNodeId, nodeType, branchPath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, branchNodeId));
 
       let result: any;
@@ -73,7 +71,7 @@ export function parseMulticastOrLoadBalanceStep(
     } else {
       // Handle direct endpoints
       const endpointId = generateUniqueId(`${nodeType}-endpoint-${index}`);
-      nodes.push(createNode(endpointId, CAMEL_NODE_TYPE, nodeType, branchPath));
+      nodes.push(createNode(endpointId, nodeType, branchPath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, endpointId));
       branchEndIds.push(endpointId);
     }
@@ -92,9 +90,7 @@ export function parseMulticastOrLoadBalanceStep(
       .replace(/\.multicast.*$/, "")
       .replace(/\.loadBalance.*$/, "");
     const placeholderId = generateUniqueId("add");
-    nodes.push(
-      createNode(placeholderId, ADD_NODE_TYPE, "add-step", path, "Add"),
-    );
+    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path, "Add"));
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, placeholderId));
     }

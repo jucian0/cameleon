@@ -2,16 +2,13 @@ import type * as RFLow from "@xyflow/react";
 
 export type Node = RFLow.Node & {
   readonly data: {
-    type: string;
     stepType: string;
     absolutePath: string;
     iconName: string;
-    operation: "add-step" | "read";
     label: string;
   };
 };
 export type Edge = RFLow.Edge;
-export type NodeType = "add-step" | "camel-step" | "add-between";
 
 export type EPIDefinition = {
   properties: Readonly<Record<string, PropertyDefinition>>;
@@ -85,6 +82,53 @@ export interface Step {
     message?: string;
     loggingLevel?: string;
   };
+  camel?: {
+    uri: string;
+  };
+  kafka?: {
+    topic: string;
+    brokers: string;
+    clientId?: string;
+    groupId?: string;
+    autoOffsetReset?: string;
+    additionalProperties?: Record<string, unknown>;
+  };
+  http?: {
+    uri: string;
+    method?: string;
+    authenticationPreemptive?: boolean;
+    authenticationUsername?: string;
+    authenticationPassword?: string;
+    headers?: Record<string, unknown>;
+    queryParameters?: Record<string, unknown>;
+    body?: string;
+  };
+  rest?: {
+    verb: string;
+  };
+  soap?: {
+    wsdlUri: string;
+    serviceName?: string;
+    portName?: string;
+    operationName?: string;
+    headers?: Record<string, unknown>;
+    body?: string;
+  };
+  wsdl?: {
+    uri: string;
+    serviceName?: string;
+    portName?: string;
+    operationName?: string;
+    headers?: Record<string, unknown>;
+    body?: string;
+  };
+  add_step?: {};
+  add_between?: {};
+  when?: {};
+  otherwise?: {};
+  doCatch?: {};
+  doFinally?: {};
+  [key: string]: any;
 }
 
 export type Route = {
@@ -104,26 +148,101 @@ export type CamelConfig = {
   comments?: Record<string, string>;
 };
 
-export type StepType =
-  | "choice"
-  | "split"
-  | "join"
-  | "aggregate"
-  | "filter"
-  | "transform"
-  | "custom"
-  | "camel"
-  | "kafka"
-  | "http"
-  | "rest"
-  | "soap"
-  | "wsdl"
-  | "add-step"
-  | "when"
-  | "otherwise"
-  | "doCatch"
-  | "doTry"
-  | "doFinally"
-  | "multicast"
-  | "loadBalance"
-  | "add-between";
+export enum STEP_TYPE {
+  CHOICE = "choice",
+  SPLIT = "split",
+  JOIN = "join",
+  AGGREGATE = "aggregate",
+  FILTER = "filter",
+  TRANSFORM = "transform",
+  CUSTOM = "custom",
+  CAMEL = "camel",
+  KAFKA = "kafka",
+  HTTP = "http",
+  REST = "rest",
+  SOAP = "soap",
+  WSDL = "wsdl",
+  ADD_STEP = "add-step",
+  WHEN = "when",
+  OTHERWISE = "otherwise",
+  DO_CATCH = "doCatch",
+  DO_TRY = "doTry",
+  DO_FINALLY = "doFinally",
+  MULTICAST = "multicast",
+  LOAD_BALANCE = "loadBalance",
+  ADD_BETWEEN = "add-between",
+}
+
+// a type of all STEP_TYPE values
+export type StepType = `${STEP_TYPE}`;
+
+export const EIPSListNames = [
+  "aggregate",
+  "bean",
+  "choice",
+  "circuitBreaker",
+  "claimCheck",
+  "convertBodyTo",
+  "convertHeaderTo",
+  "convertVariableTo",
+  "delay",
+  "doTry",
+  "doCatch",
+  "doFinally",
+  "dynamicRouter",
+  "enrich",
+  "filter",
+  "idempotentConsumer",
+  "loadBalancer",
+  "log",
+  "loop",
+  "marshal",
+  "multicast",
+  "pausable",
+  "policy",
+  "pollEnrich",
+  "process",
+  "recipientList",
+  "removeHeader",
+  "removeHeaders",
+  "removeProperties",
+  "removeProperty",
+  "removeVariable",
+  "resequence",
+  "resumable",
+  "routingSlip",
+  "saga",
+  "sample",
+  "script",
+  "setBody",
+  "setExchangePattern",
+  "setHeader",
+  "setHeaders",
+  "setVariable",
+  "setVariables",
+  "sort",
+  "split",
+  "step",
+  "stop",
+  "threads",
+  "throttle",
+  "throwException",
+  "to",
+  "toD",
+  "transacted",
+  "transform",
+  "unmarshal",
+  "validate",
+  "wireTap",
+  "claimCheck",
+  "convertVariableTo",
+  "convertHeaderTo",
+  "convertBodyTo",
+
+  // EIPs complements
+  "when",
+  "otherwise",
+  "do-while",
+  "do-finally",
+  "do-catch",
+];

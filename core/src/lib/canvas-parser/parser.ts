@@ -28,12 +28,18 @@
  * Note: This implementation assumes the existence of certain types and helper functions
  * for processing specific step types (e.g., parseChoiceStep, parseDoTryStep).
  */
-import type { Edge, Node, Route, StepType } from "../topology-types";
+import {
+  STEP_TYPE,
+  type Edge,
+  type Node,
+  type Route,
+  type StepType,
+} from "../topology-types";
 
-import { CAMEL_NODE_TYPE, generateUniqueId } from "./utils";
+import { generateUniqueId } from "./utils";
 import { createNode } from "./creation";
 import { ensurePlaceholderNext } from "./add-placeholders";
-import { ParsedTopologyModel, parseSteps } from "./parsers/steps";
+import { type ParsedTopologyModel, parseSteps } from "./parsers/steps";
 
 // ==================== Main Export Function ====================
 export function jsonToCanvasBuilder(
@@ -57,14 +63,8 @@ export function jsonToCanvasBuilder(
   }
 
   const fromId = route.route?.id ? route.route.id : generateUniqueId("route");
-  nodes.push(
-    createNode(
-      fromId,
-      CAMEL_NODE_TYPE,
-      route.route?.from.uri as StepType,
-      "route.from",
-    ),
-  );
+  const stepType = (route.route?.from.uri || STEP_TYPE.CAMEL) as StepType;
+  nodes.push(createNode(fromId, stepType, initialAbsolutePath, "route.from"));
   const routeSteps = route.route?.from.steps || [];
 
   if (routeSteps) {

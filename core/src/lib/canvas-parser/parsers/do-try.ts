@@ -1,10 +1,15 @@
-import type { Node, Edge, Step } from "../../topology-types";
+import {
+  type Node,
+  type Edge,
+  type Step,
+  STEP_TYPE,
+} from "../../topology-types";
 import {
   ensurePlaceholderNext,
   ensurePlaceholderBetween,
 } from "../add-placeholders";
 import { createNode, createEdge } from "../creation";
-import { generateUniqueId, CAMEL_NODE_TYPE, ADD_NODE_TYPE } from "../utils";
+import { generateUniqueId } from "../utils";
 
 export function parseDoTryStep(
   step: Step,
@@ -24,9 +29,7 @@ export function parseDoTryStep(
       const absolutePath = `${initialAbsolutePath}.doCatch.${i}`;
       const doCatchId = generateUniqueId(`doCatch-${stepId}-${i}`);
 
-      nodes.push(
-        createNode(doCatchId, CAMEL_NODE_TYPE, "doCatch", absolutePath),
-      );
+      nodes.push(createNode(doCatchId, STEP_TYPE.DO_CATCH, absolutePath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, doCatchId));
 
       const doCatchResult = parseSteps(
@@ -46,9 +49,7 @@ export function parseDoTryStep(
     const absolutePath = `${initialAbsolutePath}.doFinally`;
     const doFinallyId = generateUniqueId(`doFinally-${stepId}`);
 
-    nodes.push(
-      createNode(doFinallyId, CAMEL_NODE_TYPE, "doFinally", absolutePath),
-    );
+    nodes.push(createNode(doFinallyId, STEP_TYPE.DO_FINALLY, absolutePath));
     edges.push(createEdge(generateUniqueId("edge"), stepId, doFinallyId));
 
     const doFinallyResult = parseSteps(
@@ -105,9 +106,7 @@ export function parseDoTryStep(
     // need to remove last part of the absolutePath to ensure the placeholder give the correct path
     const path = initialAbsolutePath.replace(/\.doTry.*$/, "");
     const placeholderId = generateUniqueId("add");
-    nodes.push(
-      createNode(placeholderId, ADD_NODE_TYPE, "add-step", path, "Add"),
-    );
+    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path, "Add"));
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, placeholderId));
     }

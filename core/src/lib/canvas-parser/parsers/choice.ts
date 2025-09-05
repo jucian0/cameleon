@@ -1,10 +1,15 @@
-import type { Node, Edge, Step } from "../../topology-types";
+import {
+  type Node,
+  type Edge,
+  type Step,
+  STEP_TYPE,
+} from "../../topology-types";
 import {
   ensurePlaceholderNext,
   ensurePlaceholderBetween,
 } from "../add-placeholders";
 import { createNode, createEdge } from "../creation";
-import { generateUniqueId, CAMEL_NODE_TYPE, ADD_NODE_TYPE } from "../utils";
+import { generateUniqueId } from "../utils";
 
 export function parseChoiceStep(
   step: Step,
@@ -24,7 +29,7 @@ export function parseChoiceStep(
       const absolutePath = `${initialAbsolutePath}.when.${i}`;
       const whenId = generateUniqueId(`when-${stepId}`);
 
-      nodes.push(createNode(whenId, CAMEL_NODE_TYPE, "when", absolutePath));
+      nodes.push(createNode(whenId, STEP_TYPE.WHEN, absolutePath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, whenId));
 
       const whenResult = parseSteps(
@@ -54,9 +59,7 @@ export function parseChoiceStep(
     const absolutePath = `${initialAbsolutePath}.otherwise`;
     const otherwiseId = generateUniqueId(`otherwise-${stepId}`);
 
-    nodes.push(
-      createNode(otherwiseId, CAMEL_NODE_TYPE, "otherwise", absolutePath),
-    );
+    nodes.push(createNode(otherwiseId, STEP_TYPE.OTHERWISE, absolutePath));
     edges.push(createEdge(generateUniqueId("edge"), stepId, otherwiseId));
 
     const otherwiseResult = parseSteps(
@@ -87,9 +90,7 @@ export function parseChoiceStep(
     // need to remove last part of the absolutePath to ensure the placeholder give the correct path
     const path = initialAbsolutePath.replace(/\.choice.*$/, "");
     const placeholderId = generateUniqueId("add");
-    nodes.push(
-      createNode(placeholderId, ADD_NODE_TYPE, "add-step", path, "Add"),
-    );
+    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path, "Add"));
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, placeholderId));
     }

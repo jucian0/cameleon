@@ -1,10 +1,6 @@
-import { Node, Edge } from "../topology-types";
+import { type Node, type Edge, STEP_TYPE } from "../topology-types";
 import { createEdge, createNode } from "./creation";
-import {
-  ADD_BETWEEN_NODE_TYPE,
-  ADD_NODE_TYPE,
-  generateUniqueId,
-} from "./utils";
+import { generateUniqueId } from "./utils";
 /**
  * Ensure there is an "add-between" node between sourceId and targetId.
  * If such a node already exists, return its ID. If not, create it.
@@ -27,7 +23,7 @@ export function ensurePlaceholderBetween(
   // Helper: detects if a node is a branch placeholder (e.g., Add when, Add doCatch, ...)
   const isBranchPlaceholder = (n?: Node | null) =>
     !!n &&
-    (n.type === ADD_NODE_TYPE || n.data?.type === ADD_NODE_TYPE) &&
+    (n.type === STEP_TYPE.ADD_STEP || n.data?.type === STEP_TYPE.ADD_STEP) &&
     (n.data?.isPlaceholder ||
       (typeof n.data?.label === "string" && n.data.label.startsWith("Add ")));
 
@@ -49,8 +45,8 @@ export function ensurePlaceholderBetween(
 
     // If mid is add-between OR is a placeholder (Add ...), we treat it as already existing
     const midIsAddBetween =
-      midNode.type === ADD_BETWEEN_NODE_TYPE ||
-      midNode.data?.type === ADD_BETWEEN_NODE_TYPE;
+      midNode.type === STEP_TYPE.ADD_BETWEEN ||
+      midNode.data?.type === STEP_TYPE.ADD_BETWEEN;
     if (midIsAddBetween || isBranchPlaceholder(midNode)) {
       return midNode.id;
     }
@@ -67,16 +63,8 @@ export function ensurePlaceholderBetween(
   }
 
   // Creates the add-between node and connects it
-  const betweenId = generateUniqueId("add-between");
-  nodes.push(
-    createNode(
-      betweenId,
-      ADD_BETWEEN_NODE_TYPE,
-      "add-between",
-      absolutePath,
-      label,
-    ),
-  );
+  const betweenId = generateUniqueId(STEP_TYPE.ADD_BETWEEN);
+  nodes.push(createNode(betweenId, STEP_TYPE.ADD_BETWEEN, absolutePath, label));
   edges.push(createEdge(generateUniqueId("edge"), sourceId, betweenId));
   edges.push(createEdge(generateUniqueId("edge"), betweenId, targetId));
   return betweenId;
@@ -95,21 +83,10 @@ export function ensurePlaceholderNext(
 ): string {
   const placeholderId = generateUniqueId("add");
   nodes.push({
-    ...createNode(
-      placeholderId,
-      ADD_NODE_TYPE,
-      "add-step",
-      absolutePath,
-      label,
-    ),
+    ...createNode(placeholderId, STEP_TYPE.ADD_STEP, absolutePath, label),
     data: {
-      ...createNode(
-        placeholderId,
-        ADD_NODE_TYPE,
-        "add-step",
-        absolutePath,
-        label,
-      ).data,
+      ...createNode(placeholderId, STEP_TYPE.ADD_STEP, absolutePath, label)
+        .data,
       isPlaceholder: true,
     },
   });

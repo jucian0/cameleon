@@ -91,10 +91,10 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
 
   const iconPath = React.useMemo(() => {
-    if (eipListNames.includes(data.iconName)) {
-      return `/camel-icons/eips/${data.iconName}.svg`;
+    if (eipListNames.includes(data.stepType)) {
+      return `/camel-icons/eips/${data.stepType}.svg`;
     } else {
-      return `/camel-icons/components/${data.iconName}.svg`;
+      return `/camel-icons/components/${data.stepType}.svg`;
     }
   }, [data.iconName]);
 
@@ -109,7 +109,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   }
 
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
-  const isFirstNode = data.absolutePath === "route.from";
+  const isFirstNode = data.absolutePath.split(".").length === 4;
 
   return (
     <div className="flex flex-col items-center gap-1">

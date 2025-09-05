@@ -57,7 +57,6 @@ export const INITIAL_STATE = {
 export const useTopologyStore = create<TopologyStore>((set, get) => ({
   camelConfig: INITIAL_STATE,
   setCamelConfig: (json = INITIAL_STATE) => {
-    console.log("Setting Camel Config:", json);
     set({ camelConfig: json });
     // const parsedCanvas = { nodes: [], edges: [] } as any;
     // for (const route of json.data) {

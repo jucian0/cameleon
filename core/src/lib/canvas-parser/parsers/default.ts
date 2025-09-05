@@ -1,8 +1,8 @@
-import type { Edge, Step, Node } from "../../topology-types";
+import type { Edge, Step, Node, StepType } from "../../topology-types";
 
 export function parseDefaultSteps(
   step: Step,
-  nodeType: string,
+  nodeType: StepType,
   nodes: Node[],
   edges: Edge[],
   stepId: string,
