@@ -2,7 +2,7 @@ import type * as RFLow from "@xyflow/react";
 
 export type Node = RFLow.Node & {
   readonly data: {
-    stepType: string;
+    stepType: StepType;
     absolutePath: string;
     iconName: string;
     label: string;
@@ -171,9 +171,9 @@ export enum STEP_TYPE {
   MULTICAST = "multicast",
   LOAD_BALANCE = "loadBalance",
   ADD_BETWEEN = "add-between",
+  ADD_WHEN = "add-when",
 }
 
-// a type of all STEP_TYPE values
 export type StepType = `${STEP_TYPE}`;
 
 export const EIPSListNames = [

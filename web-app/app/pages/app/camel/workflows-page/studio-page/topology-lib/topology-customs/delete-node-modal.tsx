@@ -1,7 +1,8 @@
 import { Modal } from "app/components/ui/modal";
-import { removeStep } from "core";
+//import { removeStep } from "core";
 import { useTopologyStore } from "core";
 import { Button } from "app/components/ui/button";
+import { deleteStep } from "core/operations";
 
 type Props = {
   node: any;
@@ -11,16 +12,12 @@ type Props = {
 };
 
 export function DeleteNodeModal(props: Readonly<Props>) {
-  const { camelConfig, updateCamelRoute } = useTopologyStore();
+  const { camelConfig, setCamelConfig } = useTopologyStore();
   const { node, onOpenChange, isOpen } = props;
 
   const handleRemoveStep = () => {
-    const selectedRoute = camelConfig?.data?.find(
-      (route) => route.route?.id === node.routeId,
-    );
-    if (!selectedRoute) return;
-    const updatedRoute = removeStep(selectedRoute, node.absolutePath);
-    updateCamelRoute(updatedRoute, props.routeId);
+    const updatedConfig = deleteStep(camelConfig, node.absolutePath);
+    setCamelConfig(updatedConfig);
     onOpenChange(false);
   };
 

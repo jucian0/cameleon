@@ -85,7 +85,6 @@ export function parseDoTryStep(
     edges,
     stepId,
     initialAbsolutePath,
-    "Add doCatch",
   );
   branchEndIds.push(placeholderResult);
 
@@ -106,7 +105,7 @@ export function parseDoTryStep(
     // need to remove last part of the absolutePath to ensure the placeholder give the correct path
     const path = initialAbsolutePath.replace(/\.doTry.*$/, "");
     const placeholderId = generateUniqueId("add");
-    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path, "Add"));
+    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path));
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, placeholderId));
     }

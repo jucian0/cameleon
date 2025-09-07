@@ -11,6 +11,7 @@ export const nodeTypes: Record<
   React.ExoticComponent<any>
 > = {
   [STEP_TYPE.ADD_STEP]: AddNode,
+  [STEP_TYPE.ADD_WHEN]: AddNode,
   [STEP_TYPE.ADD_BETWEEN]: AddBetweenNode,
   ["component"]: DefaultNode,
 };

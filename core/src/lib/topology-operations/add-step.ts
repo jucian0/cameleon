@@ -1,5 +1,10 @@
+import dotProp from "dot-prop-immutable";
+import type { CamelConfig } from "../topology-types";
+
 export function addStep(
-  route: any,
+  camelConfig: CamelConfig,
   absolutePath: string,
   newStep: object,
-): any {}
+): CamelConfig {
+  return dotProp.set(camelConfig, absolutePath, newStep);
+}

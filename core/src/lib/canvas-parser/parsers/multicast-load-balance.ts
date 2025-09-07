@@ -90,7 +90,7 @@ export function parseMulticastOrLoadBalanceStep(
       .replace(/\.multicast.*$/, "")
       .replace(/\.loadBalance.*$/, "");
     const placeholderId = generateUniqueId("add");
-    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path, "Add"));
+    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path));
     for (const endId of branchEndIds) {
       edges.push(createEdge(generateUniqueId("edge"), endId, placeholderId));
     }

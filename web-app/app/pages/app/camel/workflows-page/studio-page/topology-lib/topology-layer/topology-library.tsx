@@ -7,7 +7,7 @@ import {
   Virtualizer,
   GridLayout,
 } from "react-aria-components";
-import { addNewRoute, addStepAfter, addStepBetween } from "core";
+import { addBetween, addStep } from "core/operations";
 import { useLayer } from "./topology-layer";
 import { getDefaultConfig } from "core";
 import { Tab, TabList, TabPanel, Tabs } from "app/components/ui/tabs";
@@ -20,22 +20,41 @@ import {
 } from "../../../../data-requests/fetch-metadata";
 import { Card } from "app/components/ui/card";
 import dotProp from "dot-prop-immutable";
+import React from "react";
 
 export function TopologyLibrary() {
   const { node, setNode } = useLayer();
   const { camelConfig, setCamelConfig } = useTopologyStore();
   const { contains } = useFilter({ sensitivity: "base" });
+  const [filter, setFilter] = React.useState("");
+
+  React.useEffect(() => {
+    console.log("Node changed:", node);
+    if (!["add-between", "add-step"].includes(node?.stepType ?? "")) {
+      const value = node?.stepType?.split("-")[1] ?? "";
+      setFilter(value);
+    }
+  }, []);
 
   function handleSelectionChange(selectedItem: Set<Key>) {
     const [selectedItemKey] = Array.from(selectedItem);
     try {
       if (!selectedItem || !node?.absolutePath) return;
-      // Create basic configuration object instead of using template
       const newStepConfig = {
         [selectedItemKey]: getDefaultConfig(selectedItemKey as string),
       };
 
-      console.log("New Step Config:", node);
+      if (node.stepType === "add-step") {
+        setCamelConfig(addStep(camelConfig, node.absolutePath, newStepConfig));
+        return setNode();
+      }
+
+      if (node.stepType === "add-between" || node.stepType === "add-when") {
+        setCamelConfig(
+          addBetween(camelConfig, node.absolutePath, newStepConfig),
+        );
+        return setNode();
+      }
 
       // const selectedRoute = camelConfig.data.find(
       //   (route) => route.route?.id === node.routeId,
@@ -91,7 +110,12 @@ export function TopologyLibrary() {
   }
 
   return (
-    <Autocomplete aria-label="Topology library" filter={contains}>
+    <Autocomplete
+      inputValue={filter}
+      onInputChange={setFilter}
+      aria-label="Topology library"
+      filter={contains}
+    >
       <div className="flex items-center gap-2">
         <SearchField
           aria-label="Search by name"

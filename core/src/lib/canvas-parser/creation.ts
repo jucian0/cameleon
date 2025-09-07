@@ -9,7 +9,6 @@ export function createNode(
   id: string,
   stepType: StepType,
   absolutePath: string,
-  label?: string,
 ): Node {
   return {
     id,
@@ -17,7 +16,11 @@ export function createNode(
       stepType,
       iconName: stepType,
       absolutePath,
-      label: label || stepType,
+      label: stepType
+        .replace("add-", "Add ")
+        .replace(/([A-Z])/g, " $1")
+        .trim(),
+      isPlaceholder: stepType.includes("add"),
     },
     position: { x: 0, y: 0 },
     type: stepType.includes("add") ? stepType : "component",

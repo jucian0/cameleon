@@ -19,9 +19,11 @@ export function parseChoiceStep(
   nextStepId: string | null,
   initialAbsolutePath: string,
   parseSteps: any,
+  addNodeId: string,
 ): string {
   const branchEndIds: string[] = [];
   const { choice } = step;
+  //const placeholderId = generateUniqueId("add");
 
   // Process 'when' branches
   if (Array.isArray(choice?.when)) {
@@ -40,18 +42,25 @@ export function parseChoiceStep(
         null,
         absolutePath,
       );
-      branchEndIds.push(whenResult.lastStepId);
+
+      const betweenId = ensurePlaceholderBetween(
+        nodes,
+        edges,
+        whenResult.lastStepId,
+        nextStepId ?? addNodeId, //placeholderId,
+        `${absolutePath}.steps.${(when?.steps ?? []).length}`,
+      );
+      branchEndIds.push(betweenId ?? whenResult.lastStepId);
     }
 
     // Always add placeholder for 'when' branches
-    const placeholderResult = ensurePlaceholderNext(
+    ensurePlaceholderNext(
       nodes,
       edges,
       stepId,
-      initialAbsolutePath,
-      "Add when",
+      `${initialAbsolutePath}.when.${(choice?.when ?? []).length}`,
+      STEP_TYPE.ADD_WHEN,
     );
-    branchEndIds.push(placeholderResult);
   }
 
   // Process 'otherwise' branch
@@ -70,31 +79,25 @@ export function parseChoiceStep(
       null,
       absolutePath,
     );
-    branchEndIds.push(otherwiseResult.lastStepId);
+    const betweenId = ensurePlaceholderBetween(
+      nodes,
+      edges,
+      otherwiseResult.lastStepId,
+      nextStepId ?? addNodeId,
+      `${absolutePath}.steps.${choice.otherwise.steps.length}`,
+    );
+    branchEndIds.push(betweenId ?? otherwiseResult.lastStepId);
   }
 
   // Connect branches to next step if it exists
   if (nextStepId && branchEndIds.length > 0) {
-    for (const endId of branchEndIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
-      ensurePlaceholderBetween(
-        nodes,
-        edges,
-        endId,
-        nextStepId,
-        initialAbsolutePath,
-      );
-    }
   } else {
     // Add placeholder to connect all branches to the next step
     // need to remove last part of the absolutePath to ensure the placeholder give the correct path
-    const path = initialAbsolutePath.replace(/\.choice.*$/, "");
-    const placeholderId = generateUniqueId("add");
-    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path, "Add"));
     for (const endId of branchEndIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, placeholderId));
+      edges.push(createEdge(generateUniqueId("edge"), endId, addNodeId));
     }
-    branchEndIds.push(placeholderId);
+    branchEndIds.push(addNodeId);
   }
 
   return branchEndIds[branchEndIds.length - 1] || stepId;

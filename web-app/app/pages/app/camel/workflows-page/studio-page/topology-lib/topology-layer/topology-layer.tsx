@@ -7,7 +7,7 @@ import { Sheet } from "app/components/ui/sheet";
 export function TopologyLayer() {
   const { node, setNode } = useLayer();
   const isOpen = !!node;
-
+  console.log("Rendering TopologyLayer with node:", node?.absolutePath);
   const onUnSelectedNode = () => {
     setNode();
   };
@@ -22,7 +22,7 @@ export function TopologyLayer() {
           </Sheet.Title>
         </Sheet.Header>
         <Sheet.Body className="space-y-4">
-          {node?.type.includes("add-step") ? <TopologyLibrary /> : <Form />}
+          {node?.stepType.includes("add") ? <TopologyLibrary /> : <Form />}
         </Sheet.Body>
       </Sheet.Content>
     </Sheet>

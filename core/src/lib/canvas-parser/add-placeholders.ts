@@ -13,7 +13,6 @@ export function ensurePlaceholderBetween(
   sourceId: string,
   targetId: string,
   absolutePath: string,
-  label = "Add between",
 ): string | null {
   if (!sourceId || !targetId || sourceId === targetId) return null;
 
@@ -21,11 +20,7 @@ export function ensurePlaceholderBetween(
   const targetNode = nodes.find((n) => n.id === targetId);
 
   // Helper: detects if a node is a branch placeholder (e.g., Add when, Add doCatch, ...)
-  const isBranchPlaceholder = (n?: Node | null) =>
-    !!n &&
-    (n.type === STEP_TYPE.ADD_STEP || n.data?.type === STEP_TYPE.ADD_STEP) &&
-    (n.data?.isPlaceholder ||
-      (typeof n.data?.label === "string" && n.data.label.startsWith("Add ")));
+  const isBranchPlaceholder = (n?: Node | null) => !!n && n.data?.isPlaceholder;
 
   // If either source or target is a branch placeholder, we do NOT create an add-between.
   if (isBranchPlaceholder(sourceNode) || isBranchPlaceholder(targetNode)) {
@@ -64,7 +59,7 @@ export function ensurePlaceholderBetween(
 
   // Creates the add-between node and connects it
   const betweenId = generateUniqueId(STEP_TYPE.ADD_BETWEEN);
-  nodes.push(createNode(betweenId, STEP_TYPE.ADD_BETWEEN, absolutePath, label));
+  nodes.push(createNode(betweenId, STEP_TYPE.ADD_BETWEEN, absolutePath));
   edges.push(createEdge(generateUniqueId("edge"), sourceId, betweenId));
   edges.push(createEdge(generateUniqueId("edge"), betweenId, targetId));
   return betweenId;
@@ -79,14 +74,13 @@ export function ensurePlaceholderNext(
   edges: Edge[],
   parentId: string,
   absolutePath: string,
-  label = "Add",
+  stepType = STEP_TYPE.ADD_STEP,
 ): string {
   const placeholderId = generateUniqueId("add");
   nodes.push({
-    ...createNode(placeholderId, STEP_TYPE.ADD_STEP, absolutePath, label),
+    ...createNode(placeholderId, stepType, absolutePath),
     data: {
-      ...createNode(placeholderId, STEP_TYPE.ADD_STEP, absolutePath, label)
-        .data,
+      ...createNode(placeholderId, stepType, absolutePath).data,
       isPlaceholder: true,
     },
   });

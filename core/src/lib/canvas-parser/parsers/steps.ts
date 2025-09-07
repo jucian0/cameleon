@@ -32,6 +32,7 @@ export function parseSteps(
   parentId: string,
   nextStepId: string | null = null,
   initialAbsolutePath: string,
+  addNodeId: string,
 ): parseStepsResult {
   let previousStepId = parentId;
   let currentNextStepId: string | null = nextStepId;
@@ -40,7 +41,7 @@ export function parseSteps(
     const nodeType = Object.keys(step)[0] as StepType;
     const stepId =
       currentNextStepId || generateUniqueId(`${nodeType}-${parentId}`);
-    const absolutePath = `${initialAbsolutePath}.steps.${i}.${nodeType}`;
+    const absolutePath = `${initialAbsolutePath}.steps.${i}`;
 
     // Determine next step ID
     currentNextStepId =
@@ -59,8 +60,9 @@ export function parseSteps(
             nodes,
             edges,
             currentNextStepId,
-            absolutePath,
+            `${absolutePath}.choice`,
             parseSteps,
+            addNodeId,
           );
           break;
         case "doTry":
