@@ -7,7 +7,6 @@ import { Sheet } from "app/components/ui/sheet";
 export function TopologyLayer() {
   const { node, setNode } = useLayer();
   const isOpen = !!node;
-  console.log("Rendering TopologyLayer with node:", node?.absolutePath);
   const onUnSelectedNode = () => {
     setNode();
   };

@@ -1,7 +1,7 @@
 import type { Edge, Node, Step, StepType } from "../../topology-types";
 import { parseChoiceStep } from "./choice";
 import { parseDoTryStep } from "./do-try";
-import { parseMulticastOrLoadBalanceStep } from "./multicast-load-balance";
+import { parseMulticastStep } from "./multicast";
 import { parseDefaultSteps } from "./default";
 import { BRANCHING_NODE_TYPES, generateUniqueId } from "../utils";
 import { createNode } from "../creation";
@@ -71,22 +71,22 @@ export function parseSteps(
             stepId,
             nodes,
             edges,
-            currentNextStepId,
+            `${absolutePath}.doTry`,
             absolutePath,
             parseSteps,
           );
           break;
         case "multicast":
-        case "loadBalance":
-          lastStepId = parseMulticastOrLoadBalanceStep(
+          lastStepId = parseMulticastStep(
             step,
             nodeType,
             stepId,
             nodes,
             edges,
             currentNextStepId,
-            absolutePath,
+            `${absolutePath}.multicast`,
             parseSteps,
+            addNodeId,
           );
           break;
       }

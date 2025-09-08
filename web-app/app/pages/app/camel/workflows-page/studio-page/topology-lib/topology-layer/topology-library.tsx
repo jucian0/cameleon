@@ -29,7 +29,6 @@ export function TopologyLibrary() {
   const [filter, setFilter] = React.useState("");
 
   React.useEffect(() => {
-    console.log("Node changed:", node);
     if (!["add-between", "add-step"].includes(node?.stepType ?? "")) {
       const value = node?.stepType?.split("-")[1] ?? "";
       setFilter(value);

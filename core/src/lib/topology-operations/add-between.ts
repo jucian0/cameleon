@@ -23,5 +23,6 @@ export function addBetween(
     return dotProp.set(camelConfig, parentPath, [newStep]);
   }
 
+  debugger;
   return camelConfig;
 }
