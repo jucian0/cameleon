@@ -1,13 +1,5 @@
-import {
-  type Node,
-  type Edge,
-  type Step,
-  STEP_TYPE,
-} from "../../topology-types";
-import {
-  ensurePlaceholderNext,
-  ensurePlaceholderBetween,
-} from "../add-placeholders";
+import { type Node, type Edge, type Step } from "../../topology-types";
+import { ensurePlaceholderNext } from "../add-placeholders";
 import { createNode, createEdge } from "../creation";
 import { generateUniqueId, BRANCHING_NODE_TYPES } from "../utils";
 
@@ -20,71 +12,83 @@ export function parseMulticastStep(
   nextStepId: string | null,
   absolutePath: string,
   parseSteps: any,
-  addNodeId: string,
 ): string {
-  const steps = step[nodeType]?.steps || [];
-  const branchEndIds: string[] = [];
+  const branchSteps = step[nodeType]?.steps || [];
+  const branchLastNodeIds: string[] = [];
 
   // Add initial placeholder
-  const placeholderResult = ensurePlaceholderNext(
+  const initialPlaceholderId = ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
     absolutePath,
   );
-  branchEndIds.push(placeholderResult);
+  branchLastNodeIds.push(initialPlaceholderId);
 
   // Process each branch
-  for (const [index, branchStep] of steps.entries()) {
-    const nodeType = Object.keys(branchStep)[0] as "multicast";
-    const branchPath = `${absolutePath}.steps.${index}`;
-    if (branchStep[nodeType]?.steps) {
-      const branchNodeId = generateUniqueId(`${nodeType}-${index}`);
-      nodes.push(createNode(branchNodeId, nodeType, branchPath));
-      edges.push(createEdge(generateUniqueId("edge"), stepId, branchNodeId));
+  for (const [index, branchStep] of branchSteps.entries()) {
+    const branchStepType = Object.keys(branchStep)[0] as "multicast";
+    const branchAbsolutePath = `${absolutePath}.steps.${index}`;
 
-      let result: any;
-      if (BRANCHING_NODE_TYPES.has(nodeType)) {
-        result = parseMulticastStep(
+    if (branchStep[branchStepType]?.steps) {
+      const branchContainerNodeId = generateUniqueId(
+        `${branchStepType}-${index}`,
+      );
+      nodes.push(
+        createNode(branchContainerNodeId, branchStepType, branchAbsolutePath),
+      );
+      edges.push(
+        createEdge(generateUniqueId("edge"), stepId, branchContainerNodeId),
+      );
+
+      let parsedBranchResult: any;
+      if (BRANCHING_NODE_TYPES.has(branchStepType)) {
+        parsedBranchResult = parseMulticastStep(
           branchStep,
-          nodeType,
-          branchNodeId,
+          branchStepType,
+          branchContainerNodeId,
           nodes,
           edges,
           null,
-          branchPath,
+          branchAbsolutePath,
           parseSteps,
-          addNodeId,
         );
       } else {
-        result = parseSteps(
-          branchStep[nodeType].steps,
+        parsedBranchResult = parseSteps(
+          branchStep[branchStepType].steps,
           nodes,
           edges,
-          branchNodeId,
+          branchContainerNodeId,
           null,
-          branchPath,
-          addNodeId,
+          branchAbsolutePath,
         );
       }
-      branchEndIds.push(
-        typeof result === "string" ? result : result.lastStepId,
+
+      branchLastNodeIds.push(
+        typeof parsedBranchResult === "string"
+          ? parsedBranchResult
+          : parsedBranchResult.lastStepId,
       );
     } else {
       // Handle direct endpoints
-      const endpointId = generateUniqueId(`${nodeType}-endpoint-${index}`);
-      nodes.push(createNode(endpointId, nodeType, branchPath));
-      edges.push(createEdge(generateUniqueId("edge"), stepId, endpointId));
-
-      branchEndIds.push(endpointId);
-    }
-    //connect to the next step or to a placeholder
-    branchEndIds.forEach((endId) => {
-      edges.push(
-        createEdge(generateUniqueId("edge"), endId, nextStepId ?? addNodeId),
+      const directEndpointNodeId = generateUniqueId(
+        `${branchStepType}-endpoint-${index}`,
       );
-    });
+      nodes.push(
+        createNode(directEndpointNodeId, branchStepType, branchAbsolutePath),
+      );
+      edges.push(
+        createEdge(generateUniqueId("edge"), stepId, directEndpointNodeId),
+      );
+
+      branchLastNodeIds.push(directEndpointNodeId);
+    }
+
+    // Connect branch endings to the next step or to a placeholder
+    for (const endId of branchLastNodeIds) {
+      edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
+    }
   }
 
-  return branchEndIds[branchEndIds.length - 1] || stepId;
+  return branchLastNodeIds[branchLastNodeIds.length - 1] || stepId;
 }

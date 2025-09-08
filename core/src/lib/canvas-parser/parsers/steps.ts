@@ -29,96 +29,93 @@ export function parseSteps(
   steps: Step[],
   nodes: Node[] = [],
   edges: Edge[] = [],
-  parentId: string,
-  nextStepId: string | null = null,
-  initialAbsolutePath: string,
-  addNodeId: string,
+  parentNodeId: string,
+  nextNodeIdOrPlaceholder: string | null,
+  baseAbsolutePath: string,
 ): parseStepsResult {
-  let previousStepId = parentId;
-  let currentNextStepId: string | null = nextStepId;
+  let previousNodeId = parentNodeId;
+  let lookaheadNodeIdOrPlaceholder: string | null;
 
-  steps.forEach((step, i) => {
+  for (const [i, step] of steps.entries()) {
     const nodeType = Object.keys(step)[0] as StepType;
-    const stepId =
-      currentNextStepId || generateUniqueId(`${nodeType}-${parentId}`);
-    const absolutePath = `${initialAbsolutePath}.steps.${i}`;
+    const currentStepId =
+      lookaheadNodeIdOrPlaceholder ||
+      generateUniqueId(`${nodeType}-${parentNodeId}`);
+    const currentAbsolutePath = `${baseAbsolutePath}.steps.${i}`;
 
-    // Determine next step ID
-    currentNextStepId =
+    // Look ahead for next step
+    lookaheadNodeIdOrPlaceholder =
       i < steps.length - 1
-        ? generateUniqueId(`${Object.keys(steps[i + 1])[0]}-${parentId}`)
-        : null;
+        ? generateUniqueId(`${Object.keys(steps[i + 1])[0]}-${parentNodeId}`)
+        : nextNodeIdOrPlaceholder;
 
-    // Process the step based on its type
-    let lastStepId = stepId;
+    let lastProcessedStepId = currentStepId;
     if (BRANCHING_NODE_TYPES.has(nodeType)) {
       switch (nodeType) {
         case "choice":
-          lastStepId = parseChoiceStep(
+          lastProcessedStepId = parseChoiceStep(
             step,
-            stepId,
+            currentStepId,
             nodes,
             edges,
-            currentNextStepId,
-            `${absolutePath}.choice`,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.choice`,
             parseSteps,
-            addNodeId,
           );
           break;
         case "doTry":
-          lastStepId = parseDoTryStep(
+          lastProcessedStepId = parseDoTryStep(
             step,
-            stepId,
+            currentStepId,
             nodes,
             edges,
-            `${absolutePath}.doTry`,
-            absolutePath,
+            `${currentAbsolutePath}.doTry`,
+            currentAbsolutePath,
             parseSteps,
           );
           break;
         case "multicast":
-          lastStepId = parseMulticastStep(
+          lastProcessedStepId = parseMulticastStep(
             step,
             nodeType,
-            stepId,
+            currentStepId,
             nodes,
             edges,
-            currentNextStepId,
-            `${absolutePath}.multicast`,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.multicast`,
             parseSteps,
-            addNodeId,
           );
           break;
       }
     } else {
-      lastStepId = parseDefaultSteps(
+      lastProcessedStepId = parseDefaultSteps(
         step,
         nodeType,
         nodes,
         edges,
-        stepId,
-        lastStepId,
-        absolutePath,
+        currentStepId,
+        lastProcessedStepId,
+        currentAbsolutePath,
         parseSteps,
       );
     }
 
-    nodes.push(createNode(stepId, nodeType, absolutePath));
+    nodes.push(createNode(currentStepId, nodeType, currentAbsolutePath));
     ensurePlaceholderBetween(
       nodes,
       edges,
-      previousStepId,
-      stepId,
-      absolutePath,
+      previousNodeId,
+      currentStepId,
+      currentAbsolutePath,
     );
-    previousStepId = lastStepId;
-  });
+    previousNodeId = lastProcessedStepId;
+  }
 
   return {
     nodes,
     edges,
-    lastStepId: previousStepId,
-    nextStepId: currentNextStepId,
-    absolutePath: initialAbsolutePath,
+    lastStepId: previousNodeId,
+    nextStepId: lookaheadNodeIdOrPlaceholder,
+    absolutePath: baseAbsolutePath,
   };
 }

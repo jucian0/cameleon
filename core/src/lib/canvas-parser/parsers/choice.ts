@@ -16,16 +16,14 @@ export function parseChoiceStep(
   stepId: string,
   nodes: Node[],
   edges: Edge[],
-  nextStepId: string | null,
+  nextOrAddId: string | null,
   initialAbsolutePath: string,
   parseSteps: any,
-  addNodeId: string,
 ): string {
   const branchEndIds: string[] = [];
   const { choice } = step;
-  //const placeholderId = generateUniqueId("add");
 
-  // Process 'when' branches
+  // when branches
   if (Array.isArray(choice?.when)) {
     for (const [i, when] of choice.when.entries()) {
       const absolutePath = `${initialAbsolutePath}.when.${i}`;
@@ -47,13 +45,12 @@ export function parseChoiceStep(
         nodes,
         edges,
         whenResult.lastStepId,
-        nextStepId ?? addNodeId, //placeholderId,
+        nextOrAddId!,
         `${absolutePath}.steps.${(when?.steps ?? []).length}`,
       );
       branchEndIds.push(betweenId ?? whenResult.lastStepId);
     }
 
-    // Always add placeholder for 'when' branches
     ensurePlaceholderNext(
       nodes,
       edges,
@@ -63,7 +60,7 @@ export function parseChoiceStep(
     );
   }
 
-  // Process 'otherwise' branch
+  // otherwise branch
   if (choice?.otherwise?.steps) {
     const absolutePath = `${initialAbsolutePath}.otherwise`;
     const otherwiseId = generateUniqueId(`otherwise-${stepId}`);
@@ -83,21 +80,18 @@ export function parseChoiceStep(
       nodes,
       edges,
       otherwiseResult.lastStepId,
-      nextStepId ?? addNodeId,
+      nextOrAddId!,
       `${absolutePath}.steps.${choice.otherwise.steps.length}`,
     );
     branchEndIds.push(betweenId ?? otherwiseResult.lastStepId);
   }
 
-  // Connect branches to next step if it exists
-  if (nextStepId && branchEndIds.length > 0) {
-  } else {
-    // Add placeholder to connect all branches to the next step
-    // need to remove last part of the absolutePath to ensure the placeholder give the correct path
+  // Connect branches
+  if (!nextOrAddId) {
     for (const endId of branchEndIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, addNodeId));
+      edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId!));
     }
-    branchEndIds.push(addNodeId);
+    branchEndIds.push(nextOrAddId!);
   }
 
   return branchEndIds[branchEndIds.length - 1] || stepId;

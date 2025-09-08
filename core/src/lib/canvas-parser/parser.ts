@@ -48,39 +48,45 @@ export function jsonToCanvasBuilder(
 ): ParsedTopologyModel {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
-  let initialAbsolutePath = `data.${routeIndex}.route.from`;
-  const placeholderId = generateUniqueId("add");
-  const placeholderNode = createNode(
-    placeholderId,
+  let fromAbsolutePath = `data.${routeIndex}.route.from`;
+  const endPlaceholderId = generateUniqueId("add");
+  const endPlaceholderNode = createNode(
+    endPlaceholderId,
     STEP_TYPE.ADD_STEP,
-    `${initialAbsolutePath}.steps.${route.route?.from.steps?.length || 0}`,
+    `${fromAbsolutePath}.steps.${route.route?.from.steps?.length || 0}`,
   );
 
-  const fromId = route.route?.id ? route.route.id : generateUniqueId("route");
-  const stepType = (route.route?.from.uri || STEP_TYPE.CAMEL) as StepType;
+  const fromNodeId = route.route?.id
+    ? route.route.id
+    : generateUniqueId("route");
+  const fromStepType = (route.route?.from.uri || STEP_TYPE.CAMEL) as StepType;
+
   // Set initial node (from)
-  nodes.push(createNode(fromId, stepType, initialAbsolutePath));
+  nodes.push(createNode(fromNodeId, fromStepType, fromAbsolutePath));
 
-  const routeSteps = route.route?.from.steps || [];
+  const fromSteps = route.route?.from.steps || [];
 
-  if (routeSteps) {
-    const result = parseSteps(
-      routeSteps,
+  if (fromSteps) {
+    const parsedStepsResult = parseSteps(
+      fromSteps,
       nodes,
       edges,
-      fromId,
-      null,
-      initialAbsolutePath,
-      placeholderId,
+      fromNodeId,
+      endPlaceholderId,
+      fromAbsolutePath,
     );
-    initialAbsolutePath = result.absolutePath || initialAbsolutePath;
+    fromAbsolutePath = parsedStepsResult.absolutePath || fromAbsolutePath;
     edges.push(
-      createEdge(generateUniqueId("edge"), result.lastStepId, placeholderId),
+      createEdge(
+        generateUniqueId("edge"),
+        parsedStepsResult.lastStepId,
+        endPlaceholderId,
+      ),
     );
   }
 
   // Always add a placeholder at the end of the route
-  nodes.push(placeholderNode);
+  nodes.push(endPlaceholderNode);
 
   return { nodes, edges };
 }
