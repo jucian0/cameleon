@@ -34,7 +34,11 @@ export function TopologyLibrary() {
       setFilter(value);
     }
   }, []);
-
+  console.log(
+    "Rendering TopologyLibrary with node:",
+    node?.absolutePath,
+    camelConfig,
+  );
   function handleSelectionChange(selectedItem: Set<Key>) {
     const [selectedItemKey] = Array.from(selectedItem);
     try {

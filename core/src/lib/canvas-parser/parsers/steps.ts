@@ -34,7 +34,7 @@ export function parseSteps(
   baseAbsolutePath: string,
 ): parseStepsResult {
   let previousNodeId = parentNodeId;
-  let lookaheadNodeIdOrPlaceholder: string | null;
+  let lookaheadNodeIdOrPlaceholder: string | null = null;
 
   for (const [i, step] of steps.entries()) {
     const nodeType = Object.keys(step)[0] as StepType;

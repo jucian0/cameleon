@@ -17,13 +17,12 @@ export function parseMulticastStep(
   const branchLastNodeIds: string[] = [];
 
   // Add initial placeholder
-  const initialPlaceholderId = ensurePlaceholderNext(
+  ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
-    absolutePath,
+    `${absolutePath}.steps.${branchSteps.length}`,
   );
-  branchLastNodeIds.push(initialPlaceholderId);
 
   // Process each branch
   for (const [index, branchStep] of branchSteps.entries()) {
@@ -49,8 +48,8 @@ export function parseMulticastStep(
           branchContainerNodeId,
           nodes,
           edges,
-          null,
-          branchAbsolutePath,
+          nextStepId,
+          `${branchAbsolutePath}.multicast`,
           parseSteps,
         );
       } else {
@@ -59,16 +58,12 @@ export function parseMulticastStep(
           nodes,
           edges,
           branchContainerNodeId,
-          null,
+          nextStepId,
           branchAbsolutePath,
         );
       }
 
-      branchLastNodeIds.push(
-        typeof parsedBranchResult === "string"
-          ? parsedBranchResult
-          : parsedBranchResult.lastStepId,
-      );
+      branchLastNodeIds.push(parsedBranchResult.lastStepId);
     } else {
       // Handle direct endpoints
       const directEndpointNodeId = generateUniqueId(
