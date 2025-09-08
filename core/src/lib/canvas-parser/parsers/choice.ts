@@ -73,9 +73,10 @@ export function parseChoiceStep(
       nodes,
       edges,
       otherwiseId,
-      null,
+      nextOrAddId,
       absolutePath,
     );
+    branchEndIds.push(otherwiseResult.lastStepId);
     const betweenId = ensurePlaceholderBetween(
       nodes,
       edges,
