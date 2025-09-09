@@ -5,8 +5,8 @@ import {
   STEP_TYPE,
 } from "../../topology-types";
 import {
-  ensurePlaceholderNext,
   ensurePlaceholderBetween,
+  ensurePlaceholderNext,
 } from "../add-placeholders";
 import { createNode, createEdge } from "../creation";
 import { generateUniqueId } from "../utils";
@@ -16,18 +16,18 @@ export function parseDoTryStep(
   stepId: string,
   nodes: Node[],
   edges: Edge[],
-  nextStepId: string | null,
+  nextOrAddId: string | null,
   initialAbsolutePath: string,
   parseSteps: any,
 ): string {
-  const branchEndIds: string[] = [];
+  const branchLastNodeIds: string[] = [];
   const { doTry } = step;
 
   // Process doCatch branch
   if (Array.isArray(doTry?.doCatch)) {
     for (const [i, doCatch] of doTry.doCatch.entries()) {
       const absolutePath = `${initialAbsolutePath}.doCatch.${i}`;
-      const doCatchId = generateUniqueId(`doCatch-${stepId}-${i}`);
+      const doCatchId = generateUniqueId(`doCatch-${stepId}`);
 
       nodes.push(createNode(doCatchId, STEP_TYPE.DO_CATCH, absolutePath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, doCatchId));
@@ -37,15 +37,31 @@ export function parseDoTryStep(
         nodes,
         edges,
         doCatchId,
-        null,
+        nextOrAddId,
         absolutePath,
       );
-      branchEndIds.push(doCatchResult.lastStepId);
+
+      const betweenId = ensurePlaceholderBetween(
+        nodes,
+        edges,
+        doCatchResult.lastStepId,
+        nextOrAddId!,
+        `${absolutePath}.steps.${(doCatch.steps ?? []).length}`,
+      );
+      branchLastNodeIds.push(betweenId ?? doCatchResult.lastStepId);
     }
+
+    ensurePlaceholderNext(
+      nodes,
+      edges,
+      stepId,
+      `${initialAbsolutePath}.doCatch.${(doTry.doCatch.steps ?? []).length}`,
+      STEP_TYPE.ADD_DO_CATCH,
+    );
   }
 
   // Process doFinally branch
-  if (doTry?.doFinally) {
+  if (doTry?.doFinally?.steps) {
     const absolutePath = `${initialAbsolutePath}.doFinally`;
     const doFinallyId = generateUniqueId(`doFinally-${stepId}`);
 
@@ -57,10 +73,17 @@ export function parseDoTryStep(
       nodes,
       edges,
       doFinallyId,
-      null,
+      nextOrAddId,
       absolutePath,
     );
-    branchEndIds.push(doFinallyResult.lastStepId);
+    const betweenId = ensurePlaceholderBetween(
+      nodes,
+      edges,
+      doFinallyResult.lastStepId,
+      nextOrAddId!,
+      `${absolutePath}.steps.${doTry.doFinally?.steps.length}`,
+    );
+    branchLastNodeIds.push(betweenId ?? doFinallyResult.lastStepId);
   }
 
   // Process main try branch
@@ -73,44 +96,27 @@ export function parseDoTryStep(
       nodes,
       edges,
       stepId,
-      null,
+      nextOrAddId,
       absolutePath,
     );
-    branchEndIds.push(doTryResult.lastStepId);
+
+    const betweenId = ensurePlaceholderBetween(
+      nodes,
+      edges,
+      doTryResult.lastStepId,
+      nextOrAddId!,
+      `${absolutePath}.steps.${doTry.steps?.length}`,
+    );
+
+    branchLastNodeIds.push(betweenId ?? doTryResult.lastStepId);
   }
 
-  // Always add placeholder for doCatch
-  const placeholderResult = ensurePlaceholderNext(
-    nodes,
-    edges,
-    stepId,
-    initialAbsolutePath,
-  );
-  branchEndIds.push(placeholderResult);
-
-  // Connect branches to next step if it exists
-  if (nextStepId && branchEndIds.length > 0) {
-    for (const endId of branchEndIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
-      ensurePlaceholderBetween(
-        nodes,
-        edges,
-        endId,
-        nextStepId,
-        initialAbsolutePath,
-      );
+  // Connect branch endings to the next step or to a placeholder
+  if (nextOrAddId) {
+    for (const endId of branchLastNodeIds) {
+      edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId));
     }
-  } else {
-    // Add placeholder to connect all branches to the next step
-    // need to remove last part of the absolutePath to ensure the placeholder give the correct path
-    const path = initialAbsolutePath.replace(/\.doTry.*$/, "");
-    const placeholderId = generateUniqueId("add");
-    nodes.push(createNode(placeholderId, STEP_TYPE.ADD_STEP, path));
-    for (const endId of branchEndIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, placeholderId));
-    }
-    branchEndIds.push(placeholderId);
   }
 
-  return branchEndIds[branchEndIds.length - 1] || stepId;
+  return branchLastNodeIds[branchLastNodeIds.length - 1] || stepId;
 }

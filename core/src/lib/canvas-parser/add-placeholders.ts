@@ -42,6 +42,7 @@ export function ensurePlaceholderBetween(
     const midIsAddBetween =
       midNode.type === STEP_TYPE.ADD_BETWEEN ||
       midNode.data?.type === STEP_TYPE.ADD_BETWEEN;
+
     if (midIsAddBetween || isBranchPlaceholder(midNode)) {
       return midNode.id;
     }

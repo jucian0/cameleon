@@ -12,6 +12,7 @@ export const nodeTypes: Record<
 > = {
   [STEP_TYPE.ADD_STEP]: AddNode,
   [STEP_TYPE.ADD_WHEN]: AddNode,
+  [STEP_TYPE.ADD_DO_CATCH]: AddNode,
   [STEP_TYPE.ADD_BETWEEN]: AddBetweenNode,
   ["component"]: DefaultNode,
 };

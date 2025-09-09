@@ -28,17 +28,15 @@ export function TopologyLibrary() {
   const { contains } = useFilter({ sensitivity: "base" });
   const [filter, setFilter] = React.useState("");
 
+  console.log("TopologyLibrary node:", node?.absolutePath);
+
   React.useEffect(() => {
     if (!["add-between", "add-step"].includes(node?.stepType ?? "")) {
       const value = node?.stepType?.split("-")[1] ?? "";
       setFilter(value);
     }
   }, []);
-  console.log(
-    "Rendering TopologyLibrary with node:",
-    node?.absolutePath,
-    camelConfig,
-  );
+
   function handleSelectionChange(selectedItem: Set<Key>) {
     const [selectedItemKey] = Array.from(selectedItem);
     try {
@@ -52,7 +50,11 @@ export function TopologyLibrary() {
         return setNode();
       }
 
-      if (node.stepType === "add-between" || node.stepType === "add-when") {
+      if (
+        node.stepType === "add-between" ||
+        node.stepType === "add-when" ||
+        node.stepType === "add-doCatch"
+      ) {
         setCamelConfig(
           addBetween(camelConfig, node.absolutePath, newStepConfig),
         );

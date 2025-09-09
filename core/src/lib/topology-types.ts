@@ -63,7 +63,9 @@ export interface Step {
   };
   doTry?: {
     steps?: Step[];
-    doCatch?: Step[];
+    doCatch?: {
+      steps?: Step[];
+    };
     doFinally?: {
       steps?: Step[];
     };
@@ -172,6 +174,7 @@ export enum STEP_TYPE {
   LOAD_BALANCE = "loadBalance",
   ADD_BETWEEN = "add-between",
   ADD_WHEN = "add-when",
+  ADD_DO_CATCH = "add-doCatch",
 }
 
 export type StepType = `${STEP_TYPE}`;

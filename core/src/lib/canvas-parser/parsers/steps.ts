@@ -69,8 +69,8 @@ export function parseSteps(
             currentStepId,
             nodes,
             edges,
+            lookaheadNodeIdOrPlaceholder,
             `${currentAbsolutePath}.doTry`,
-            currentAbsolutePath,
             parseSteps,
           );
           break;
