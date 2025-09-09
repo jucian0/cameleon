@@ -9,7 +9,7 @@ export function parseMulticastStep(
   stepId: string,
   nodes: Node[],
   edges: Edge[],
-  nextStepId: string | null,
+  nextOrAddId: string | null,
   absolutePath: string,
   parseSteps: any,
 ): string {
@@ -48,7 +48,7 @@ export function parseMulticastStep(
           branchContainerNodeId,
           nodes,
           edges,
-          nextStepId,
+          nextOrAddId,
           `${branchAbsolutePath}.multicast`,
           parseSteps,
         );
@@ -58,7 +58,7 @@ export function parseMulticastStep(
           nodes,
           edges,
           branchContainerNodeId,
-          nextStepId,
+          nextOrAddId,
           branchAbsolutePath,
         );
       }
@@ -80,8 +80,10 @@ export function parseMulticastStep(
     }
 
     // Connect branch endings to the next step or to a placeholder
-    for (const endId of branchLastNodeIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, nextStepId));
+    if (nextOrAddId) {
+      for (const endId of branchLastNodeIds) {
+        edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId));
+      }
     }
   }
 

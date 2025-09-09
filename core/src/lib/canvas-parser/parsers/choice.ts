@@ -20,7 +20,7 @@ export function parseChoiceStep(
   initialAbsolutePath: string,
   parseSteps: any,
 ): string {
-  const branchEndIds: string[] = [];
+  const branchLastNodeIds: string[] = [];
   const { choice } = step;
 
   // when branches
@@ -37,7 +37,7 @@ export function parseChoiceStep(
         nodes,
         edges,
         whenId,
-        null,
+        nextOrAddId,
         absolutePath,
       );
 
@@ -48,7 +48,7 @@ export function parseChoiceStep(
         nextOrAddId!,
         `${absolutePath}.steps.${(when?.steps ?? []).length}`,
       );
-      branchEndIds.push(betweenId ?? whenResult.lastStepId);
+      branchLastNodeIds.push(betweenId ?? whenResult.lastStepId);
     }
 
     ensurePlaceholderNext(
@@ -76,7 +76,6 @@ export function parseChoiceStep(
       nextOrAddId,
       absolutePath,
     );
-    branchEndIds.push(otherwiseResult.lastStepId);
     const betweenId = ensurePlaceholderBetween(
       nodes,
       edges,
@@ -84,16 +83,15 @@ export function parseChoiceStep(
       nextOrAddId!,
       `${absolutePath}.steps.${choice.otherwise.steps.length}`,
     );
-    branchEndIds.push(betweenId ?? otherwiseResult.lastStepId);
+    branchLastNodeIds.push(betweenId ?? otherwiseResult.lastStepId);
   }
 
-  // Connect branches
-  if (!nextOrAddId) {
-    for (const endId of branchEndIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId!));
+  // Connect branch endings to the next step or to a placeholder
+  if (nextOrAddId) {
+    for (const endId of branchLastNodeIds) {
+      edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId));
     }
-    branchEndIds.push(nextOrAddId!);
   }
 
-  return branchEndIds[branchEndIds.length - 1] || stepId;
+  return branchLastNodeIds[branchLastNodeIds.length - 1] || stepId;
 }
