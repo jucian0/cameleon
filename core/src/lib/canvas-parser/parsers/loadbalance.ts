@@ -17,7 +17,7 @@ export function parseLoadbalanceStep(
   const branchLastNodeIds: string[] = [];
 
   // Add initial placeholder
-  ensurePlaceholderNext(
+  const placeholderId = ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
@@ -49,9 +49,10 @@ export function parseLoadbalanceStep(
           nodes,
           edges,
           nextOrAddId,
-          `${branchAbsolutePath}.loadBalance`,
+          `${branchAbsolutePath}.${branchStepType}`,
           parseSteps,
         );
+        branchLastNodeIds.push(parsedBranchResult);
       } else {
         parsedBranchResult = parseSteps(
           branchStep[branchStepType].steps,
@@ -87,5 +88,5 @@ export function parseLoadbalanceStep(
     }
   }
 
-  return branchLastNodeIds[branchLastNodeIds.length - 1] || stepId;
+  return placeholderId || stepId;
 }

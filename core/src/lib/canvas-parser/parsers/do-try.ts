@@ -23,12 +23,19 @@ export function parseDoTryStep(
   const branchLastNodeIds: string[] = [];
   const { doTry } = step;
 
+  const betweenId = ensurePlaceholderNext(
+    nodes,
+    edges,
+    stepId,
+    `${initialAbsolutePath}.doCatch.${(doTry?.doCatch?.steps ?? []).length}`,
+    STEP_TYPE.ADD_DO_CATCH,
+  );
+
   // Process doCatch branch
   if (Array.isArray(doTry?.doCatch)) {
     for (const [i, doCatch] of doTry.doCatch.entries()) {
       const absolutePath = `${initialAbsolutePath}.doCatch.${i}`;
       const doCatchId = generateUniqueId(`doCatch-${stepId}`);
-
       nodes.push(createNode(doCatchId, STEP_TYPE.DO_CATCH, absolutePath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, doCatchId));
 
@@ -41,23 +48,14 @@ export function parseDoTryStep(
         absolutePath,
       );
 
-      const betweenId = ensurePlaceholderBetween(
+      ensurePlaceholderBetween(
         nodes,
         edges,
         doCatchResult.lastStepId,
         nextOrAddId!,
         `${absolutePath}.steps.${(doCatch.steps ?? []).length}`,
       );
-      branchLastNodeIds.push(betweenId ?? doCatchResult.lastStepId);
     }
-
-    ensurePlaceholderNext(
-      nodes,
-      edges,
-      stepId,
-      `${initialAbsolutePath}.doCatch.${(doTry.doCatch.steps ?? []).length}`,
-      STEP_TYPE.ADD_DO_CATCH,
-    );
   }
 
   // Process doFinally branch
@@ -76,14 +74,13 @@ export function parseDoTryStep(
       nextOrAddId,
       absolutePath,
     );
-    const betweenId = ensurePlaceholderBetween(
+    ensurePlaceholderBetween(
       nodes,
       edges,
       doFinallyResult.lastStepId,
       nextOrAddId!,
       `${absolutePath}.steps.${doTry.doFinally?.steps.length}`,
     );
-    branchLastNodeIds.push(betweenId ?? doFinallyResult.lastStepId);
   }
 
   // Process main try branch
@@ -100,15 +97,13 @@ export function parseDoTryStep(
       absolutePath,
     );
 
-    const betweenId = ensurePlaceholderBetween(
+    ensurePlaceholderBetween(
       nodes,
       edges,
       doTryResult.lastStepId,
       nextOrAddId!,
       `${absolutePath}.steps.${doTry.steps?.length}`,
     );
-
-    branchLastNodeIds.push(betweenId ?? doTryResult.lastStepId);
   }
 
   // Connect branch endings to the next step or to a placeholder
@@ -118,5 +113,5 @@ export function parseDoTryStep(
     }
   }
 
-  return branchLastNodeIds[branchLastNodeIds.length - 1] || stepId;
+  return betweenId || stepId;
 }

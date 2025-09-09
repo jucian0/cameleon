@@ -23,12 +23,19 @@ export function parseChoiceStep(
   const branchLastNodeIds: string[] = [];
   const { choice } = step;
 
+  const placeholderId = ensurePlaceholderNext(
+    nodes,
+    edges,
+    stepId,
+    `${initialAbsolutePath}.when.${(choice?.when ?? []).length}`,
+    STEP_TYPE.ADD_WHEN,
+  );
+
   // when branches
   if (Array.isArray(choice?.when)) {
     for (const [i, when] of choice.when.entries()) {
       const absolutePath = `${initialAbsolutePath}.when.${i}`;
       const whenId = generateUniqueId(`when-${stepId}`);
-
       nodes.push(createNode(whenId, STEP_TYPE.WHEN, absolutePath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, whenId));
 
@@ -41,30 +48,20 @@ export function parseChoiceStep(
         absolutePath,
       );
 
-      const betweenId = ensurePlaceholderBetween(
+      ensurePlaceholderBetween(
         nodes,
         edges,
         whenResult.lastStepId,
         nextOrAddId!,
         `${absolutePath}.steps.${(when?.steps ?? []).length}`,
       );
-      branchLastNodeIds.push(betweenId ?? whenResult.lastStepId);
     }
-
-    ensurePlaceholderNext(
-      nodes,
-      edges,
-      stepId,
-      `${initialAbsolutePath}.when.${(choice?.when ?? []).length}`,
-      STEP_TYPE.ADD_WHEN,
-    );
   }
 
   // otherwise branch
   if (choice?.otherwise?.steps) {
     const absolutePath = `${initialAbsolutePath}.otherwise`;
     const otherwiseId = generateUniqueId(`otherwise-${stepId}`);
-
     nodes.push(createNode(otherwiseId, STEP_TYPE.OTHERWISE, absolutePath));
     edges.push(createEdge(generateUniqueId("edge"), stepId, otherwiseId));
 
@@ -76,14 +73,13 @@ export function parseChoiceStep(
       nextOrAddId,
       absolutePath,
     );
-    const betweenId = ensurePlaceholderBetween(
+    ensurePlaceholderBetween(
       nodes,
       edges,
       otherwiseResult.lastStepId,
       nextOrAddId!,
       `${absolutePath}.steps.${choice.otherwise.steps.length}`,
     );
-    branchLastNodeIds.push(betweenId ?? otherwiseResult.lastStepId);
   }
 
   // Connect branch endings to the next step or to a placeholder
@@ -93,5 +89,5 @@ export function parseChoiceStep(
     }
   }
 
-  return branchLastNodeIds[branchLastNodeIds.length - 1] || stepId;
+  return placeholderId || stepId;
 }

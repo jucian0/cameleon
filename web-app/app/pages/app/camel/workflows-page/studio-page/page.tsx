@@ -19,7 +19,7 @@ export function meta({ loaderData }: MetaArgs<typeof loader>) {
 }
 
 export const handle = {
-  breadcrumb: () => "Camel Studio",
+  breadcrumb: ({ name }: typeof loader) => `Camel Studio - ${name}`,
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -59,7 +59,7 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
   const workflowCanvas = React.useMemo(() => {
     if (routeId) {
       const route = camelConfig?.data.find((r) => r.route?.id === routeId);
-      const routeIndex = camelConfig?.data.findIndex(
+      const routeIndex = camelConfig?.data?.findIndex(
         (r) => r.route?.id === routeId,
       );
       return route
@@ -69,7 +69,7 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
       const parsedCanvas = { nodes: [], edges: [] } as any;
       for (const route of camelConfig?.data ?? INITIAL_STATE.data) {
         if (route.route) {
-          const routeIndex = camelConfig?.data.findIndex(
+          const routeIndex = camelConfig?.data?.findIndex(
             (r) => r.route?.id === route.route?.id,
           );
           const { nodes, edges } = jsonToCanvasBuilder(route, routeIndex);

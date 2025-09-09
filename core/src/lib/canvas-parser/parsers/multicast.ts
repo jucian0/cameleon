@@ -17,7 +17,7 @@ export function parseMulticastStep(
   const branchLastNodeIds: string[] = [];
 
   // Add initial placeholder
-  ensurePlaceholderNext(
+  const placeholderId = ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
@@ -52,6 +52,7 @@ export function parseMulticastStep(
           `${branchAbsolutePath}.multicast`,
           parseSteps,
         );
+        branchLastNodeIds.push(parsedBranchResult);
       } else {
         parsedBranchResult = parseSteps(
           branchStep[branchStepType].steps,
@@ -87,5 +88,5 @@ export function parseMulticastStep(
     }
   }
 
-  return branchLastNodeIds[branchLastNodeIds.length - 1] || stepId;
+  return placeholderId || stepId;
 }
