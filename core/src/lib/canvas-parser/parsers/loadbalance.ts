@@ -3,9 +3,9 @@ import { ensurePlaceholderNext } from "../add-placeholders";
 import { createNode, createEdge } from "../creation";
 import { generateUniqueId, BRANCHING_NODE_TYPES } from "../utils";
 
-export function parseMulticastStep(
+export function parseLoadbalanceStep(
   step: Step,
-  nodeType: "multicast",
+  nodeType: "loadBalance",
   stepId: string,
   nodes: Node[],
   edges: Edge[],
@@ -26,7 +26,7 @@ export function parseMulticastStep(
 
   // Process each branch
   for (const [index, branchStep] of branchSteps.entries()) {
-    const branchStepType = Object.keys(branchStep)[0] as "multicast";
+    const branchStepType = Object.keys(branchStep)[0] as "loadBalance";
     const branchAbsolutePath = `${absolutePath}.steps.${index}`;
 
     if (branchStep[branchStepType]?.steps) {
@@ -42,14 +42,14 @@ export function parseMulticastStep(
 
       let parsedBranchResult: any;
       if (BRANCHING_NODE_TYPES.has(branchStepType)) {
-        parsedBranchResult = parseMulticastStep(
+        parsedBranchResult = parseLoadbalanceStep(
           branchStep,
           branchStepType,
           branchContainerNodeId,
           nodes,
           edges,
           nextOrAddId,
-          `${branchAbsolutePath}.multicast`,
+          `${branchAbsolutePath}.loadBalance`,
           parseSteps,
         );
       } else {

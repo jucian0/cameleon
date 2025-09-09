@@ -6,6 +6,7 @@ import { parseDefaultSteps } from "./default";
 import { BRANCHING_NODE_TYPES, generateUniqueId } from "../utils";
 import { createNode } from "../creation";
 import { ensurePlaceholderBetween } from "../add-placeholders";
+import { parseLoadbalanceStep } from "./loadbalance";
 
 // ==================== Types ====================
 export type parseStepsResult = {
@@ -83,6 +84,18 @@ export function parseSteps(
             edges,
             lookaheadNodeIdOrPlaceholder,
             `${currentAbsolutePath}.multicast`,
+            parseSteps,
+          );
+          break;
+        case "loadBalance":
+          lastProcessedStepId = parseLoadbalanceStep(
+            step,
+            nodeType,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.loadBalance`,
             parseSteps,
           );
           break;
