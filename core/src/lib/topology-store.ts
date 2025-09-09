@@ -26,6 +26,7 @@ import {
 import { jsonToCanvasBuilder } from "./canvas-parser/parser";
 import { jsonToYaml } from "./yaml-json";
 import type { CamelConfig, Edge, Route, Node } from "./topology-types";
+import { generateStepId } from "./topology-operations/topology-operations";
 
 type TopologyStore = {
   camelConfig: CamelConfig;
@@ -45,55 +46,22 @@ export const INITIAL_STATE = {
   data: [
     {
       route: {
-        id: "route1",
+        id: generateStepId("route"),
         nodePrefixId: "route1-",
-        from: { uri: "timer:foo", id: "1" },
+        from: { uri: "init", id: "1", steps: [] },
       },
     },
   ],
   comments: {},
 };
 
+export const INITIAL_STATE_YAML = jsonToYaml(INITIAL_STATE);
+
 export const useTopologyStore = create<TopologyStore>((set, get) => ({
   camelConfig: INITIAL_STATE,
   setCamelConfig: (json = INITIAL_STATE) => {
     set({ camelConfig: json });
-    // const parsedCanvas = { nodes: [], edges: [] } as any;
-    // for (const route of json.data) {
-    //   if (route.route) {
-    //     const { nodes, edges } = jsonToCanvasBuilder(route);
-    //     parsedCanvas.nodes.push(...nodes);
-    //     parsedCanvas.edges.push(...edges);
-    //   }
-    // }
-
-    //need to fix here, when save from code editor need to keep the current route if it exists
-    // set({ canvas: { ...get().canvas, ...parsedCanvas } });
   },
-
-  // updateCamelRoute: (json: any, routeId: string) => {
-  //   const state = get();
-  //   const { camelConfig, canvas } = state;
-
-  //   const data = camelConfig.data ?? [];
-
-  //   // Update or insert the route
-  //   const updatedData = data.some((r) => r.route?.id === routeId)
-  //     ? data.map((route) =>
-  //         route.route?.id === routeId ? { ...route, ...json } : route,
-  //       )
-  //     : [...data, json];
-
-  //   // Build topology based on the updated route position
-  //   const routeIndex = updatedData.findIndex((r) => r.route?.id === routeId);
-  //   const { nodes, edges } = jsonToCanvasBuilder(json, routeIndex);
-
-  //   // Commit new state
-  //   set({
-  //     camelConfig: { ...camelConfig, data: updatedData },
-  //     canvas: { ...canvas, nodes, edges },
-  //   });
-  // },
 
   getCamelConfigYaml: () => {
     const state = get();

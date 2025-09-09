@@ -14,6 +14,8 @@ import {
 } from "react-router";
 import type { Route } from "./+types/page";
 import { ProgressCircle } from "app/components/ui/progress-circle";
+import { INITIAL_STATE_YAML } from "core";
+import { encode } from "js-base64";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -53,6 +55,7 @@ export async function action({ request }: LoaderFunctionArgs) {
   if (!isEdit) formData.delete("id");
 
   formData.set("owner", user.data.user?.id || "");
+  formData.set("content", encode(INITIAL_STATE_YAML));
 
   const { error } = await supabase
     .from("workflows")
