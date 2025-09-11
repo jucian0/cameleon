@@ -1,4 +1,9 @@
-import { INITIAL_STATE, jsonToCanvasBuilder, useTopologyStore } from "core";
+import {
+  INITIAL_STATE,
+  jsonToCanvasBuilder,
+  useTopologyStore,
+  type CamelConfig,
+} from "core";
 import { TopologyBuilder } from "./topology-lib/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
@@ -51,7 +56,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function CamelStudio({ loaderData }: Route.ComponentProps) {
-  const { content } = loaderData;
+  const { content, name } = loaderData;
   const { setCamelConfig, canvas, camelConfig } = useTopologyStore();
   const [query] = useSearchParams();
   const routeId = query.get("route");
@@ -82,9 +87,9 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
   }, [camelConfig, routeId]);
 
   React.useEffect(() => {
-    setCamelConfig(content);
+    setCamelConfig(content as CamelConfig);
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
-  }, [content, setCamelConfig]);
+  }, [name]);
 
   React.useEffect(() => {
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
