@@ -1,7 +1,7 @@
 import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
 
-import type { Node } from "core";
+import type { Node, StepType } from "core";
 import { DefaultHandle } from "./default-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
@@ -100,8 +100,8 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 
   const { setNode } = useLayer();
 
-  function handleClick() {
-    setNode({ ...data, ...props });
+  function handleClick(stepType: StepType) {
+    return () => setNode({ ...data, ...props, stepType });
   }
 
   function handleMenuOpen() {
@@ -145,11 +145,11 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
           <Tooltip.Content>{data.label?.toUpperCase()}</Tooltip.Content>
         </Tooltip>
         <Menu.Content placement="bottom">
-          <Menu.Item onAction={handleClick} textValue={data.label}>
+          <Menu.Item onAction={handleClick("add-step")} textValue={data.label}>
             <IconPencilBox /> Edit
           </Menu.Item>
           <Menu.Item
-            onAction={() => setIsOpen(true)}
+            onAction={handleClick("add-step")}
             textValue={`Replace ${data.label}`}
           >
             <IconRepeat /> Replace
