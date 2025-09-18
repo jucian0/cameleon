@@ -1,11 +1,11 @@
-import { Button, buttonStyles } from "app/components/ui/button";
+import { buttonStyles } from "app/components/ui/button";
 import type { Route } from "./+types/home-page";
-import { IconFile, IconPlus } from "@intentui/icons";
-import { RestIcon } from "app/components/icons/rest";
-import { CamelStudioIcon } from "app/components/icons/camel-studio";
+import { IconPlus } from "@intentui/icons";
 import { Menu } from "app/components/ui/menu";
 import type { LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "app/modules/supabase/supabase-server";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Link } from "@/components/ui/link";
 
 export function meta(_: Route.MetaArgs) {
   return [
@@ -14,23 +14,17 @@ export function meta(_: Route.MetaArgs) {
   ];
 }
 
-const mockedProjects = [
-  { id: 1, name: "E-commerce API", type: "REST", updatedAt: "2025-05-14" },
-  { id: 2, name: "Customer GraphQL", type: "GraphQL", updatedAt: "2025-05-12" },
-  { id: 3, name: "Kafka to DB Flow", type: "Camel", updatedAt: "2025-05-10" },
-];
+const productInfo = {
+  title: "Cameleon - Your Integration Companion",
+  description:
+    "Cameleon simplifies integration design by providing tools to manage workflows and user profiles effectively. Build, organize, and share your integrations effortlessly.",
+};
 
-const quickStart = [
-  { label: "Start Camel Flow", icon: <CamelStudioIcon className="w-5" /> },
-  { label: "Start REST API", icon: <RestIcon className="w-5" /> },
-  { label: "Import File", icon: <IconFile /> },
-];
-
-const presets = [
-  { name: "Auth Flow", type: "REST" },
-  { name: "Kafka Pipeline", type: "Camel" },
-  { name: "User Service Schema", type: "GraphQL" },
-];
+const userProfile = {
+  name: "John Doe",
+  role: "Integration Architect",
+  projects: 5,
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
@@ -60,51 +54,57 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         </Menu>
       </div>
 
-      {/* Recent Projects */}
+      {/* Product Information */}
       <section>
-        <h2 className="text-xl font-semibold mb-3">Recent Projects</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {mockedProjects.map((project) => (
-            <div
-              key={project.id}
-              className="border rounded-xl p-4 shadow-sm hover:shadow-md transition"
-            >
-              <div className="text-lg font-medium">{project.name}</div>
-              <div className="text-sm text-gray-500">Type: {project.type}</div>
-              <div className="text-xs text-gray-400">
-                Updated: {project.updatedAt}
-              </div>
-            </div>
-          ))}
-        </div>
+        <h2 className="text-xl font-semibold mb-3">{productInfo.title}</h2>
+        <p className="text-lg text-gray-600">{productInfo.description}</p>
       </section>
 
-      {/* Quick Start */}
-      {/*<section>
-        <h2 className="text-xl font-semibold mb-3">Quick Start</h2>
-        <div className="flex flex-wrap gap-4">
-          {quickStart.map((item) => (
-            <Button key={item.label} intent="secondary">
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </Button>
-          ))}
-        </div>
-      </section>*/}
-
-      {/* Presets */}
       <section>
-        <h2 className="text-xl font-semibold mb-3">Your Presets</h2>
-        <div className="flex flex-wrap gap-4">
-          {presets.map((preset, index) => (
-            <div
-              key={index}
-              className="bg-bg border rounded-xl px-4 py-3 shadow hover:shadow-md transition"
+        <h2 className="text-xl font-semibold mb-3">Explore Pages</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            {
+              href: "/app/camel/workflows",
+              title: "Workflows",
+              description: "Organize and manage your workflow diagrams.",
+            },
+            {
+              href: "/app/camel/library/eips",
+              title: "EIPs Library",
+              description: "Explore Enterprise Integration Patterns.",
+            },
+          ].map((route) => (
+            <Card
+              key={route.href}
+              className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card hover:-translate-y-0.5"
             >
-              <div className="font-medium">{preset.name}</div>
-              <div className="text-sm text-gray-500">{preset.type}</div>
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <CardHeader className="relative pb-3">
+                <h3 className="text-lg font-semibold text-[var(--card-title)] mb-2">
+                  {route.title}
+                </h3>
+              </CardHeader>
+              <CardContent className="relative pt-0">
+                <p className="text-sm text-[var(--card-description)] mb-4">
+                  {route.description}
+                </p>
+                <Link href={route.href}>Go to {route.title}</Link>
+              </CardContent>
+            </Card>
           ))}
+          <Card className="group relative overflow-hidden bg-gradient-card border-border/50 rounded-xl p-6 shadow-md opacity-50 cursor-not-allowed">
+            <CardHeader className="relative pb-3">
+              <h3 className="text-lg font-semibold text-[var(--card-title)] mb-2">
+                Open API
+              </h3>
+            </CardHeader>
+            <CardContent className="relative pt-0">
+              <p className="text-sm text-[var(--card-description)] mb-4">
+                Coming soon: Explore and interact with Open APIs.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
     </div>
