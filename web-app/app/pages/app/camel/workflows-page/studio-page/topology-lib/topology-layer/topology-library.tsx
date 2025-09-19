@@ -19,7 +19,6 @@ import {
   fetchEIPsMetadata,
 } from "../../../../data-requests/fetch-metadata";
 import { Card } from "app/components/ui/card";
-import dotProp from "dot-prop-immutable";
 import React from "react";
 
 export function TopologyLibrary() {
@@ -31,7 +30,7 @@ export function TopologyLibrary() {
   console.log("TopologyLibrary node:", node?.absolutePath);
 
   React.useEffect(() => {
-    if (!["add-between", "add-step"].includes(node?.stepType ?? "")) {
+    if (!["add-between", "add-step"].includes(node?.operation ?? "")) {
       const value = node?.stepType?.split("-")[1] ?? "";
       setFilter(value);
     }
@@ -45,15 +44,13 @@ export function TopologyLibrary() {
         [selectedItemKey]: getDefaultConfig(selectedItemKey as string),
       };
 
-      if (node.stepType === "add-step") {
+      if (node.operation === "add-step") {
         setCamelConfig(addStep(camelConfig, node.absolutePath, newStepConfig));
         return setNode();
       }
 
       if (
-        node.stepType === "add-between" ||
-        node.stepType === "add-when" ||
-        node.stepType === "add-doCatch"
+        ["add-between", "add-when", "add-doCatch"].includes(node.operation!)
       ) {
         setCamelConfig(
           addBetween(camelConfig, node.absolutePath, newStepConfig),

@@ -6,6 +6,7 @@ export type Node = RFLow.Node & {
     absolutePath: string;
     iconName: string;
     label: string;
+    operation: StepType;
   };
 };
 export type Edge = RFLow.Edge;
@@ -175,6 +176,7 @@ export enum STEP_TYPE {
   ADD_BETWEEN = "add-between",
   ADD_WHEN = "add-when",
   ADD_DO_CATCH = "add-doCatch",
+  EDIT = "edit",
 }
 
 export type StepType = `${STEP_TYPE}`;

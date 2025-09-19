@@ -1,7 +1,7 @@
 import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
 
-import type { Node, StepType } from "core";
+import { EIPSListNames, type Node, type StepType } from "core";
 import { DefaultHandle } from "./default-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
@@ -11,78 +11,6 @@ import { Tooltip } from "app/components/ui/tooltip";
 import { FallbackImage } from "app/components/fallback-image";
 import { useSearchParams } from "react-router";
 
-const eipListNames = [
-  "aggregate",
-  "bean",
-  "choice",
-  "circuitBreaker",
-  "claimCheck",
-  "convertBodyTo",
-  "convertHeaderTo",
-  "convertVariableTo",
-  "delay",
-  "doTry",
-  "doCatch",
-  "doFinally",
-  "dynamicRouter",
-  "enrich",
-  "filter",
-  "idempotentConsumer",
-  "loadBalancer",
-  "log",
-  "loop",
-  "marshal",
-  "multicast",
-  "pausable",
-  "policy",
-  "pollEnrich",
-  "process",
-  "recipientList",
-  "removeHeader",
-  "removeHeaders",
-  "removeProperties",
-  "removeProperty",
-  "removeVariable",
-  "resequence",
-  "resumable",
-  "routingSlip",
-  "saga",
-  "sample",
-  "script",
-  "setBody",
-  "setExchangePattern",
-  "setHeader",
-  "setHeaders",
-  "setVariable",
-  "setVariables",
-  "sort",
-  "split",
-  "step",
-  "stop",
-  "threads",
-  "throttle",
-  "throwException",
-  "to",
-  "toD",
-  "transacted",
-  "transform",
-  "unmarshal",
-  "validate",
-  "wireTap",
-  "claimCheck",
-  "convertVariableTo",
-  "convertHeaderTo",
-  "convertBodyTo",
-
-  // EIPs complements
-
-  "when",
-  "otherwise",
-  "do-while",
-  "do-finally",
-  "do-catch",
-];
-
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [query] = useSearchParams();
@@ -91,7 +19,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
 
   const iconPath = React.useMemo(() => {
-    if (eipListNames.includes(data.stepType)) {
+    if (EIPSListNames.includes(data.stepType)) {
       return `/camel-icons/eips/${data.stepType}.svg`;
     } else {
       return `/camel-icons/components/${data.stepType}.svg`;
@@ -100,8 +28,8 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
 
   const { setNode } = useLayer();
 
-  function handleClick(stepType: StepType) {
-    return () => setNode({ ...data, ...props, stepType });
+  function handleClick(operation: StepType) {
+    return () => setNode({ ...data, ...props, operation });
   }
 
   function handleMenuOpen() {
@@ -145,7 +73,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
           <Tooltip.Content>{data.label?.toUpperCase()}</Tooltip.Content>
         </Tooltip>
         <Menu.Content placement="bottom">
-          <Menu.Item onAction={handleClick("add-step")} textValue={data.label}>
+          <Menu.Item onAction={handleClick("edit")} textValue={data.label}>
             <IconPencilBox /> Edit
           </Menu.Item>
           <Menu.Item

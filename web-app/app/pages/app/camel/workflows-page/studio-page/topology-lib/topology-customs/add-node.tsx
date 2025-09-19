@@ -16,7 +16,7 @@ export const AddNode = React.memo(({ data }: NodeProps<Node>) => {
   const { setNode } = useLayer();
 
   function handleClick() {
-    setNode(data);
+    setNode({ ...data, operation: "add-step" });
   }
 
   function handleKeyDown(event: React.KeyboardEvent) {
