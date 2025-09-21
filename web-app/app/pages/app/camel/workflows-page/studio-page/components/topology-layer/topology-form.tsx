@@ -7,7 +7,7 @@ import { useTopologyStore } from "core";
 
 export function Form() {
   const { node } = useLayer();
-  const { updateCamelRoute, camelConfig } = useTopologyStore();
+  const { camelConfig } = useTopologyStore();
   const selectedRoute = camelConfig?.data?.find(
     (route: any) => route.route.id === "",
   );
@@ -22,6 +22,7 @@ export function Form() {
   const episJson = useAsyncList({
     async load() {
       const response = await fetch("metadata/eips.json");
+      console.log("response", response);
       const data = await response.json();
       return {
         items: data,
@@ -39,7 +40,7 @@ export function Form() {
     if (node) {
       const updatedJson = dot.set(selectedRoute, node?.absolutePath, formData);
       //fix it here
-      updateCamelRoute(updatedJson, "");
+      // updateCamelRoute(updatedJson, "");
     }
   }
 

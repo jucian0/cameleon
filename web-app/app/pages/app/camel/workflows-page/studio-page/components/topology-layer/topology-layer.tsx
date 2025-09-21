@@ -6,7 +6,7 @@ import { Sheet } from "app/components/ui/sheet";
 import React from "react";
 import { FallbackImage } from "@/components/fallback-image";
 
-export function TopologyLayer() {
+export function TopologyLibraryLayer() {
   const { node, setNode } = useLayer();
   const isOpen = !!node;
   const onUnSelectedNode = () => {
@@ -26,7 +26,6 @@ export function TopologyLayer() {
       <Sheet.Content isDismissable>
         <Sheet.Header>
           <Sheet.Title className="gap-2">
-            {/* <img src={iconPath} className="w-6 h-auto" /> */}
             <FallbackImage
               src={iconPath}
               fallback="/camel-icons/components/generic.svg"
