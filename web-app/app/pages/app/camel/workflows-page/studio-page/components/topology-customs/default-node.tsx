@@ -73,7 +73,7 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
           <Tooltip.Content>{data.label?.toUpperCase()}</Tooltip.Content>
         </Tooltip>
         <Menu.Content placement="bottom">
-          <Menu.Item onAction={handleClick("edit")} textValue={data.label}>
+          <Menu.Item onAction={handleClick("edit-step")} textValue={data.label}>
             <IconPencilBox /> Edit
           </Menu.Item>
           <Menu.Item

@@ -4,7 +4,7 @@ import {
   useTopologyStore,
   type CamelConfig,
 } from "core";
-import { TopologyBuilder } from "./topology-lib/topology-builder/topology-builder";
+import { TopologyBuilder } from "./components/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
   useSearchParams,

@@ -1,5 +1,4 @@
 import { Modal } from "app/components/ui/modal";
-//import { removeStep } from "core";
 import { useTopologyStore } from "core";
 import { Button } from "app/components/ui/button";
 import { deleteStep } from "core/operations";

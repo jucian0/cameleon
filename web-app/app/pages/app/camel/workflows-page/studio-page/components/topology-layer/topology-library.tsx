@@ -58,53 +58,6 @@ export function TopologyLibrary() {
         return setNode();
       }
 
-      // const selectedRoute = camelConfig.data.find(
-      //   (route) => route.route?.id === node.routeId,
-      // );
-
-      // if (!selectedRoute) {
-      //   const route = addNewRoute(newStepConfig);
-      //   const nextCamelConfig = dotProp.set(
-      //     camelConfig,
-      //     route.absolutePath,
-      //     route,
-      //   );
-      //   setCamelConfig(nextCamelConfig);
-      //   // updateCamelRoute(route);
-      //   // setCamelRouteId(route.route.id);
-      //   setNode();
-      //   return;
-      // }
-
-      // if (node.operation === "add-step") {
-      //   const updatedRoute = addStepAfter(
-      //     selectedRoute,
-      //     node.absolutePath,
-      //     newStepConfig,
-      //   );
-      //   const nextCamelConfig = dotProp.set(
-      //     camelConfig,
-      //     `data.${camelConfig.data.indexOf(selectedRoute)}`,
-      //     updatedRoute,
-      //   );
-      //   setCamelConfig(nextCamelConfig);
-      //   // updateCamelRoute(updatedRoute);
-      // }
-
-      // if (node.operation === "add-step-between") {
-      //   const updatedRoute = addStepBetween(
-      //     selectedRoute,
-      //     node.absolutePath,
-      //     newStepConfig,
-      //   );
-      //   const nextCamelConfig = dotProp.set(
-      //     camelConfig,
-      //     `data.${camelConfig.data.indexOf(selectedRoute)}`,
-      //     updatedRoute,
-      //   );
-      //   setCamelConfig(nextCamelConfig);
-      //   // updateCamelRoute(updatedRoute);
-      // }
       setNode();
     } catch (error) {
       console.error("Error adding step:", error);

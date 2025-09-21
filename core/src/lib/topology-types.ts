@@ -176,7 +176,7 @@ export enum STEP_TYPE {
   ADD_BETWEEN = "add-between",
   ADD_WHEN = "add-when",
   ADD_DO_CATCH = "add-doCatch",
-  EDIT = "edit",
+  EDIT = "edit-step",
 }
 
 export type StepType = `${STEP_TYPE}`;

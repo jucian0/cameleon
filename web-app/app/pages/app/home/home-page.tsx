@@ -89,7 +89,9 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <p className="text-sm text-[var(--card-description)] mb-4">
                   {route.description}
                 </p>
-                <Link href={route.href}>Go to {route.title}</Link>
+                <Link className="hover:text-primary" href={route.href}>
+                  Go to {route.title}
+                </Link>
               </CardContent>
             </Card>
           ))}

@@ -38,7 +38,6 @@ import {
 
 import { generateUniqueId } from "./utils";
 import { createEdge, createNode } from "./creation";
-import { ensurePlaceholderNext } from "./add-placeholders";
 import { type ParsedTopologyModel, parseSteps } from "./parsers/steps";
 
 // ==================== Main Export Function ====================

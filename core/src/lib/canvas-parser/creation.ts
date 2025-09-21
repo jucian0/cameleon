@@ -21,6 +21,7 @@ export function createNode(
         .replace(/([A-Z])/g, " $1")
         .trim(),
       isPlaceholder: stepType.includes("add"),
+      operation: stepType.includes("add") ? stepType : "edit-step",
     },
     position: { x: 0, y: 0 },
     type: stepType.includes("add") ? stepType : "component",
