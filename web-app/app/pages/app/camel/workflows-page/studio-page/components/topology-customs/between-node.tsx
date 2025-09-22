@@ -2,7 +2,7 @@ import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
 import type { Node } from "core";
 import { DefaultHandle } from "./default-handle";
-import { useLayer } from "../topology-layer/topology-layer";
+import { useLayer } from "../../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 import { Tooltip } from "app/components/ui/tooltip";
 import { Pressable } from "react-aria-components";

@@ -24,6 +24,15 @@ export default [
           {
             id: "workflow-edit",
           },
+          // [
+          //   // route(
+          //   //   "edit",
+          //   //   "pages/app/camel/workflows-page/studio-page/page.tsx",
+          //   // ),
+          //   // route("replace", ""),
+          //   // route("add-next", ""),
+          //   // route("add-between", ""),
+          // ],
         ),
         route("workflows", "pages/app/camel/workflows-page/page.tsx", [
           route(

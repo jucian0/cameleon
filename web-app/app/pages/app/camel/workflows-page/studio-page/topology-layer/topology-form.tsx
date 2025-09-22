@@ -3,7 +3,7 @@ import { useAsyncList } from "react-stately";
 import React from "react";
 import dot from "dot-prop-immutable";
 import { useLayer } from "./topology-layer";
-import { useTopologyStore } from "core";
+import { EIPSListNames, useTopologyStore } from "core";
 
 export function Form() {
   const { node } = useLayer();
@@ -12,17 +12,20 @@ export function Form() {
     (route: any) => route.route.id === "",
   );
 
-  // fix it here
-  // getCurrentCamelRoute();
+  const kind = EIPSListNames.includes(node?.stepType!) ? "eip" : "component";
 
   const formData = React.useMemo(() => {
     return dot.get(selectedRoute, node?.absolutePath ?? "") ?? {};
   }, [selectedRoute, node?.absolutePath]);
 
-  const episJson = useAsyncList({
+  const nodeData = useAsyncList({
     async load() {
-      const response = await fetch("metadata/eips.json");
-      console.log("response", response);
+      let response: any = [];
+      if (kind === "eip") {
+        response = await fetch("metadata/eips.json");
+      } else {
+        response = await fetch("metadata/components.json");
+      }
       const data = await response.json();
       return {
         items: data,
@@ -32,9 +35,9 @@ export function Form() {
 
   const formSchema = React.useMemo(() => {
     return (
-      episJson?.items?.find((item: any) => item.name === node?.stepType) ?? {}
+      nodeData?.items?.find((item: any) => item.name === node?.stepType) ?? {}
     );
-  }, [episJson.items, node?.stepType]);
+  }, [nodeData.items, node?.stepType]);
 
   function handleSubmit(formData: any) {
     if (node) {
@@ -52,3 +55,9 @@ export function Form() {
     />
   );
 }
+
+// going to work with routes
+// /edit route for editting node details
+// /add route for adding new nodes
+// /replace for replacing nodes
+// /add-between for adding nodes between existing nodes

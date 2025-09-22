@@ -4,7 +4,7 @@ import { Position, type NodeProps } from "@xyflow/react";
 import { EIPSListNames, type Node, type StepType } from "core";
 import { DefaultHandle } from "./default-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
-import { useLayer } from "../topology-layer/topology-layer";
+import { useLayer } from "../../topology-layer/topology-layer";
 import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
 import { Menu } from "app/components/ui/menu";
 import { Tooltip } from "app/components/ui/tooltip";
