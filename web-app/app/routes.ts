@@ -15,7 +15,6 @@
 //     layout("pages/app/layout.tsx", [
 //       index("pages/app/home/home-page.tsx"),
 //       ...prefix("camel", [
-//         route("studio", "pages/app/camel/workflows-page/studio-page/page.tsx", {
 //           id: "workflows-create",
 //         }),
 //         route(

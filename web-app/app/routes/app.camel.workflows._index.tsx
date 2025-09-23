@@ -12,7 +12,7 @@ import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import type { Route } from "./+types/app.camel.workflows._index";
 import { Link } from "app/components/ui/link";
-import { CamelCard } from "@/camel/workflows-page/components/card";
+import { CamelCard } from "@/camel/workflows-components/card";
 
 const metaData = {
   title: "Workflows | Chameleon",

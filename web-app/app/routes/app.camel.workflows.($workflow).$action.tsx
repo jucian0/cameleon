@@ -7,12 +7,12 @@ import { withModal } from "app/components/utils/with-modal";
 import { Save } from "lucide-react";
 import {
   redirect,
-  useLocation,
   useNavigation,
+  useParams,
   type LoaderFunctionArgs,
   type MetaArgs,
 } from "react-router";
-import type { Route } from "./+types/page";
+import type { Route } from "./+types/app.camel.workflows.($workflow).$action";
 import { ProgressCircle } from "app/components/ui/progress-circle";
 import { INITIAL_STATE_YAML } from "core";
 import { encode } from "js-base64";
@@ -30,7 +30,8 @@ export const handle = {
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
-  const workflowId = params.workflowsId;
+  const workflowId = params.workflow;
+  const action = params.action;
   if (workflowId) {
     const workflow = await supabase
       .from("workflows")
@@ -39,7 +40,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (workflow.error) {
       throw new Response(workflow.error.message, { status: 500 });
     }
-    const isClone = request.url.includes("clone");
+    const isClone = action === "clone";
     if (isClone) workflow.data[0].name = `Clone of ${workflow.data?.[0].name}`;
     return { workflow: workflow.data?.[0] };
   }
@@ -47,11 +48,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return { workflow: {} };
 }
 
-export async function action({ request }: LoaderFunctionArgs) {
+export async function action({ request, params }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
+  const action = params.action;
   const formData = await request.formData();
   const user = await supabase.auth.getUser();
-  const isEdit = request.url.includes("edit");
+  const isEdit = action === "edit";
   if (!isEdit) formData.delete("id");
 
   formData.set("owner", user.data.user?.id || "");
@@ -77,12 +79,8 @@ export default withModal<Route.ComponentProps>(function ModalPage({
   actionData,
 }) {
   const navigation = useNavigation();
-  const location = useLocation();
-  const pageAction = location.pathname.includes("edit")
-    ? "Edit"
-    : location.pathname.includes("clone")
-      ? "Clone"
-      : "Create";
+  const { action } = useParams<"workflow" | "action">();
+  const pageAction = action?.toUpperCase() || "CREATE";
 
   function handleClose() {
     closeModal("/app/camel/workflows");

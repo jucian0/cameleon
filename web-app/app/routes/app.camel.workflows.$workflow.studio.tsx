@@ -13,7 +13,7 @@ import {
 import { decode, encode } from "js-base64";
 import { yamlToJson } from "core";
 import React from "react";
-import { TopologyBuilder } from "@/camel/workflows-page/studio-page/components/topology-builder/topology-builder";
+import { TopologyBuilder } from "@/camel/studio-components/topology-builder/topology-builder";
 import type { Route } from "./+types/app.camel.workflows.$workflow.studio";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
