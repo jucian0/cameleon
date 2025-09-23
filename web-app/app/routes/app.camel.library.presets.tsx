@@ -11,7 +11,7 @@ import { Card } from "app/components/ui/card";
 import { type LoaderFunctionArgs } from "react-router";
 import type { EPIDefinition } from "core";
 import axios from "axios";
-import type { Route } from "./+types/presets-page";
+import type { Route } from "./+types/app.camel.library.presets";
 
 export function meta() {
   return [

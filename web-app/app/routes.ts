@@ -79,3 +79,5 @@ import { flatRoutes } from "@react-router/fs-routes";
 export default flatRoutes({
   rootDirectory: "routes",
 }) satisfies RouteConfig;
+
+//http://localhost:3000/app/camel/workflows/ab3e8f2b-206f-4707-b8ba-730d43597a8f/studio

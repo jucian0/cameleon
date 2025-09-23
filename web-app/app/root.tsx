@@ -11,15 +11,16 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
 } from "react-router";
-import { themeSessionResolver } from "./pages/app/set-theme/server";
-import {
-  PreventFlashOnWrongTheme,
-  ThemeProvider,
-  useTheme,
-  type Theme,
-} from "./pages/app/set-theme/provider";
+
 import { createServerSupabase } from "./modules/supabase/supabase-server";
 import { RouterProvider } from "react-aria-components";
+import { themeSessionResolver } from "./routes/app.set-theme";
+import {
+  PreventFlashOnWrongTheme,
+  Theme,
+  ThemeProvider,
+  useTheme,
+} from "remix-themes";
 
 export type Loader = typeof loader;
 export async function loader({ request }: LoaderFunctionArgs) {

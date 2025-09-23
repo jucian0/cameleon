@@ -10,9 +10,9 @@ import { Grid2X2, List, Plus } from "lucide-react";
 import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
-import type { Route } from "./+types/page";
+import type { Route } from "./+types/app.camel.workflows._index";
 import { Link } from "app/components/ui/link";
-import { CamelCard } from "./components/card";
+import { CamelCard } from "@/camel/workflows-page/components/card";
 
 const metaData = {
   title: "Workflows | Chameleon",

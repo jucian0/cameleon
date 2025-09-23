@@ -4,17 +4,17 @@ import {
   useTopologyStore,
   type CamelConfig,
 } from "core";
-import { TopologyBuilder } from "./components/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
   useSearchParams,
   type LoaderFunctionArgs,
   type MetaArgs,
 } from "react-router";
-import type { Route } from "../studio-page/+types/page";
 import { decode, encode } from "js-base64";
 import { yamlToJson } from "core";
 import React from "react";
+import { TopologyBuilder } from "@/camel/workflows-page/studio-page/components/topology-builder/topology-builder";
+import type { Route } from "./+types/app.camel.workflows.$workflow.studio";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -29,7 +29,7 @@ export const handle = {
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
-  const workflowsId = params.workflowsId;
+  const workflowsId = params.workflow;
   const { data, error } = await supabase
     .from("workflows")
     .select("*")

@@ -10,10 +10,10 @@ import {
   IconLogout,
   IconSettings,
 } from "@intentui/icons";
-import { ThemeMenu } from "@/pages/app/set-theme/menu";
 import { useMatches, useRouteLoaderData } from "react-router";
 import type { Loader } from "@/root";
 import { Link } from "react-aria-components";
+import { ThemeMenu } from "./theme-menu";
 
 function BreadcrumbsNav() {
   const matches = useMatches();

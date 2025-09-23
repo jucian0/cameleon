@@ -13,7 +13,6 @@ export function ThemeMenu() {
 
   const switchTheme = (theme: Selection) => {
     const nextThemeValue = (theme as Set<string>).values().next().value;
-    console.log("nextTheme", nextThemeValue);
     if (nextThemeValue === "system") {
       setTheme(null);
     } else {

@@ -11,7 +11,7 @@ import { FallbackImage } from "app/components/fallback-image";
 import type { LoaderFunctionArgs } from "react-router";
 import type { ComponentDefinition } from "core";
 import axios from "axios";
-import type { Route } from "./+types/components-page";
+import type { Route } from "./+types/app.camel.library.components";
 
 export function meta() {
   return [
@@ -69,7 +69,7 @@ export default function CamelComponentsTab({
               <Card.Header className="flex gap-2 p-2">
                 <FallbackImage
                   src={`/camel-icons/components/${item.component.name}.svg`}
-                  alt={item.component.name}
+                  alt={item.component.name ?? "component icon"}
                   className="h-8 w-8 rounded"
                   fallback="/camel-icons/components/generic.svg"
                 />

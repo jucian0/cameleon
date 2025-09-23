@@ -9,7 +9,7 @@ import {
 import { Card } from "app/components/ui/card";
 import axios from "axios";
 import type { EPIDefinition } from "core";
-import type { Route } from "./+types/eips-page";
+import type { Route } from "./+types/app.camel.library.eips";
 import type { LoaderFunctionArgs } from "react-router";
 
 export function meta() {

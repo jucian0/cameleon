@@ -31,11 +31,11 @@ import { StudioIcon } from "./icons/studio";
 import { CamelStudioIcon } from "./icons/camel-studio";
 import { ProcessorIcon } from "./icons/processor";
 import { SwaggerIcon } from "./icons/swagger";
-import { ThemeMenu } from "@/pages/app/set-theme/menu";
 import { useLocation, useNavigate, useRouteLoaderData } from "react-router";
 import { useState } from "react";
 import { createClient } from "@/modules/supabase/supabase-client";
 import type { Loader } from "@/root";
+import { ThemeMenu } from "./theme-menu";
 
 export default function AppSidebar(
   props: Readonly<React.ComponentProps<typeof Sidebar>>,
