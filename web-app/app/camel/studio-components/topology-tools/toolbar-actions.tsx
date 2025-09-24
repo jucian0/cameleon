@@ -2,7 +2,7 @@ import { useTopologyStore } from "core";
 import { Button, buttonStyles } from "app/components/ui/button";
 import { useLocation, useNavigation, useSubmit } from "react-router";
 import { Loader } from "app/components/ui/loader";
-import { Link } from "@/components/ui/link";
+import { Link } from "app/components/ui/link";
 import { Code2 } from "lucide-react";
 
 export const TopologyToolbarActions = () => {
@@ -25,8 +25,8 @@ export const TopologyToolbarActions = () => {
         {navigation.state === "submitting" && <Loader />}
         Save
       </Button>
-      <Link href={`${location.pathname}/code`} className={buttonStyles({ size: "sm", intent: "secondary" })}>
-        <Code2 />
+      <Link href={`${location.pathname}/code${location.search}`} className={buttonStyles({ size: "lg", intent: "secondary" })}>
+        <Code2 size={16} />
       </Link>
     </div>
   );

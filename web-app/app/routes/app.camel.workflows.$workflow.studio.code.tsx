@@ -1,10 +1,10 @@
-import MonacoEditor, { type Monaco, Editor } from "@monaco-editor/react";
+import MonacoEditor from "@monaco-editor/react";
 import { jsonToYaml, useTopologyStore, yamlToJson } from "core";
 import { Sheet } from "app/components/ui/sheet";
 import { useTheme } from "remix-themes";
 import React from "react";
 import debounce from "debounce";
-import { withModal } from "@/components/utils/with-modal";
+import { withModal } from "app/components/utils/with-modal";
 import type { Route } from "./+types/app.camel.workflows.$workflow.studio.code";
 import { useLocation } from "react-router";
 
@@ -30,7 +30,7 @@ export default withModal<Route.ComponentProps>(({
   };
 
   function handleClose() {
-    closeModal(location.pathname.replace('/code', ''));
+    closeModal(`${location.pathname.replace('/code', '')}${location.search}`);
   }
 
   return (

@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { EIPSListNames, type Node } from "core";
 import { Sheet } from "app/components/ui/sheet";
 import React from "react";
-import { FallbackImage } from "@/components/fallback-image";
+import { FallbackImage } from "app/components/fallback-image";
 
 export function TopologyLibraryLayer() {
   const { node, setNode } = useLayer();

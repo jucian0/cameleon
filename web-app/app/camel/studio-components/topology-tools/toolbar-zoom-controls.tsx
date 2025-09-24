@@ -1,31 +1,34 @@
 import { Maximize, Minus, Plus, ArrowRightFromLine } from "lucide-react";
-import type { useReactFlow } from "@xyflow/react";
+import { useReactFlow, useStore, useViewport } from "@xyflow/react";
 import { Button } from "app/components/ui/button";
 import { Slider } from "app/components/ui/slider";
+import { useSearchParams } from "react-router";
 
 export function TopologyZoomControls({
-  zoom,
-  minZoom,
-  maxZoom,
-  zoomIn,
-  zoomOut,
-  zoomTo,
-  fitView,
-  direction,
-  setDirection,
   showZoomPercent = false,
 }: {
-  zoom: number;
-  minZoom: number;
-  maxZoom: number;
-  zoomIn: ReturnType<typeof useReactFlow>["zoomIn"];
-  zoomOut: ReturnType<typeof useReactFlow>["zoomOut"];
-  zoomTo: ReturnType<typeof useReactFlow>["zoomTo"];
-  fitView: ReturnType<typeof useReactFlow>["fitView"];
-  direction: string;
-  setDirection: (d: "LR" | "TB") => void;
   showZoomPercent?: boolean;
 }) {
+
+  const { zoom } = useViewport();
+  const { zoomTo, zoomIn, zoomOut, fitView } = useReactFlow();
+  const [query, setQuery] = useSearchParams();
+
+  const { minZoom, maxZoom } = useStore(
+    (state) => ({
+      minZoom: state.minZoom,
+      maxZoom: state.maxZoom,
+    }),
+    (a, b) => a.minZoom !== b.minZoom || a.maxZoom !== b.maxZoom,
+  );
+
+  function setDirection(direction: "LR" | "TB" | "RL" | "BT") {
+    query.set("direction", direction);
+    setQuery(query);
+  }
+
+  const direction = query.get("direction") || "LR";
+
   return (
     <div className="flex items-center gap-1">
       <Button

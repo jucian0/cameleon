@@ -3,42 +3,21 @@ import { Settings } from "lucide-react";
 
 import {
   Panel,
-  useViewport,
-  useStore,
-  useReactFlow,
   type PanelProps,
 } from "@xyflow/react";
 import { Button } from "app/components/ui/button";
 import { useMediaQuery } from "app/components/utils/use-media-query";
 import { Popover } from "app/components/ui/popover";
-import { TopologyToolbarActions } from "./topology-toolbar-actions";
-import { TopologyRouteSelector } from "./topology-router-selector";
-import { TopologyZoomControls } from "./topology-zoom-controls";
-import { useSearchParams } from "react-router";
+import { TopologyToolbarActions } from "./toolbar-actions";
+import { TopologyRouteSelector } from "./toolbar-router-selector";
+import { TopologyZoomControls } from "./toolbar-zoom-controls";
 
 export const TopologyTools = forwardRef<
   HTMLDivElement,
   Omit<PanelProps, "children">
 >(({ className, ...props }, ref) => {
-  const { zoom } = useViewport();
-  const { zoomTo, zoomIn, zoomOut, fitView } = useReactFlow();
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const [query, setQuery] = useSearchParams();
 
-  const { minZoom, maxZoom } = useStore(
-    (state) => ({
-      minZoom: state.minZoom,
-      maxZoom: state.maxZoom,
-    }),
-    (a, b) => a.minZoom !== b.minZoom || a.maxZoom !== b.maxZoom,
-  );
-
-  function setDirection(direction: "LR" | "TB" | "RL" | "BT") {
-    query.set("direction", direction);
-    setQuery(query);
-  }
-
-  const direction = query.get("direction") || "LR";
 
   return (
     <Panel
@@ -52,33 +31,11 @@ export const TopologyTools = forwardRef<
             <Settings className="h-4 w-4" />
           </Button>
           <Popover.Content className="p-2 w-auto">
-            <TopologyZoomControls
-              zoom={zoom}
-              minZoom={minZoom}
-              maxZoom={maxZoom}
-              zoomIn={zoomIn}
-              zoomOut={zoomOut}
-              zoomTo={zoomTo}
-              fitView={fitView}
-              direction={direction}
-              setDirection={setDirection}
-              showZoomPercent={false}
-            />
+            <TopologyZoomControls showZoomPercent={false} />
           </Popover.Content>
         </Popover>
       ) : (
-        <TopologyZoomControls
-          zoom={zoom}
-          minZoom={minZoom}
-          maxZoom={maxZoom}
-          zoomIn={zoomIn}
-          zoomOut={zoomOut}
-          zoomTo={zoomTo}
-          fitView={fitView}
-          direction={direction}
-          setDirection={setDirection}
-          showZoomPercent
-        />
+        <TopologyZoomControls showZoomPercent />
       )}
 
       <TopologyRouteSelector />

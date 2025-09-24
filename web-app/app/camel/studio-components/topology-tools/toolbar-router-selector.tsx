@@ -1,7 +1,7 @@
 import { useReactFlow } from "@xyflow/react";
 import { buttonStyles } from "app/components/ui/button";
 import { useTopologyStore } from "core";
-import { Select } from "@/components/ui/select";
+import { Select } from "app/components/ui/select";
 import type { Key } from "react-stately";
 import { useSearchParams } from "react-router";
 

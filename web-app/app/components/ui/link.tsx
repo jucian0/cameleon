@@ -4,10 +4,12 @@ import {
 } from "react-aria-components";
 import { twJoin } from "tailwind-merge";
 import { composeTailwindRenderProps } from "app/components/lib/primitive";
+import type { LinksProps as PrimitiveProps } from "react-router";
 
-interface LinkProps extends LinkPrimitiveProps {
+type LinkProps = LinkPrimitiveProps & {
   intent?: "primary" | "secondary" | "unstyled";
   ref?: React.RefObject<HTMLAnchorElement>;
+  href: LinkPrimitiveProps["href"] | PrimitiveProps;
 }
 
 const Link = ({ className, ref, intent = "unstyled", ...props }: LinkProps) => {

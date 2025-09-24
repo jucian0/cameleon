@@ -4,8 +4,8 @@ import { IconPlus } from "@intentui/icons";
 import { Menu } from "app/components/ui/menu";
 import type { LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "app/modules/supabase/supabase-server";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Link } from "@/components/ui/link";
+import { Card, CardContent, CardHeader } from "app/components/ui/card";
+import { Link } from "app/components/ui/link";
 
 export function meta(_: Route.MetaArgs) {
   return [
