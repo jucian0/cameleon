@@ -1,25 +1,25 @@
-import MonacoEditor from "@monaco-editor/react";
-import { jsonToYaml, useTopologyStore } from "core";
-import { yamlToJson } from "core";
+import MonacoEditor, { type Monaco, Editor } from "@monaco-editor/react";
+import { jsonToYaml, useTopologyStore, yamlToJson } from "core";
 import { Sheet } from "app/components/ui/sheet";
-import { Button } from "app/components/ui/button";
-import { Code2Icon } from "lucide-react";
 import { useTheme } from "remix-themes";
 import React from "react";
 import debounce from "debounce";
+import { withModal } from "@/components/utils/with-modal";
+import type { Route } from "./+types/app.camel.workflows.$workflow.studio.code";
+import { useLocation } from "react-router";
 
-export function TopologyEditor() {
+export default withModal<Route.ComponentProps>(({
+  isOpen,
+  closeModal,
+}) => {
   const { setCamelConfig, camelConfig } = useTopologyStore();
   const theme = useTheme();
+  const location = useLocation()
   const [debouncedSetCamelConfig] = React.useState(() =>
     debounce(setCamelConfig, 500),
   );
 
-  const editorDidMount = (editor: any, monaco: any) => {
-    editor.focus();
-  };
-
-  const onChange = (newValue: string | undefined, e: any) => {
+  const onChange = (newValue: string | undefined) => {
     if (newValue !== undefined) {
       debouncedSetCamelConfig(yamlToJson(newValue));
     }
@@ -29,12 +29,13 @@ export function TopologyEditor() {
     selectOnLineNumbers: true,
   };
 
+  function handleClose() {
+    closeModal(location.pathname.replace('/code', ''));
+  }
+
   return (
-    <Sheet>
-      <Button intent="secondary" size="lg">
-        <Code2Icon className="w-4 h-4" />
-      </Button>
-      <Sheet.Content className="">
+    <Sheet isOpen={isOpen} onOpenChange={handleClose}>
+      <Sheet.Content>
         <Sheet.Body className="p-0!">
           <div className="w-full h-full relative rounded-lg py-11">
             <MonacoEditor
@@ -44,11 +45,10 @@ export function TopologyEditor() {
               defaultValue={jsonToYaml(camelConfig)}
               options={options}
               onChange={onChange}
-              onMount={editorDidMount}
             />
           </div>
         </Sheet.Body>
       </Sheet.Content>
     </Sheet>
   );
-}
+});

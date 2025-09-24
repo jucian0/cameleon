@@ -13,8 +13,12 @@ const getLayoutedNodes = (nodes: Node[], edges: Edge[], direction: string) => {
   g.setGraph({ rankdir: direction });
   g.setDefaultEdgeLabel(() => ({}));
 
-  nodes.forEach((node) => g.setNode(node.id, { width: 150, height: 50 }));
-  edges.forEach((edge) => g.setEdge(edge.source, edge.target));
+  for (const node of nodes) {
+    g.setNode(node.id, { width: 150, height: 50 });
+  }
+  for (const edge of edges) {
+    g.setEdge(edge.source, edge.target);
+  }
 
   dagre.layout(g);
 
@@ -29,8 +33,12 @@ const getLayoutedEdges = (nodes: Node[], edges: Edge[], direction: string) => {
   g.setGraph({ rankdir: direction });
   g.setDefaultEdgeLabel(() => ({}));
 
-  nodes.forEach((node) => g.setNode(node.id, { width: 150, height: 50 }));
-  edges.forEach((edge) => g.setEdge(edge.source, edge.target));
+  for (const node of nodes) {
+    g.setNode(node.id, { width: 150, height: 50 });
+  }
+  for (const edge of edges) {
+    g.setEdge(edge.source, edge.target);
+  }
 
   dagre.layout(g);
 

@@ -1,20 +1,22 @@
 import { useTopologyStore } from "core";
-import { Button } from "app/components/ui/button";
-import { TopologyEditor } from "../topology-editor/code-editor";
-import { useNavigation, useSubmit } from "react-router";
+import { Button, buttonStyles } from "app/components/ui/button";
+import { useLocation, useNavigation, useSubmit } from "react-router";
 import { Loader } from "app/components/ui/loader";
+import { Link } from "@/components/ui/link";
+import { Code2 } from "lucide-react";
 
 export const TopologyToolbarActions = () => {
   const { getCamelConfigYaml } = useTopologyStore();
   const submit = useSubmit();
   const navigation = useNavigation();
+  const location = useLocation();
 
   function handleSave() {
     submit({ content: getCamelConfigYaml() }, { method: "post" });
   }
 
   return (
-    <div className={`flex items-center gap-1`}>
+    <div className='flex items-center gap-1'>
       <Button
         size="sm"
         onPress={handleSave}
@@ -23,7 +25,9 @@ export const TopologyToolbarActions = () => {
         {navigation.state === "submitting" && <Loader />}
         Save
       </Button>
-      <TopologyEditor />
+      <Link href={`${location.pathname}/code`} className={buttonStyles({ size: "sm", intent: "secondary" })}>
+        <Code2 />
+      </Link>
     </div>
   );
 };

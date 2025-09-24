@@ -9,11 +9,10 @@ import {
 } from "react-aria-components";
 import { addBetween, addStep } from "core/operations";
 import { useLayer } from "./topology-layer";
-import { getDefaultConfig } from "core";
+import { getDefaultConfig, useTopologyStore } from "core";
 import { Tab, TabList, TabPanel, Tabs } from "app/components/ui/tabs";
 import { tryCatch } from "@/utils/try-catch";
 import { SearchField } from "app/components/ui/search-field";
-import { useTopologyStore } from "core";
 import {
   fetchComponentsMetadata,
   fetchEIPsMetadata,
@@ -27,16 +26,14 @@ export function TopologyLibrary() {
   const { contains } = useFilter({ sensitivity: "base" });
   const [filter, setFilter] = React.useState("");
 
-  console.log("TopologyLibrary node:", node?.absolutePath);
-
   React.useEffect(() => {
     if (!["add-between", "add-step"].includes(node?.operation ?? "")) {
       const value = node?.stepType?.split("-")[1] ?? "";
       setFilter(value);
     }
-  }, []);
+  }, [node?.operation, node?.stepType]);
 
-  function handleSelectionChange(selectedItem: Set<Key>) {
+  function handleSelectionChange(selectedItem: Selection) {
     const [selectedItemKey] = Array.from(selectedItem);
     try {
       if (!selectedItem || !node?.absolutePath) return;
@@ -50,7 +47,7 @@ export function TopologyLibrary() {
       }
 
       if (
-        ["add-between", "add-when", "add-doCatch"].includes(node.operation!)
+        ["add-between", "add-when", "add-doCatch"].includes(node.operation)
       ) {
         setCamelConfig(
           addBetween(camelConfig, node.absolutePath, newStepConfig),
@@ -96,9 +93,7 @@ export function TopologyLibrary() {
 
 function CamelComponentsTab({
   onSelectionChange,
-}: {
-  onSelectionChange: (node: any) => void;
-}) {
+}: Readonly<{ onSelectionChange: (selectedKeys: Selection) => void }>) {
   const components = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchComponentsMetadata());
@@ -157,7 +152,7 @@ function CamelComponentsTab({
 
 function CamelEIPsTab({
   onSelectionChange,
-}: Readonly<{ onSelectionChange: (node: any) => void }>) {
+}: Readonly<{ onSelectionChange: (selectedKeys: Selection) => void }>) {
   const eips = useAsyncList({
     async load() {
       const { data, error } = await tryCatch(fetchEIPsMetadata());

@@ -1,5 +1,5 @@
 import { Maximize, Minus, Plus, ArrowRightFromLine } from "lucide-react";
-import { useReactFlow } from "@xyflow/react";
+import type { useReactFlow } from "@xyflow/react";
 import { Button } from "app/components/ui/button";
 import { Slider } from "app/components/ui/slider";
 

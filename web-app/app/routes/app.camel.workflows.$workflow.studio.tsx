@@ -3,9 +3,12 @@ import {
   jsonToCanvasBuilder,
   useTopologyStore,
   type CamelConfig,
+  type Edge,
+  type Node,
 } from "core";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
+  Outlet,
   useSearchParams,
   type LoaderFunctionArgs,
   type MetaArgs,
@@ -70,30 +73,36 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
       return route
         ? jsonToCanvasBuilder(route, routeIndex)
         : { nodes: [], edges: [] };
-    } else {
-      const parsedCanvas = { nodes: [], edges: [] } as any;
-      for (const route of camelConfig?.data ?? INITIAL_STATE.data) {
-        if (route.route) {
-          const routeIndex = camelConfig?.data?.findIndex(
-            (r) => r.route?.id === route.route?.id,
-          );
-          const { nodes, edges } = jsonToCanvasBuilder(route, routeIndex);
-          parsedCanvas.nodes.push(...nodes);
-          parsedCanvas.edges.push(...edges);
-        }
-      }
-      return parsedCanvas;
     }
+    const parsedCanvas = { nodes: [] as Node[], edges: [] as Edge[] };
+    for (const route of camelConfig?.data ?? INITIAL_STATE.data) {
+      if (route.route) {
+        const routeIndex = camelConfig?.data?.findIndex(
+          (r) => r.route?.id === route.route?.id,
+        );
+        const { nodes, edges } = jsonToCanvasBuilder(route, routeIndex);
+        parsedCanvas.nodes.push(...nodes);
+        parsedCanvas.edges.push(...edges);
+      }
+    }
+    return parsedCanvas;
   }, [camelConfig, routeId]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   React.useEffect(() => {
     setCamelConfig(content as CamelConfig);
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
   }, [name]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   React.useEffect(() => {
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
   }, [routeId, camelConfig]);
 
-  return <TopologyBuilder />;
+  return (
+    <>
+      <TopologyBuilder />
+      <Outlet />
+    </>
+  );
 }
