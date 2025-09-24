@@ -75,7 +75,7 @@ export default function TopologyLibrary() {
               <PresetIcon /> Presets
             </Tab>
           </TabList>
-          <TabPanel id="eips"></TabPanel>
+          <TabPanel id="eips" />
           <TabPanel id={currentCamelRoute}>
             <Outlet />
           </TabPanel>
