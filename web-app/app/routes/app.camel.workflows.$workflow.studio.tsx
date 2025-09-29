@@ -2,6 +2,7 @@
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
   Outlet,
+  useOutletContext,
   type LoaderFunctionArgs,
 } from "react-router";
 import { encode } from "js-base64";
@@ -25,11 +26,11 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function CamelStudio({ loaderData }: Route.ComponentProps) {
-
+  const { visibility } = useOutletContext<{ visibility: "public" | "private" }>()
   return (
     <>
       <TopologyBuilder />
-      <Outlet />
+      <Outlet context={{ visibility }} />
     </>
   );
 }

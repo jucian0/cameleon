@@ -6,7 +6,7 @@ import { edgeTypes, nodeTypes } from "../topology-customs";
 import { TopologyTools } from "../topology-tools/topology-toolbar";
 import type { Edge, Node } from "core";
 import { useTopologyStore } from "core";
-import { useOutletContext, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 const getLayoutedNodes = (nodes: Node[], edges: Edge[], direction: string) => {
   const g = new dagre.graphlib.Graph();

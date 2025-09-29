@@ -14,12 +14,11 @@ export function TopologyLibraryLayer() {
   };
 
   const iconPath = React.useMemo(() => {
-    if (EIPSListNames.includes(node?.stepType!)) {
-      return `/camel-icons/eips/${node?.stepType}.svg`;
-    } else {
-      return `/camel-icons/components/${node?.stepType}.svg`;
+    if (node?.stepType && EIPSListNames.includes(node.stepType)) {
+      return `/camel-icons/eips/${node.stepType}.svg`;
     }
-  }, [node?.iconName]);
+    return `/camel-icons/components/${node?.stepType ?? "generic"}.svg`;
+  }, [node?.stepType]);
 
   return (
     <Sheet isOpen={isOpen} onOpenChange={onUnSelectedNode}>

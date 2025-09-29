@@ -76,7 +76,7 @@ export const CamelCard = ({
       <CardContent className="relative pt-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Badge intent={visibility === "public" ? "success" : "info"} className="text-xs">
+            <Badge intent={visibility === "public" ? "warning" : "info"} className="text-xs">
               {visibility === "public" ? "Public" : "Private"}
             </Badge>
             <span className="text-xs text-muted-foreground">
