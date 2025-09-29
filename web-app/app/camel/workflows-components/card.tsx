@@ -6,23 +6,25 @@ import { Menu } from "app/components/ui/menu";
 import { Link } from "app/components/ui/link";
 import React from "react";
 import { DeleteModal } from "./delete-modal";
+import type { CamelConfig } from "@/modules/supabase/supabase-db";
 
-interface CamelCardProps {
-  id: string;
-  name: string;
-  description: string;
-  lastModified: string;
-  nodeCount: number;
+type CamelCardProps = {
+  camelConfig: CamelConfig;
 }
 
 export const CamelCard = ({
-  id,
-  name,
-  description,
-  lastModified,
-  nodeCount,
+  camelConfig
 }: CamelCardProps) => {
+  const {
+    id,
+    name,
+    description,
+    visibility,
+    updated_at
+  } = camelConfig;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
+  const isDisabled = visibility === "public";
+  const updatedAt = new Date(updated_at).toLocaleDateString();
 
   return (
     <Card className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card hover:-translate-y-0.5">
@@ -49,7 +51,7 @@ export const CamelCard = ({
               <MoreHorizontal size={16} />
             </Menu.Trigger>
             <Menu.Content className="justify-end">
-              <Menu.Item href={`/app/camel/workflows/${id}/edit`}>
+              <Menu.Item isDisabled={isDisabled} href={`/app/camel/workflows/${id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Details
               </Menu.Item>
@@ -62,7 +64,7 @@ export const CamelCard = ({
                 Share
               </Menu.Item>
               <Menu.Separator />
-              <Menu.Item isDanger onPress={() => setIsDeleteModalOpen(true)}>
+              <Menu.Item isDisabled={isDisabled} isDanger onPress={() => setIsDeleteModalOpen(true)}>
                 <Trash className="h-4 w-4 mr-2" />
                 Delete
               </Menu.Item>
@@ -74,11 +76,11 @@ export const CamelCard = ({
       <CardContent className="relative pt-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Badge intent="secondary" className="text-xs">
-              {nodeCount} nodes
+            <Badge intent={visibility === "public" ? "success" : "info"} className="text-xs">
+              {visibility === "public" ? "Public" : "Private"}
             </Badge>
             <span className="text-xs text-muted-foreground">
-              {lastModified}
+              {`Updated on ${updatedAt}`}
             </span>
           </div>
 

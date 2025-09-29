@@ -8,9 +8,9 @@ export function DeleteModal({
   isOpen,
   onClose,
 }: {
-  id: string;
-  isOpen: boolean;
-  onClose: () => void;
+  readonly id: string;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }) {
   const deleteSubmit = useSubmit();
   const navigation = useNavigation();

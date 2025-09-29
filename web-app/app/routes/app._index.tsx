@@ -35,7 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 }
 
-export default function HomePage({ loaderData }: Route.ComponentProps) {
+export default function HomePage({ loaderData }: Readonly<Route.ComponentProps>) {
   return (
     <div className="p-8 mx-auto space-y-10">
       {/* Header */}

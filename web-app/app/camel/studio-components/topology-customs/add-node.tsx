@@ -6,12 +6,14 @@ import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
 import { Tooltip } from "app/components/ui/tooltip";
 import { Pressable } from "react-aria-components";
-import { useSearchParams } from "react-router";
+import { useOutletContext, useSearchParams } from "react-router";
 
 export const AddNode = React.memo(({ data }: NodeProps<Node>) => {
   const [query] = useSearchParams();
   const direction = query.get("direction") || "LR";
   const targetPosition = direction === "LR" ? Position.Left : Position.Top;
+  const { visibility } = useOutletContext<{ visibility: "public" | "private" }>();
+  const isDisabled = visibility === "public";
 
   const { setNode } = useLayer();
 
@@ -27,15 +29,14 @@ export const AddNode = React.memo(({ data }: NodeProps<Node>) => {
 
   return (
     <Tooltip>
-      <Pressable>
+      <Pressable isDisabled={isDisabled}>
         <div className="w-10 h-10 flex items-center justify-center">
-          <div
+          <button
+            disabled={isDisabled}
             aria-label="Add node"
             onClick={handleClick}
-            onKeyDown={handleKeyDown}
-            role="button"
-            tabIndex={0}
-            className="relative cursor-pointer flex justify-center border-dashed border-primary border rounded bg-transparent transition-all duration-200 ease-in-out w-6 h-6 p-1 px-2 gap-2"
+            className="relative cursor-pointer flex justify-center border-dashed border-primary border rounded bg-transparent transition-all duration-200 ease-in-out w-6 h-6 p-1 px-2 gap-2 disabled:cursor-not-allowed"
+            type="button"
           >
             {data.iconName && (
               <div className="flex items-center justify-center">
@@ -43,7 +44,7 @@ export const AddNode = React.memo(({ data }: NodeProps<Node>) => {
               </div>
             )}
             <DefaultHandle type="target" position={targetPosition} />
-          </div>
+          </button>
         </div>
       </Pressable>
       <Tooltip.Content>{data.label.toUpperCase()}</Tooltip.Content>

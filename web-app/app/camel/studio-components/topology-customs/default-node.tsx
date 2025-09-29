@@ -9,7 +9,7 @@ import { IconPencilBox, IconRepeat, IconTrash } from "@intentui/icons";
 import { Menu } from "app/components/ui/menu";
 import { Tooltip } from "app/components/ui/tooltip";
 import { FallbackImage } from "app/components/fallback-image";
-import { useSearchParams } from "react-router";
+import { useOutletContext, useSearchParams } from "react-router";
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -17,14 +17,15 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const direction = query.get("direction") || "LR";
   const targetPosition = direction === "LR" ? Position.Left : Position.Top;
   const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
+  const { visibility } = useOutletContext<{ visibility: "public" | "private" }>();
+  const isDisabled = visibility === "public";
 
   const iconPath = React.useMemo(() => {
     if (EIPSListNames.includes(data.stepType)) {
       return `/camel-icons/eips/${data.stepType}.svg`;
-    } else {
-      return `/camel-icons/components/${data.stepType}.svg`;
     }
-  }, [data.iconName]);
+    return `/camel-icons/components/${data.stepType}.svg`;
+  }, [data.stepType]);
 
   const { setNode } = useLayer();
 
@@ -49,9 +50,10 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
       <Menu isOpen={isOpen} onOpenChange={setIsOpen}>
         <Tooltip>
           <Menu.Trigger
+            isDisabled={isDisabled}
             data-slot="menu-trigger"
             onPress={handleMenuOpen}
-            className={`cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center`}
+            className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center disabled:cursor-not-allowed"
           >
             {data.iconName && (
               <FallbackImage

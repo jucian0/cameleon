@@ -8,6 +8,10 @@ export type Database = {
           owner: string;
           tags: string[] | null;
           environment: string;
+          created_at: string;
+          updated_at: string;
+          description: string | null;
+          visibility: "public" | "private";
         };
         Insert: {
           id?: string;

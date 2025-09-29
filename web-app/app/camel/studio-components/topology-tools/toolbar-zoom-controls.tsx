@@ -6,9 +6,9 @@ import { useSearchParams } from "react-router";
 
 export function TopologyZoomControls({
   showZoomPercent = false,
-}: {
+}: Readonly<{
   showZoomPercent?: boolean;
-}) {
+}>) {
 
   const { zoom } = useViewport();
   const { zoomTo, zoomIn, zoomOut, fitView } = useReactFlow();
