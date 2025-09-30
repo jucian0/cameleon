@@ -100,13 +100,13 @@ const Slider = ({
           "group relative flex touch-none select-none flex-col disabled:opacity-50",
           orientation === "horizontal" && "w-full min-w-56 gap-y-2",
           orientation === "vertical" &&
-            "h-full min-h-56 w-1.5 items-center gap-y-2",
+          "h-full min-h-56 w-1.5 items-center gap-y-2",
           className,
         ]),
       )}
       {...props}
     >
-      <div className="flex text-fg">
+      {/* <div className="flex text-fg">
         {props.label && <Label>{props.label}</Label>}
         {output === "inline" && (
           <SliderOutput className="text-muted-fg text-sm tabular-nums data-[orientation=vertical]:mx-auto data-[orientation=horizontal]:ml-auto">
@@ -117,7 +117,7 @@ const Slider = ({
             }
           </SliderOutput>
         )}
-      </div>
+      </div> */}
       <SliderTrack>
         {({ state }) => (
           <>

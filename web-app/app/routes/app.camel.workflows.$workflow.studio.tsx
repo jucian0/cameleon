@@ -1,4 +1,5 @@
 
+import { TopologyBuilder } from "@/camel/studio-components/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
   Outlet,
@@ -7,16 +8,12 @@ import {
 } from "react-router";
 import { encode } from "js-base64";
 
-import { TopologyBuilder } from "@/camel/studio-components/topology-builder/topology-builder";
-import type { Route } from "./+types/app.camel.workflows.$workflow.studio";
-
-
-
 export async function action({ request, params }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
-  const workflowsId = params.workflowsId;
+  const workflowsId = params.workflow;
   const formData = await request.formData();
   const content = formData.get("content") ?? "";
+
   await supabase
     .from("workflows")
     .update({
@@ -25,7 +22,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
     .eq("id", workflowsId);
 }
 
-export default function CamelStudio({ loaderData }: Route.ComponentProps) {
+export default function CamelStudio() {
   const { visibility } = useOutletContext<{ visibility: "public" | "private" }>()
   return (
     <>

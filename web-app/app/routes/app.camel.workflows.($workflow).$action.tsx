@@ -16,7 +16,6 @@ import type { Route } from "./+types/app.camel.workflows.($workflow).$action";
 import { ProgressCircle } from "app/components/ui/progress-circle";
 import { INITIAL_STATE_YAML } from "core";
 import { encode } from "js-base64";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -126,18 +125,6 @@ export default withModal<Route.ComponentProps>(function ModalPage({
             <span aria-label="error" className="text-red-500">
               {actionData?.error}
             </span>
-            {/* <ToggleGroup
-
-              className={"w-fit mt-8"}
-              defaultSelectedKeys={[loaderData?.workflow?.visibility]}
-              onSelectionChange={(value) => {
-                formData.set("visibility", value.values().next().value);
-              }}
-            >
-              <ToggleGroupItem id="public">Public</ToggleGroupItem>
-              <ToggleGroupItem id="private">Private</ToggleGroupItem>
-              <input type="hidden" name="visibility" value={loaderData?.workflow?.visibility || "private"} />
-            </ToggleGroup> */}
           </Modal.Body>
           <Modal.Footer>
             <Button onPress={handleClose} intent="plain">

@@ -24,7 +24,7 @@ import {
   type NodeChange,
 } from "@xyflow/react";
 import { jsonToYaml } from "./yaml-json";
-import type { CamelConfig, Edge, Route, Node } from "./topology-types";
+import type { CamelConfig, Edge, Node } from "./topology-types";
 import { generateStepId } from "./topology-operations/topology-operations";
 
 type TopologyStore = {

@@ -49,10 +49,12 @@ const getLayoutedEdges = (nodes: Node[], edges: Edge[], direction: string) => {
 };
 
 function Flow() {
-  const { canvas } = useTopologyStore();
+  const { canvas, getCamelConfigYaml, camelConfig } = useTopologyStore();
   const { nodes, edges, onNodesChange, onEdgesChange } = canvas;
   const [query] = useSearchParams();
   const direction = query.get("direction") || "LR";
+
+  console.log("Current workflow YAML", camelConfig);
 
   return (
     <div className="h-[calc(100vh-52px)] relative">

@@ -41,7 +41,7 @@ export function TopologyZoomControls({
       </Button>
 
       <Slider
-        className="w-[120px] sm:w-[140px]"
+        className="w-[120px] sm:w-[140px] flex items-center"
         value={[zoom]}
         minValue={minZoom}
         maxValue={maxZoom}
