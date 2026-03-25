@@ -13,22 +13,22 @@ export function parseLoadbalanceStep(
   absolutePath: string,
   parseSteps: any,
 ): string {
-  const branchSteps = step[nodeType]?.steps || [];
+  const rawBranchSteps = step[nodeType]?.steps;
+  const branchSteps = Array.isArray(rawBranchSteps) ? rawBranchSteps : [];
   const branchLastNodeIds: string[] = [];
-  const joinTargetId =
-    nextOrAddId ||
-    ensurePlaceholderNext(
-      nodes,
-      edges,
-      stepId,
-      `${absolutePath}.steps.${branchSteps.length}`,
-    );
+
+  // Add initial placeholder
+  const placeholderId = ensurePlaceholderNext(
+    nodes,
+    edges,
+    stepId,
+    `${absolutePath}.steps.${branchSteps.length}`,
+  );
 
   // Process each branch
   for (const [index, branchStep] of branchSteps.entries()) {
     const branchStepType = Object.keys(branchStep)[0] as "loadBalance";
     const branchAbsolutePath = `${absolutePath}.steps.${index}`;
-    let branchEndId: string | null = null;
 
     if (branchStep[branchStepType]?.steps) {
       const branchContainerNodeId = generateUniqueId(
@@ -43,27 +43,29 @@ export function parseLoadbalanceStep(
 
       let parsedBranchResult: any;
       if (BRANCHING_NODE_TYPES.has(branchStepType)) {
-        branchEndId = parseLoadbalanceStep(
+        parsedBranchResult = parseLoadbalanceStep(
           branchStep,
           branchStepType,
           branchContainerNodeId,
           nodes,
           edges,
-          joinTargetId,
+          nextOrAddId,
           `${branchAbsolutePath}.${branchStepType}`,
           parseSteps,
         );
+        branchLastNodeIds.push(parsedBranchResult);
       } else {
         parsedBranchResult = parseSteps(
           branchStep[branchStepType].steps,
           nodes,
           edges,
           branchContainerNodeId,
-          joinTargetId,
+          nextOrAddId,
           branchAbsolutePath,
         );
-        branchEndId = parsedBranchResult.lastStepId;
       }
+
+      branchLastNodeIds.push(parsedBranchResult.lastStepId);
     } else {
       // Handle direct endpoints
       const directEndpointNodeId = generateUniqueId(
@@ -76,21 +78,20 @@ export function parseLoadbalanceStep(
         createEdge(generateUniqueId("edge"), stepId, directEndpointNodeId),
       );
 
-      branchEndId = directEndpointNodeId;
+      branchLastNodeIds.push(directEndpointNodeId);
     }
 
-    if (branchEndId) {
-      branchLastNodeIds.push(branchEndId);
+    // Connect branch endings to the next step or to a placeholder
+    if (nextOrAddId) {
+      for (const endId of branchLastNodeIds) {
+        edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId));
+      }
     }
   }
 
-  for (const endId of branchLastNodeIds) {
-    edges.push(createEdge(generateUniqueId("edge"), endId, joinTargetId));
+  if (branchSteps.length > 0 && nextOrAddId) {
+    return nextOrAddId;
   }
 
-  if (branchLastNodeIds.length === 0) {
-    edges.push(createEdge(generateUniqueId("edge"), stepId, joinTargetId));
-  }
-
-  return joinTargetId || stepId;
+  return placeholderId || stepId;
 }

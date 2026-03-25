@@ -58,6 +58,11 @@ export function getDefaultConfig(stepType: string): any {
       strategyRef: null,
       stopOnException: false,
     },
+    loadBalance: {
+      id: generateStepId(stepType),
+      steps: [],
+      strategyRef: null,
+    },
     recipientList: {
       id: generateStepId(stepType),
       expression: { simple: "${header.recipients}" },

@@ -20,74 +20,103 @@ export function parseChoiceStep(
   initialAbsolutePath: string,
   parseSteps: any,
 ): string {
-  const branchLastNodeIds: string[] = [];
   const { choice } = step;
-
-  const placeholderId = ensurePlaceholderNext(
+  const whenBranches = Array.isArray(choice?.when) ? choice.when : [];
+  const addWhenId = ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
-    `${initialAbsolutePath}.when.${(choice?.when ?? []).length}`,
+    `${initialAbsolutePath}.when.${whenBranches.length}`,
     STEP_TYPE.ADD_WHEN,
   );
+  const joinTargetId = nextOrAddId;
 
-  // when branches
-  if (Array.isArray(choice?.when)) {
-    for (const [i, when] of choice.when.entries()) {
-      const absolutePath = `${initialAbsolutePath}.when.${i}`;
-      const whenId = generateUniqueId(`when-${stepId}`);
-      nodes.push(createNode(whenId, STEP_TYPE.WHEN, absolutePath));
-      edges.push(createEdge(generateUniqueId("edge"), stepId, whenId));
+  for (const [i, when] of whenBranches.entries()) {
+    const absolutePath = `${initialAbsolutePath}.when.${i}`;
+    const whenId = generateUniqueId(`when-${stepId}`);
+    const whenSteps = when?.steps ?? [];
 
+    nodes.push(createNode(whenId, STEP_TYPE.WHEN, absolutePath));
+    edges.push(createEdge(generateUniqueId("edge"), stepId, whenId));
+
+    if (whenSteps.length > 0) {
       const whenResult = parseSteps(
-        when?.steps ?? [],
+        whenSteps,
         nodes,
         edges,
         whenId,
-        nextOrAddId,
+        joinTargetId,
         absolutePath,
       );
 
-      ensurePlaceholderBetween(
-        nodes,
-        edges,
-        whenResult.lastStepId,
-        nextOrAddId!,
-        `${absolutePath}.steps.${(when?.steps ?? []).length}`,
-      );
+      if (joinTargetId && whenResult.lastStepId !== joinTargetId) {
+        ensurePlaceholderBetween(
+          nodes,
+          edges,
+          whenResult.lastStepId,
+          joinTargetId,
+          `${absolutePath}.steps.${whenSteps.length}`,
+        );
+      }
+    } else {
+      if (joinTargetId) {
+        ensurePlaceholderBetween(
+          nodes,
+          edges,
+          whenId,
+          joinTargetId,
+          `${absolutePath}.steps.0`,
+        );
+      }
     }
   }
 
-  // otherwise branch
-  if (choice?.otherwise?.steps) {
+  if (choice?.otherwise) {
     const absolutePath = `${initialAbsolutePath}.otherwise`;
     const otherwiseId = generateUniqueId(`otherwise-${stepId}`);
+    const otherwiseSteps = choice.otherwise.steps ?? [];
+
     nodes.push(createNode(otherwiseId, STEP_TYPE.OTHERWISE, absolutePath));
     edges.push(createEdge(generateUniqueId("edge"), stepId, otherwiseId));
 
-    const otherwiseResult = parseSteps(
-      choice.otherwise.steps,
-      nodes,
-      edges,
-      otherwiseId,
-      nextOrAddId,
-      absolutePath,
-    );
-    ensurePlaceholderBetween(
-      nodes,
-      edges,
-      otherwiseResult.lastStepId,
-      nextOrAddId!,
-      `${absolutePath}.steps.${choice.otherwise.steps.length}`,
-    );
-  }
+    if (otherwiseSteps.length > 0) {
+      const otherwiseResult = parseSteps(
+        otherwiseSteps,
+        nodes,
+        edges,
+        otherwiseId,
+        joinTargetId,
+        absolutePath,
+      );
 
-  // Connect branch endings to the next step or to a placeholder
-  if (nextOrAddId) {
-    for (const endId of branchLastNodeIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId));
+      if (joinTargetId && otherwiseResult.lastStepId !== joinTargetId) {
+        ensurePlaceholderBetween(
+          nodes,
+          edges,
+          otherwiseResult.lastStepId,
+          joinTargetId,
+          `${absolutePath}.steps.${otherwiseSteps.length}`,
+        );
+      }
+    } else {
+      if (joinTargetId) {
+        ensurePlaceholderBetween(
+          nodes,
+          edges,
+          otherwiseId,
+          joinTargetId,
+          `${absolutePath}.steps.0`,
+        );
+      }
     }
   }
 
-  return placeholderId || stepId;
+  if (joinTargetId) {
+    if (whenBranches.length === 0 && !choice?.otherwise) {
+      edges.push(createEdge(generateUniqueId("edge"), stepId, joinTargetId));
+    }
+    return joinTargetId;
+  }
+
+  return addWhenId || stepId;
 }

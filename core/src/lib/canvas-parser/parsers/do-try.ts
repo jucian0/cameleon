@@ -20,96 +20,109 @@ export function parseDoTryStep(
   initialAbsolutePath: string,
   parseSteps: any,
 ): string {
-  const branchLastNodeIds: string[] = [];
   const { doTry } = step;
+  const doCatchList = Array.isArray(doTry?.doCatch) ? doTry.doCatch : [];
+  const branchEndIds: string[] = [];
 
   const betweenId = ensurePlaceholderNext(
     nodes,
     edges,
     stepId,
-    `${initialAbsolutePath}.doCatch.${(doTry?.doCatch?.steps ?? []).length}`,
+    `${initialAbsolutePath}.doCatch.${doCatchList.length}`,
     STEP_TYPE.ADD_DO_CATCH,
   );
 
-  // Process doCatch branch
-  if (Array.isArray(doTry?.doCatch)) {
-    for (const [i, doCatch] of doTry.doCatch.entries()) {
+  // Main try path.
+  if ((doTry?.steps ?? []).length > 0) {
+    const doTryResult = parseSteps(
+      doTry?.steps ?? [],
+      nodes,
+      edges,
+      stepId,
+      null,
+      initialAbsolutePath,
+    );
+    branchEndIds.push(doTryResult.lastStepId);
+  } else {
+    branchEndIds.push(stepId);
+  }
+
+  // Exception paths.
+  if (doCatchList.length > 0) {
+    for (const [i, doCatch] of doCatchList.entries()) {
       const absolutePath = `${initialAbsolutePath}.doCatch.${i}`;
       const doCatchId = generateUniqueId(`doCatch-${stepId}`);
       nodes.push(createNode(doCatchId, STEP_TYPE.DO_CATCH, absolutePath));
       edges.push(createEdge(generateUniqueId("edge"), stepId, doCatchId));
 
-      const doCatchResult = parseSteps(
-        doCatch.steps ?? [],
+      const doCatchSteps = doCatch.steps ?? [];
+      if (doCatchSteps.length > 0) {
+        const doCatchResult = parseSteps(
+          doCatchSteps,
+          nodes,
+          edges,
+          doCatchId,
+          null,
+          absolutePath,
+        );
+        branchEndIds.push(doCatchResult.lastStepId);
+      } else {
+        branchEndIds.push(doCatchId);
+      }
+    }
+  }
+
+  // Shared finally path.
+  if (doTry?.doFinally) {
+    const absolutePath = `${initialAbsolutePath}.doFinally`;
+    const doFinallyId = generateUniqueId(`doFinally-${stepId}`);
+    const doFinallySteps = doTry.doFinally.steps ?? [];
+
+    nodes.push(createNode(doFinallyId, STEP_TYPE.DO_FINALLY, absolutePath));
+
+    for (const endId of branchEndIds) {
+      if (endId !== doFinallyId) {
+        edges.push(createEdge(generateUniqueId("edge"), endId, doFinallyId));
+      }
+    }
+
+    if (doFinallySteps.length > 0) {
+      const doFinallyResult = parseSteps(
+        doFinallySteps,
         nodes,
         edges,
-        doCatchId,
+        doFinallyId,
         nextOrAddId,
         absolutePath,
       );
 
+      if (nextOrAddId) {
+        ensurePlaceholderBetween(
+          nodes,
+          edges,
+          doFinallyResult.lastStepId,
+          nextOrAddId,
+          `${absolutePath}.steps.${doFinallySteps.length}`,
+        );
+      }
+    } else if (nextOrAddId) {
+      edges.push(
+        createEdge(generateUniqueId("edge"), doFinallyId, nextOrAddId),
+      );
+    }
+
+    return betweenId || doFinallyId;
+  }
+
+  if (nextOrAddId) {
+    for (const endId of branchEndIds) {
       ensurePlaceholderBetween(
         nodes,
         edges,
-        doCatchResult.lastStepId,
-        nextOrAddId!,
-        `${absolutePath}.steps.${(doCatch.steps ?? []).length}`,
+        endId,
+        nextOrAddId,
+        `${initialAbsolutePath}.steps.${doTry?.steps?.length ?? 0}`,
       );
-    }
-  }
-
-  // Process doFinally branch
-  if (doTry?.doFinally?.steps) {
-    const absolutePath = `${initialAbsolutePath}.doFinally`;
-    const doFinallyId = generateUniqueId(`doFinally-${stepId}`);
-
-    nodes.push(createNode(doFinallyId, STEP_TYPE.DO_FINALLY, absolutePath));
-    edges.push(createEdge(generateUniqueId("edge"), stepId, doFinallyId));
-
-    const doFinallyResult = parseSteps(
-      doTry.doFinally.steps ?? [],
-      nodes,
-      edges,
-      doFinallyId,
-      nextOrAddId,
-      absolutePath,
-    );
-    ensurePlaceholderBetween(
-      nodes,
-      edges,
-      doFinallyResult.lastStepId,
-      nextOrAddId!,
-      `${absolutePath}.steps.${doTry.doFinally?.steps.length}`,
-    );
-  }
-
-  // Process main try branch
-  if (doTry?.steps) {
-    const absolutePath = initialAbsolutePath;
-    edges.push(createEdge(generateUniqueId("edge"), stepId, stepId));
-
-    const doTryResult = parseSteps(
-      doTry.steps,
-      nodes,
-      edges,
-      stepId,
-      nextOrAddId,
-      absolutePath,
-    );
-
-    ensurePlaceholderBetween(
-      nodes,
-      edges,
-      doTryResult.lastStepId,
-      nextOrAddId!,
-      `${absolutePath}.steps.${doTry.steps?.length}`,
-    );
-  }
-
-  // Connect branch endings to the next step or to a placeholder
-  if (nextOrAddId) {
-    for (const endId of branchLastNodeIds) {
-      edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId));
     }
   }
 

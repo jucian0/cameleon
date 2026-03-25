@@ -198,7 +198,7 @@ export const EIPSListNames = [
   "enrich",
   "filter",
   "idempotentConsumer",
-  "loadBalancer",
+  "loadBalance",
   "log",
   "loop",
   "marshal",

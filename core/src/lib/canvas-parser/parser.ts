@@ -48,6 +48,7 @@ export function jsonToCanvasBuilder(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   let fromAbsolutePath = `data.${routeIndex}.route.from`;
+  let shouldAddRouteEndPlaceholder = true;
   const endPlaceholderId = generateUniqueId("add");
   const endPlaceholderNode = createNode(
     endPlaceholderId,
@@ -75,7 +76,13 @@ export function jsonToCanvasBuilder(
       fromAbsolutePath,
     );
     fromAbsolutePath = parsedStepsResult.absolutePath || fromAbsolutePath;
-    if (parsedStepsResult.lastStepId !== endPlaceholderId) {
+    const lastNode = nodes.find(
+      (node) => node.id === parsedStepsResult.lastStepId,
+    );
+
+    if (lastNode?.data?.isPlaceholder) {
+      shouldAddRouteEndPlaceholder = false;
+    } else if (parsedStepsResult.lastStepId !== endPlaceholderId) {
       edges.push(
         createEdge(
           generateUniqueId("edge"),
@@ -87,7 +94,9 @@ export function jsonToCanvasBuilder(
   }
 
   // Always add a placeholder at the end of the route
-  nodes.push(endPlaceholderNode);
+  if (shouldAddRouteEndPlaceholder) {
+    nodes.push(endPlaceholderNode);
+  }
 
   return { nodes, edges };
 }
