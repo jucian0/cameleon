@@ -16,13 +16,13 @@ export default function AuthPage() {
   const { env } = useRouteLoaderData("root") as {
     env: {
       SUPABASE_URL: string;
-      SUPABASE_ANON_KEY: string;
+      SUPABASE_KEY: string;
       ENV: string;
     };
   };
 
-  const [supabase] = useState(
-    createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY),
+  const [supabase] = useState(() =>
+    createClient(env.SUPABASE_URL, env.SUPABASE_KEY),
   );
 
   async function handleGithubSignIn() {
@@ -31,8 +31,8 @@ export default function AuthPage() {
       options: {
         redirectTo:
           env.ENV === "development"
-            ? "http://localhost:3000/app/auth/callback"
-            : "https://cameleon.juciano.com/app/auth/callback",
+            ? "http://localhost:3000/app/auth/callback?next=/app"
+            : "https://cameleon.juciano.com/app/auth/callback?next=/app",
       },
     });
   }

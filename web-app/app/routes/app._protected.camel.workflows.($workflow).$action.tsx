@@ -12,7 +12,6 @@ import {
   type LoaderFunctionArgs,
   type MetaArgs,
 } from "react-router";
-import type { Route } from "./+types/app.camel.workflows.($workflow).$action";
 import { ProgressCircle } from "app/components/ui/progress-circle";
 import { INITIAL_STATE_YAML } from "core";
 import { encode } from "js-base64";
@@ -20,7 +19,7 @@ import { encode } from "js-base64";
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
     { title: `${loaderData?.workflow.name || "Create a workflow"} | Cameleon` },
-    { description: 'Create, edit or clone workflows.' },
+    { description: "Create, edit or clone workflows." },
   ];
 }
 
@@ -72,12 +71,12 @@ export async function action({ request, params }: LoaderFunctionArgs) {
   return redirect("/app/camel/workflows");
 }
 
-export default withModal<Route.ComponentProps>(function ModalPage({
+export default withModal(function ModalPage({
   isOpen,
   closeModal,
   loaderData,
   actionData,
-}) {
+}: any) {
   const navigation = useNavigation();
   const { action } = useParams<"workflow" | "action">();
   const pageAction = action?.toUpperCase() || "CREATE";

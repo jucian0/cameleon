@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+    resolve: {
+      dedupe: ["react", "react-dom"],
+    },
     build: {
       outDir: "build",
     },

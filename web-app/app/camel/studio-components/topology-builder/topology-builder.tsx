@@ -54,8 +54,6 @@ function Flow() {
   const [query] = useSearchParams();
   const direction = query.get("direction") || "LR";
 
-  console.log("Current workflow YAML", camelConfig);
-
   return (
     <div className="h-[calc(100vh-52px)] relative">
       <ReactFlow

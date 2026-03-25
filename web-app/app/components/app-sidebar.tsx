@@ -49,7 +49,7 @@ export default function AppSidebar(
   const [supabase] = useState(
     createClient(
       loaderData?.env.SUPABASE_URL as "",
-      loaderData?.env.SUPABASE_ANON_KEY as "",
+      loaderData?.env.SUPABASE_KEY as "",
     ),
   );
 

@@ -1,4 +1,3 @@
-
 import { TopologyBuilder } from "@/camel/studio-components/topology-builder/topology-builder";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
@@ -23,7 +22,10 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function CamelStudio() {
-  const { visibility } = useOutletContext<{ visibility: "public" | "private" }>()
+  const { visibility } = useOutletContext<{
+    visibility: "public" | "private";
+  }>();
+
   return (
     <>
       <TopologyBuilder />

@@ -1,5 +1,4 @@
 import { buttonStyles } from "app/components/ui/button";
-import type { Route } from "./+types/app._index";
 import { IconPlus } from "@intentui/icons";
 import { Menu } from "app/components/ui/menu";
 import type { LoaderFunctionArgs } from "react-router";
@@ -7,7 +6,7 @@ import { createServerSupabase } from "app/modules/supabase/supabase-server";
 import { Card, CardContent, CardHeader } from "app/components/ui/card";
 import { Link } from "app/components/ui/link";
 
-export function meta(_: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "New React Router App" },
     { name: "description", content: "Welcome to React Router!" },
@@ -20,12 +19,6 @@ const productInfo = {
     "Cameleon simplifies integration design by providing tools to manage workflows and user profiles effectively. Build, organize, and share your integrations effortlessly.",
 };
 
-const userProfile = {
-  name: "John Doe",
-  role: "Integration Architect",
-  projects: 5,
-};
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
   const currentUser = await supabase.auth.getUser();
@@ -35,10 +28,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 }
 
-export default function HomePage({ loaderData }: Readonly<Route.ComponentProps>) {
+export default function HomePage({
+  loaderData,
+}: {
+  loaderData: { user: any };
+}) {
   return (
     <div className="p-8 mx-auto space-y-10">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">
           Welcome back, {loaderData.user?.user_metadata.name} 👋
@@ -53,7 +49,6 @@ export default function HomePage({ loaderData }: Readonly<Route.ComponentProps>)
         </Menu>
       </div>
 
-      {/* Product Information */}
       <section>
         <h2 className="text-xl font-semibold mb-3">{productInfo.title}</h2>
         <p className="text-lg text-gray-600">{productInfo.description}</p>

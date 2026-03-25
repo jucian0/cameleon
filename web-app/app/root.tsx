@@ -13,6 +13,7 @@ import {
 } from "react-router";
 
 import { createServerSupabase } from "./modules/supabase/supabase-server";
+import { getSupabaseEnv } from "./modules/supabase/supabase-env";
 import { RouterProvider } from "react-aria-components";
 import { themeSessionResolver } from "./routes/app.set-theme";
 import {
@@ -27,13 +28,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   const { supabase } = createServerSupabase(request);
   const currentUser = await supabase.auth.getUser();
+  const { url, key } = getSupabaseEnv();
 
   return {
     theme: getTheme(),
     user: currentUser.data.user,
     env: {
-      SUPABASE_URL: process.env.SUPABASE_URL,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+      SUPABASE_URL: url,
+      SUPABASE_KEY: key,
       ENV: process.env.NODE_ENV,
     },
   };

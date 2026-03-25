@@ -10,10 +10,8 @@ import { Grid2X2, List, Plus } from "lucide-react";
 import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
-import type { Route } from "./+types/app.camel.workflows._index";
 import { Link } from "app/components/ui/link";
 import { CamelCard } from "@/camel/workflows-components/card";
-import type { Key } from "react-stately";
 import type { CamelConfig } from "@/modules/supabase/supabase-db";
 
 const metaData = {
@@ -32,7 +30,7 @@ export const handle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
-  const { data, error } = await supabase.from("workflows").select("*")
+  const { data, error } = await supabase.from("workflows").select("*");
   return { data, error };
 }
 
@@ -70,7 +68,11 @@ const filterItems = (items: CamelConfig[], searchParams: URLSearchParams) => {
     });
 };
 
-export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
+export default function CamelWorkflows({
+  loaderData,
+}: {
+  loaderData: { data: CamelConfig[] };
+}) {
   const items = loaderData.data;
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -104,12 +106,14 @@ export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
             <Select
               className="flex-1"
               defaultSelectedKey={searchParams.get("sort") ?? "updatedAt"}
-              onSelectionChange={(v) => handleSearchChange({ sort: v?.toString() ?? "" })}
+              onSelectionChange={(v) =>
+                handleSearchChange({ sort: v?.toString() ?? "" })
+              }
             >
               <SelectTrigger className="w-40" aria-label="Sort by" />
               <SelectList>
                 <SelectOption id="updatedAt">Recent first</SelectOption>
-                <SelectOption id="name">Name A–Z</SelectOption>
+                <SelectOption id="name">Name A-Z</SelectOption>
               </SelectList>
             </Select>
           </div>
@@ -120,7 +124,9 @@ export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
               selectionMode="single"
               defaultSelectedKeys={[searchParams.get("view") ?? "cards"]}
               onSelectionChange={(v) =>
-                handleSearchChange({ view: v.values().next().value?.toString() ?? "" })
+                handleSearchChange({
+                  view: v.values().next().value?.toString() ?? "",
+                })
               }
               aria-label="View mode"
             >
@@ -154,10 +160,7 @@ export default function CamelWorkflows({ loaderData }: Route.ComponentProps) {
           }
         >
           {filteredItems?.map((c) => (
-            <CamelCard
-              key={c.id}
-              camelConfig={c}
-            />
+            <CamelCard key={c.id} camelConfig={c} />
           ))}
         </div>
       </section>

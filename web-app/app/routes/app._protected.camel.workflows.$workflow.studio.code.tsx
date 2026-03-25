@@ -5,17 +5,15 @@ import { useTheme } from "remix-themes";
 import React from "react";
 import debounce from "debounce";
 import { withModal } from "app/components/utils/with-modal";
-import type { Route } from "./+types/app.camel.workflows.$workflow.studio.code";
 import { useLocation, useOutletContext } from "react-router";
 
-export default withModal<Route.ComponentProps>(({
-  isOpen,
-  closeModal,
-}) => {
+export default withModal(({ isOpen, closeModal }: any) => {
   const { setCamelConfig, camelConfig } = useTopologyStore();
   const theme = useTheme();
-  const location = useLocation()
-  const { visibility } = useOutletContext<{ visibility: "public" | "private" }>();
+  const location = useLocation();
+  const { visibility } = useOutletContext<{
+    visibility: "public" | "private";
+  }>();
   const isPublic = visibility === "public";
   const [debouncedSetCamelConfig] = React.useState(() =>
     debounce(setCamelConfig, 500),
@@ -27,27 +25,26 @@ export default withModal<Route.ComponentProps>(({
     }
   };
 
-  const options = {
-    selectOnLineNumbers: true,
-    readOnly: isPublic,
-  };
-
   function handleClose() {
-    closeModal(`${location.pathname.replace('/code', '')}${location.search}`);
+    closeModal(`${location.pathname.replace("/code", "")}${location.search}`);
   }
 
   return (
     <Sheet isOpen={isOpen} onOpenChange={handleClose}>
       <Sheet.Content>
         <Sheet.Body className="p-0!">
-          <div className={`w-full h-full relative rounded-lg py-11 ${isPublic ? 'pointer-none' : ''}`}>
+          <div
+            className={`w-full h-full relative rounded-lg py-11 ${isPublic ? "pointer-none" : ""}`}
+          >
             <MonacoEditor
-
-              className={`"w-full h-full" ${isPublic ? 'pointer-none' : ''}`}
+              className={`"w-full h-full" ${isPublic ? "pointer-none" : ""}`}
               language="yaml"
               theme={theme[0] === "dark" ? "vs-dark" : "vs-light"}
               defaultValue={jsonToYaml(camelConfig)}
-              options={options}
+              options={{
+                selectOnLineNumbers: true,
+                readOnly: isPublic,
+              }}
               onChange={onChange}
             />
           </div>

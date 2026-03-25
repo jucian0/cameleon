@@ -16,7 +16,6 @@ import {
 import { decode } from "js-base64";
 import { yamlToJson } from "core";
 import React from "react";
-import type { Route } from "./+types/app.camel.workflows.$workflow";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -41,11 +40,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const decodedData = decode(data[0].content ?? "");
-  return { content: yamlToJson(decodedData), name: data[0].name, visibility: data[0].visibility };
+  return {
+    content: yamlToJson(decodedData),
+    name: data[0].name,
+    visibility: data[0].visibility,
+  };
 }
 
-
-export default function CamelStudio({ loaderData }: Route.ComponentProps) {
+export default function CamelStudio({
+  loaderData,
+}: {
+  loaderData: {
+    content: unknown;
+    name: string;
+    visibility: "public" | "private";
+  };
+}) {
   const { content, name, visibility } = loaderData;
   const { setCamelConfig, canvas, camelConfig } = useTopologyStore();
   const [query] = useSearchParams();
@@ -75,18 +85,16 @@ export default function CamelStudio({ loaderData }: Route.ComponentProps) {
     return parsedCanvas;
   }, [camelConfig, routeId]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: initialized from loader result
   React.useEffect(() => {
     setCamelConfig(content as CamelConfig);
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
   }, [name]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: canvas state follows route and store changes
   React.useEffect(() => {
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
   }, [routeId, camelConfig]);
 
-  return (
-    <Outlet context={{ visibility }} />
-  );
+  return <Outlet context={{ visibility }} />;
 }

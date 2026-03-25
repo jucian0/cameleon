@@ -11,7 +11,6 @@ import { FallbackImage } from "app/components/fallback-image";
 import type { LoaderFunctionArgs } from "react-router";
 import type { ComponentDefinition } from "core";
 import axios from "axios";
-import type { Route } from "./+types/app.camel.library.components";
 
 export function meta() {
   return [
@@ -30,15 +29,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { error, data } = await tryCatch(
     axios.get<ComponentDefinition[]>(componentsUrl),
   );
+  const components = (
+    error ? [] : Object.values(data?.data ?? {})
+  ) as ComponentDefinition[];
 
   return {
-    components: error ? [] : Object.values(data?.data),
+    components,
   };
 }
 
 export default function CamelComponentsTab({
   loaderData,
-}: Route.ComponentProps) {
+}: {
+  loaderData: { components: ComponentDefinition[] };
+}) {
   const { components } = loaderData;
 
   function handleSelectionChange(selectedKeys: Selection) {
@@ -46,37 +50,38 @@ export default function CamelComponentsTab({
       .map((key) => components?.find((item) => item.component.name === key))
       .filter(Boolean);
     if (!selectedItem) return;
-    // onSelectionChange(selectedKeys);
   }
 
   return (
     <Virtualizer layout={GridLayout}>
       <ListBox
-        className={"-m-4"}
+        className="-m-4"
         selectionMode="single"
         onSelectionChange={handleSelectionChange}
         renderEmptyState={() => (
           <span className="m-4">No components to display</span>
         )}
       >
-        {components?.map((item) => (
+        {components.map((item: any) => (
           <ListBoxItem
-            textValue={item.component.name}
-            key={item.component.name}
-            id={item.component.name}
+            textValue={String(item.component.name)}
+            key={String(item.component.name)}
+            id={String(item.component.name)}
           >
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
                 <FallbackImage
-                  src={`/camel-icons/components/${item.component.name}.svg`}
-                  alt={item.component.name ?? "component icon"}
+                  src={`/camel-icons/components/${String(item.component.name)}.svg`}
+                  alt={String(item.component.name ?? "component icon")}
                   className="h-8 w-8 rounded"
                   fallback="/camel-icons/components/generic.svg"
                 />
-                <div className="flex flex-col">{item.component.title}</div>
+                <div className="flex flex-col">
+                  {String(item.component.title)}
+                </div>
               </Card.Header>
               <Card.Content className="p-2">
-                {item.component.description}
+                {String(item.component.description)}
               </Card.Content>
             </Card>
           </ListBoxItem>

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "react-router-v7",
+  "owner": "existential-birds",
+  "repo": "beagle",
+  "path": "plugins/beagle-react/skills/react-router-v7",
+  "branch": "main",
+  "sha": "fb4e34d587f27cb1b264cae3c620b5fb365c2a0e",
+  "source": "manual"
+}

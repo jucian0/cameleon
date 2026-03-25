@@ -15,19 +15,20 @@ export function parseMulticastStep(
 ): string {
   const branchSteps = step[nodeType]?.steps || [];
   const branchLastNodeIds: string[] = [];
-
-  // Add initial placeholder
-  const placeholderId = ensurePlaceholderNext(
-    nodes,
-    edges,
-    stepId,
-    `${absolutePath}.steps.${branchSteps.length}`,
-  );
+  const joinTargetId =
+    nextOrAddId ||
+    ensurePlaceholderNext(
+      nodes,
+      edges,
+      stepId,
+      `${absolutePath}.steps.${branchSteps.length}`,
+    );
 
   // Process each branch
   for (const [index, branchStep] of branchSteps.entries()) {
     const branchStepType = Object.keys(branchStep)[0] as "multicast";
     const branchAbsolutePath = `${absolutePath}.steps.${index}`;
+    let branchEndId: string | null = null;
 
     if (branchStep[branchStepType]?.steps) {
       const branchContainerNodeId = generateUniqueId(
@@ -42,29 +43,27 @@ export function parseMulticastStep(
 
       let parsedBranchResult: any;
       if (BRANCHING_NODE_TYPES.has(branchStepType)) {
-        parsedBranchResult = parseMulticastStep(
+        branchEndId = parseMulticastStep(
           branchStep,
           branchStepType,
           branchContainerNodeId,
           nodes,
           edges,
-          nextOrAddId,
+          joinTargetId,
           `${branchAbsolutePath}.multicast`,
           parseSteps,
         );
-        branchLastNodeIds.push(parsedBranchResult);
       } else {
         parsedBranchResult = parseSteps(
           branchStep[branchStepType].steps,
           nodes,
           edges,
           branchContainerNodeId,
-          nextOrAddId,
+          joinTargetId,
           branchAbsolutePath,
         );
+        branchEndId = parsedBranchResult.lastStepId;
       }
-
-      branchLastNodeIds.push(parsedBranchResult.lastStepId);
     } else {
       // Handle direct endpoints
       const directEndpointNodeId = generateUniqueId(
@@ -77,16 +76,21 @@ export function parseMulticastStep(
         createEdge(generateUniqueId("edge"), stepId, directEndpointNodeId),
       );
 
-      branchLastNodeIds.push(directEndpointNodeId);
+      branchEndId = directEndpointNodeId;
     }
 
-    // Connect branch endings to the next step or to a placeholder
-    if (nextOrAddId) {
-      for (const endId of branchLastNodeIds) {
-        edges.push(createEdge(generateUniqueId("edge"), endId, nextOrAddId));
-      }
+    if (branchEndId) {
+      branchLastNodeIds.push(branchEndId);
     }
   }
 
-  return placeholderId || stepId;
+  for (const endId of branchLastNodeIds) {
+    edges.push(createEdge(generateUniqueId("edge"), endId, joinTargetId));
+  }
+
+  if (branchLastNodeIds.length === 0) {
+    edges.push(createEdge(generateUniqueId("edge"), stepId, joinTargetId));
+  }
+
+  return joinTargetId || stepId;
 }

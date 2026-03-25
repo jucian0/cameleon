@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/auth-helpers-remix";
 import type { Database } from "./supabase-db";
+import { getSupabaseEnv } from "./supabase-env";
 
 export type SupabaseClientRequest = {
   request: Request;
@@ -8,11 +9,11 @@ export type SupabaseClientRequest = {
 
 export function createServerSupabase(request: Request) {
   const response = new Response();
-  const supabase = createServerClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response },
-  );
+  const { url, key } = getSupabaseEnv();
+  const supabase = createServerClient<Database>(url, key, {
+    request,
+    response,
+  });
 
   return { supabase, response };
 }

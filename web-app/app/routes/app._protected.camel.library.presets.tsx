@@ -11,7 +11,6 @@ import { Card } from "app/components/ui/card";
 import { type LoaderFunctionArgs } from "react-router";
 import type { EPIDefinition } from "core";
 import axios from "axios";
-import type { Route } from "./+types/app.camel.library.presets";
 
 export function meta() {
   return [
@@ -28,13 +27,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const eipsUrl = url.origin + "/metadata/eips.json";
   const { data, error } = await tryCatch(axios.get<EPIDefinition[]>(eipsUrl));
+  const eips = (
+    error ? [] : Object.values(data?.data ?? {})
+  ) as EPIDefinition[];
 
   return {
-    eips: error ? [] : Object.values(data?.data),
+    eips,
   };
 }
 
-export default function CamelEIPsTab({ loaderData }: Route.ComponentProps) {
+export default function CamelEIPsTab({
+  loaderData,
+}: {
+  loaderData: { eips: EPIDefinition[] };
+}) {
   const { eips } = loaderData;
 
   function handleSelectionChange(selectedKeys: Selection) {
@@ -42,7 +48,6 @@ export default function CamelEIPsTab({ loaderData }: Route.ComponentProps) {
       .map((key) => eips.find((item) => item.model.name === key))
       .filter(Boolean);
     if (!selectedItem) return;
-    // onSelectionChange(selectedKeys);
   }
 
   return (
@@ -52,25 +57,25 @@ export default function CamelEIPsTab({ loaderData }: Route.ComponentProps) {
         onSelectionChange={handleSelectionChange}
         items={eips}
         renderEmptyState={() => <span className="m-4">No EIPs to display</span>}
-        className={"-m-4"}
+        className="-m-4"
       >
-        {(item) => (
+        {(item: any) => (
           <ListBoxItem
-            textValue={item.model.name}
-            key={item.model.name}
-            id={item.model.name}
+            textValue={String(item.model.name)}
+            key={String(item.model.name)}
+            id={String(item.model.name)}
           >
             <Card className="h-40 overflow-auto p-0">
               <Card.Header className="flex gap-2 p-2">
                 <img
-                  src={`/camel-icons/eips/${item.model.name}.svg`}
-                  alt={item.model.name}
+                  src={`/camel-icons/eips/${String(item.model.name)}.svg`}
+                  alt={String(item.model.name)}
                   className="h-8 w-8"
                 />
-                <div className="flex flex-col">{item.model.title}</div>
+                <div className="flex flex-col">{String(item.model.title)}</div>
               </Card.Header>
               <Card.Content className="p-2">
-                {item.model.description}
+                {String(item.model.description)}
               </Card.Content>
             </Card>
           </ListBoxItem>

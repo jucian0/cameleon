@@ -75,13 +75,15 @@ export function jsonToCanvasBuilder(
       fromAbsolutePath,
     );
     fromAbsolutePath = parsedStepsResult.absolutePath || fromAbsolutePath;
-    edges.push(
-      createEdge(
-        generateUniqueId("edge"),
-        parsedStepsResult.lastStepId,
-        endPlaceholderId,
-      ),
-    );
+    if (parsedStepsResult.lastStepId !== endPlaceholderId) {
+      edges.push(
+        createEdge(
+          generateUniqueId("edge"),
+          parsedStepsResult.lastStepId,
+          endPlaceholderId,
+        ),
+      );
+    }
   }
 
   // Always add a placeholder at the end of the route
