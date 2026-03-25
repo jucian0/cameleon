@@ -1,0 +1,21 @@
+- route:
+    id: route-filter-demo
+    nodePrefixId: route-filter-
+    from:
+      id: from-filter-demo
+      uri: direct:start
+      steps:
+        - filter:
+            id: filter-demo
+            expression:
+              simple: "${body} != null"
+            steps:
+              - log:
+                  id: log-filter-a
+                  message: "inside filter"
+              - bean:
+                  id: bean-filter-b
+                  bean: {}
+        - log:
+            id: log-after-filter
+            message: "after filter"

@@ -1,0 +1,21 @@
+- route:
+    id: route-split-demo
+    nodePrefixId: route-split-
+    from:
+      id: from-split-demo
+      uri: direct:start
+      steps:
+        - split:
+            id: split-demo
+            expression:
+              simple: "${body}"
+            steps:
+              - log:
+                  id: log-split-a
+                  message: "split branch start"
+              - bean:
+                  id: bean-split-b
+                  bean: {}
+        - log:
+            id: log-after-split
+            message: "after split"

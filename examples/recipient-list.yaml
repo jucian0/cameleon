@@ -1,0 +1,24 @@
+- route:
+    id: route-recipient-list-demo
+    nodePrefixId: route-recipient-list-
+    from:
+      id: from-recipient-list-demo
+      uri: direct:start
+      steps:
+        - recipientList:
+            id: recipient-list-demo
+            expression:
+              simple: "${header.recipients}"
+            delimiter: ","
+            parallelProcessing: false
+            stopOnException: false
+            steps:
+              - log:
+                  id: log-recipient-a
+                  message: "recipient A"
+              - bean:
+                  id: bean-recipient-b
+                  bean: {}
+        - log:
+            id: log-after-recipient-list
+            message: "after recipient list"

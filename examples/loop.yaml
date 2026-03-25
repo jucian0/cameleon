@@ -1,0 +1,23 @@
+- route:
+    id: route-loop-demo
+    nodePrefixId: route-loop-
+    from:
+      id: from-loop-demo
+      uri: direct:start
+      steps:
+        - loop:
+            id: loop-demo
+            expression:
+              simple: "3"
+            copy: false
+            doWhile: false
+            steps:
+              - log:
+                  id: log-loop-a
+                  message: "inside loop"
+              - bean:
+                  id: bean-loop-b
+                  bean: {}
+        - log:
+            id: log-after-loop
+            message: "after loop"

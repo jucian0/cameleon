@@ -51,8 +51,35 @@ export interface Step {
     aggregationStrategyRef?: string;
     steps?: Step[];
   };
+  circuitBreaker?: {
+    resilience4jConfiguration?: Record<string, unknown>;
+    steps?: Step[];
+    onFallback?: {
+      steps?: Step[];
+    };
+  };
+  recipientList?: {
+    expression?: Record<string, unknown>;
+    delimiter?: string;
+    parallelProcessing?: boolean;
+    stopOnException?: boolean;
+    steps?: Step[];
+  };
   filter?: {
     expression?: string;
+    steps?: Step[];
+  };
+  loop?: {
+    expression?: Record<string, unknown>;
+    copy?: boolean;
+    doWhile?: boolean;
+    steps?: Step[];
+  };
+  saga?: {
+    propagation?: string;
+    completionMode?: string;
+    compensation?: string;
+    completion?: string;
     steps?: Step[];
   };
   transform?: {
@@ -156,7 +183,11 @@ export enum STEP_TYPE {
   SPLIT = "split",
   JOIN = "join",
   AGGREGATE = "aggregate",
+  CIRCUIT_BREAKER = "circuitBreaker",
+  RECIPIENT_LIST = "recipientList",
   FILTER = "filter",
+  LOOP = "loop",
+  SAGA = "saga",
   TRANSFORM = "transform",
   CUSTOM = "custom",
   CAMEL = "camel",
@@ -171,6 +202,7 @@ export enum STEP_TYPE {
   DO_CATCH = "doCatch",
   DO_TRY = "doTry",
   DO_FINALLY = "doFinally",
+  CUSTOM_FALLBACK = "fallback",
   MULTICAST = "multicast",
   LOAD_BALANCE = "loadBalance",
   ADD_BETWEEN = "add-between",

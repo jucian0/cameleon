@@ -80,6 +80,24 @@ export function getDefaultConfig(stepType: string): any {
       timeout: 0,
       strategyRef: null,
     },
+    filter: {
+      id: generateStepId(stepType),
+      expression: { simple: "${body} != null" },
+      steps: [],
+    },
+    loop: {
+      id: generateStepId(stepType),
+      expression: { simple: "3" },
+      copy: false,
+      doWhile: false,
+      steps: [],
+    },
+    saga: {
+      id: generateStepId(stepType),
+      propagation: "REQUIRED",
+      completionMode: "AUTO",
+      steps: [],
+    },
     aggregate: {
       id: generateStepId(stepType),
       strategyRef: "aggregationStrategy",
@@ -87,6 +105,7 @@ export function getDefaultConfig(stepType: string): any {
       completionTimeout: 1000,
       completionInterval: 500,
       correlationExpression: { simple: "${header.groupId}" },
+      steps: [],
     },
 
     // Error handling EIPs

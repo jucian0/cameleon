@@ -1,0 +1,26 @@
+- route:
+    id: route-circuit-breaker-demo
+    nodePrefixId: route-circuit-breaker-
+    from:
+      id: from-circuit-breaker-demo
+      uri: direct:start
+      steps:
+        - circuitBreaker:
+            id: circuit-breaker-demo
+            resilience4jConfiguration:
+              failureRateThreshold: 50
+              minimumNumberOfCalls: 5
+              slidingWindowSize: 10
+              timeoutDuration: 1000
+            steps:
+              - log:
+                  id: log-cb-main
+                  message: "inside circuit breaker"
+            onFallback:
+              steps:
+                - log:
+                    id: log-cb-fallback
+                    message: "fallback path"
+        - log:
+            id: log-after-circuit-breaker
+            message: "after circuit breaker"

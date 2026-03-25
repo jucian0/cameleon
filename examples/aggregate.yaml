@@ -1,0 +1,24 @@
+- route:
+    id: route-aggregate-demo
+    nodePrefixId: route-aggregate-
+    from:
+      id: from-aggregate-demo
+      uri: direct:start
+      steps:
+        - aggregate:
+            id: aggregate-demo
+            strategyRef: aggregationStrategy
+            completionSize: 10
+            completionTimeout: 1000
+            correlationExpression:
+              simple: "${header.groupId}"
+            steps:
+              - log:
+                  id: log-aggregate-a
+                  message: "inside aggregate"
+              - bean:
+                  id: bean-aggregate-b
+                  bean: {}
+        - log:
+            id: log-after-aggregate
+            message: "after aggregate"

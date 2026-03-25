@@ -7,6 +7,13 @@ import { BRANCHING_NODE_TYPES, generateUniqueId } from "../utils";
 import { createNode } from "../creation";
 import { ensurePlaceholderBetween } from "../add-placeholders";
 import { parseLoadbalanceStep } from "./loadbalance";
+import { parseSplitStep } from "./split";
+import { parseFilterStep } from "./filter";
+import { parseAggregateStep } from "./aggregate";
+import { parseRecipientListStep } from "./recipient-list";
+import { parseLoopStep } from "./loop";
+import { parseCircuitBreakerStep } from "./circuit-breaker";
+import { parseSagaStep } from "./saga";
 
 // ==================== Types ====================
 export type parseStepsResult = {
@@ -96,6 +103,83 @@ export function parseSteps(
             edges,
             lookaheadNodeIdOrPlaceholder,
             `${currentAbsolutePath}.loadBalance`,
+            parseSteps,
+          );
+          break;
+        case "split":
+          lastProcessedStepId = parseSplitStep(
+            step,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.split`,
+            parseSteps,
+          );
+          break;
+        case "filter":
+          lastProcessedStepId = parseFilterStep(
+            step,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.filter`,
+            parseSteps,
+          );
+          break;
+        case "aggregate":
+          lastProcessedStepId = parseAggregateStep(
+            step,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.aggregate`,
+            parseSteps,
+          );
+          break;
+        case "recipientList":
+          lastProcessedStepId = parseRecipientListStep(
+            step,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.recipientList`,
+            parseSteps,
+          );
+          break;
+        case "circuitBreaker":
+          lastProcessedStepId = parseCircuitBreakerStep(
+            step,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.circuitBreaker`,
+            parseSteps,
+          );
+          break;
+        case "loop":
+          lastProcessedStepId = parseLoopStep(
+            step,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.loop`,
+            parseSteps,
+          );
+          break;
+        case "saga":
+          lastProcessedStepId = parseSagaStep(
+            step,
+            currentStepId,
+            nodes,
+            edges,
+            lookaheadNodeIdOrPlaceholder,
+            `${currentAbsolutePath}.saga`,
             parseSteps,
           );
           break;

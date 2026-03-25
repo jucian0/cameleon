@@ -1,0 +1,21 @@
+- route:
+    id: route-saga-demo
+    nodePrefixId: route-saga-
+    from:
+      id: from-saga-demo
+      uri: direct:start
+      steps:
+        - saga:
+            id: saga-demo
+            propagation: REQUIRED
+            completionMode: AUTO
+            steps:
+              - log:
+                  id: log-saga-a
+                  message: "inside saga"
+              - bean:
+                  id: bean-saga-b
+                  bean: {}
+        - log:
+            id: log-after-saga
+            message: "after saga"
