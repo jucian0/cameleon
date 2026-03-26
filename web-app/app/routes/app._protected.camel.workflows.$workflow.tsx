@@ -16,6 +16,7 @@ import {
 import { decode } from "js-base64";
 import { yamlToJson } from "core";
 import React from "react";
+import { data as routerData } from "react-router";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -34,16 +35,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { data, error } = await supabase
     .from("workflows")
     .select("*")
-    .eq("id", workflowsId);
+    .eq("id", workflowsId)
+    .maybeSingle();
   if (error) {
-    return { error: error.message };
+    throw routerData({ message: error.message }, { status: 500 });
+  }
+  if (!data) {
+    throw routerData({ message: "Workflow not found" }, { status: 404 });
   }
 
-  const decodedData = decode(data[0].content ?? "");
+  const decodedData = decode(data.content ?? "");
   return {
     content: yamlToJson(decodedData),
-    name: data[0].name,
-    visibility: data[0].visibility,
+    name: data.name,
+    visibility: data.visibility,
   };
 }
 
