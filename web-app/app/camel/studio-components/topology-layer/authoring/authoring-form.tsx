@@ -12,10 +12,15 @@ import { ScalarField } from "./renderers/scalar-field";
 import { BooleanField } from "./renderers/boolean-field";
 import { EnumField } from "./renderers/enum-field";
 import { EndpointField } from "./renderers/endpoint-field";
-import type { FieldRendererProps, PropertySchema } from "./types";
+import type {
+  ComponentMetadata,
+  FieldRendererProps,
+  PropertySchema,
+} from "./types";
 
 type Props = {
   schema: Record<string, PropertySchema>;
+  componentMetadata?: ComponentMetadata | null;
   initialFormData: Record<string, any>;
   onSubmit?: (formData: Record<string, any>) => void;
   onCancel?: () => void;
@@ -63,6 +68,7 @@ function FieldRenderer(props: FieldRendererProps) {
 
 export function AuthoringForm({
   schema,
+  componentMetadata,
   initialFormData,
   onSubmit,
   onCancel,
@@ -158,6 +164,8 @@ export function AuthoringForm({
                 description={property.description}
                 property={property}
                 value={currentValue}
+                schema={schema}
+                componentMetadata={componentMetadata}
                 formData={formData}
                 onChange={(value) => updateField(key, value)}
                 onFormDataChange={(nextFormData) => setFormData(nextFormData)}

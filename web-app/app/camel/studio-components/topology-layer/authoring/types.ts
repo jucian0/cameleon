@@ -1,15 +1,33 @@
 export type PropertySchema = {
   displayName?: string;
   description?: string;
-  type?: "boolean" | "string" | "number" | "object" | "array";
+  type?:
+    | "boolean"
+    | "string"
+    | "number"
+    | "object"
+    | "array"
+    | "integer"
+    | "duration";
   defaultValue?: boolean | number | string;
   oneOf?: string[];
+  enum?: string[];
   required?: boolean;
   secret?: boolean;
   group?: string;
   kind?: string;
   asPredicate?: boolean;
   index?: number;
+};
+
+export type ComponentMetadata = {
+  component?: {
+    name?: string;
+    title?: string;
+    description?: string;
+    syntax?: string;
+  };
+  properties?: Record<string, PropertySchema>;
 };
 
 export type FieldRendererKind =
@@ -33,6 +51,8 @@ export type FieldRendererProps = {
   description?: string;
   property: PropertySchema;
   value: unknown;
+  schema: Record<string, PropertySchema>;
+  componentMetadata?: ComponentMetadata | null;
   formData: Record<string, unknown>;
   onChange: (value: unknown) => void;
   onFormDataChange: (nextFormData: Record<string, unknown>) => void;

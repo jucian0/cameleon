@@ -1,10 +1,17 @@
 import React from "react";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "app/components/ui/checkbox";
 import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
 import type { FieldRendererProps } from "../types";
 import { parseKeyValueLines } from "../field-registry";
-import { parseEndpointUri, serializeEndpointUri } from "../endpoint-model";
+import {
+  buildEndpointTarget,
+  parseEndpointUri,
+  serializeEndpointUri,
+  splitEndpointTarget,
+  type EndpointPathDefinition,
+} from "../endpoint-model";
 
 function normalizeParameters(formData: Record<string, unknown>, uri: string) {
   const parsed = parseEndpointUri(uri);
@@ -21,10 +28,37 @@ function normalizeParameters(formData: Record<string, unknown>, uri: string) {
   return parsed?.parameters ?? {};
 }
 
+function getPathDefinitions(
+  props: FieldRendererProps["componentMetadata"],
+  parsedComponent: string | undefined,
+) {
+  const componentName = props?.component?.name;
+  const properties = props?.properties ?? {};
+
+  if (!componentName || !parsedComponent || componentName !== parsedComponent) {
+    return [] as EndpointPathDefinition[];
+  }
+
+  return Object.entries(properties)
+    .filter(([, property]) => property.kind === "path")
+    .sort(([, left], [, right]) => {
+      const leftIndex = left.index ?? Number.MAX_SAFE_INTEGER;
+      const rightIndex = right.index ?? Number.MAX_SAFE_INTEGER;
+      return leftIndex - rightIndex;
+    })
+    .map(([key, property]) => ({
+      key,
+      label: property.displayName || key,
+      description: property.description,
+      required: property.required,
+    }));
+}
+
 export function EndpointField({
   label,
   description,
   value,
+  componentMetadata,
   formData,
   onChange,
   onFormDataChange,
@@ -32,6 +66,15 @@ export function EndpointField({
   const uri = typeof value === "string" ? value : "";
   const parsed = React.useMemo(() => parseEndpointUri(uri), [uri]);
   const [rawMode, setRawMode] = React.useState(() => !parsed);
+  const shouldPersistParameters = "parameters" in formData;
+  const pathDefinitions = React.useMemo(
+    () => getPathDefinitions(componentMetadata, parsed?.component),
+    [componentMetadata, parsed?.component],
+  );
+  const pathSegments = React.useMemo(
+    () => splitEndpointTarget(parsed?.target ?? ""),
+    [parsed?.target],
+  );
 
   React.useEffect(() => {
     setRawMode(!parsed);
@@ -61,11 +104,18 @@ export function EndpointField({
 
     const nextUri = serializeEndpointUri(nextModel);
     onChange(nextUri);
-    onFormDataChange({
-      ...formData,
-      uri: nextUri,
-      parameters: nextModel.parameters,
-    });
+    onFormDataChange(
+      shouldPersistParameters
+        ? {
+            ...formData,
+            uri: nextUri,
+            parameters: nextModel.parameters,
+          }
+        : {
+            ...formData,
+            uri: nextUri,
+          },
+    );
   }
 
   const preview = parsed
@@ -78,6 +128,16 @@ export function EndpointField({
 
   return (
     <div className="space-y-3 rounded-lg border border-border p-3">
+      {componentMetadata?.component?.title && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2">
+          <Badge intent="secondary">{componentMetadata.component.title}</Badge>
+          {componentMetadata.component.syntax && (
+            <code className="text-xs text-muted-fg">
+              {componentMetadata.component.syntax}
+            </code>
+          )}
+        </div>
+      )}
       <Checkbox
         isSelected={rawMode}
         onChange={(nextRawMode) => {
@@ -109,12 +169,34 @@ export function EndpointField({
             value={parsed?.component ?? ""}
             onChange={(nextValue) => updateEndpoint({ component: nextValue })}
           />
-          <TextField
-            label="Target"
-            description={description}
-            value={parsed?.target ?? ""}
-            onChange={(nextValue) => updateEndpoint({ target: nextValue })}
-          />
+          {pathDefinitions.length > 0 ? (
+            pathDefinitions.map((pathDefinition, index) => (
+              <TextField
+                key={pathDefinition.key}
+                label={pathDefinition.label}
+                description={
+                  index === 0
+                    ? description || pathDefinition.description
+                    : pathDefinition.description
+                }
+                value={pathSegments[index] ?? ""}
+                onChange={(nextValue) => {
+                  const nextSegments = [...pathSegments];
+                  nextSegments[index] = nextValue;
+                  updateEndpoint({
+                    target: buildEndpointTarget(nextSegments),
+                  });
+                }}
+              />
+            ))
+          ) : (
+            <TextField
+              label="Target"
+              description={description}
+              value={parsed?.target ?? ""}
+              onChange={(nextValue) => updateEndpoint({ target: nextValue })}
+            />
+          )}
           <Textarea
             label="Query Parameters"
             description="One key=value entry per line. Serialized in deterministic key order."
@@ -129,11 +211,7 @@ export function EndpointField({
               })
             }
           />
-          <TextField
-            label="Generated URI Preview"
-            value={preview}
-            isReadOnly
-          />
+          <TextField label="Generated URI Preview" value={preview} isReadOnly />
         </>
       )}
     </div>

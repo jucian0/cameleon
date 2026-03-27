@@ -8,7 +8,28 @@ import {
   fetchEIPsMetadata,
 } from "../../data-requests/fetch-metadata";
 import { tryCatch } from "@/utils/try-catch";
-import type { PropertySchema } from "./authoring/types";
+import type { ComponentMetadata, PropertySchema } from "./authoring/types";
+
+function normalizePropertySchema(
+  property: Record<string, unknown>,
+): PropertySchema {
+  const normalizedType =
+    property.type === "integer"
+      ? "number"
+      : property.type === "duration"
+        ? "string"
+        : (property.type as PropertySchema["type"]);
+
+  return {
+    ...property,
+    type: normalizedType,
+    oneOf: Array.isArray(property.oneOf)
+      ? (property.oneOf as string[])
+      : Array.isArray(property.enum)
+        ? (property.enum as string[])
+        : undefined,
+  };
+}
 
 const INLINE_NODE_TYPES = new Set([
   "when",
@@ -61,11 +82,13 @@ export function Form() {
     const entry = metadata.find((item: any) => {
       if (kind === "eip") return item.model?.name === node?.stepType;
       return item.component?.name === componentName;
-    });
-    const entryProperties = (entry?.properties ?? {}) as Record<
-      string,
-      PropertySchema
-    >;
+    }) as ComponentMetadata | undefined;
+    const entryProperties = Object.fromEntries(
+      Object.entries(entry?.properties ?? {}).map(([key, property]) => [
+        key,
+        normalizePropertySchema(property as Record<string, unknown>),
+      ]),
+    ) as Record<string, PropertySchema>;
 
     if (
       kind === "component" &&
@@ -120,6 +143,26 @@ export function Form() {
     return entryProperties;
   }, [formData, kind, metadata, node?.stepType]);
 
+  const componentMetadata = React.useMemo(() => {
+    if (kind !== "component") return null;
+    const componentName = (node?.stepType ?? "").split(":")[0];
+    const entry = metadata.find(
+      (item: any) => item.component?.name === componentName,
+    ) as ComponentMetadata | undefined;
+
+    if (!entry) return null;
+
+    return {
+      ...entry,
+      properties: Object.fromEntries(
+        Object.entries(entry.properties ?? {}).map(([key, property]) => [
+          key,
+          normalizePropertySchema(property as Record<string, unknown>),
+        ]),
+      ),
+    } as ComponentMetadata;
+  }, [kind, metadata, node?.stepType]);
+
   function handleSubmit(updatedFormData: Record<string, any>) {
     if (!node || !configPath) return;
     setCamelConfig(dot.set(camelConfig, configPath, updatedFormData));
@@ -131,6 +174,7 @@ export function Form() {
   return (
     <AuthoringForm
       schema={formSchema}
+      componentMetadata={componentMetadata}
       initialFormData={formData}
       onSubmit={handleSubmit}
       onCancel={() => setNode()}

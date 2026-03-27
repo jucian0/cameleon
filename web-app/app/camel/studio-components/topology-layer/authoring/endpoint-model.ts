@@ -6,6 +6,13 @@ export type EndpointModel = {
   parameters: Record<string, unknown>;
 };
 
+export type EndpointPathDefinition = {
+  key: string;
+  label: string;
+  description?: string;
+  required?: boolean;
+};
+
 export function parseEndpointUri(uri: string): EndpointModel | null {
   const trimmed = uri.trim();
   const separatorIndex = trimmed.indexOf(":");
@@ -42,4 +49,12 @@ export function serializeEndpointUri(model: EndpointModel) {
     .join("&");
 
   return `${model.component}:${model.target}${query ? `?${query}` : ""}`;
+}
+
+export function splitEndpointTarget(target: string) {
+  return target.split(":");
+}
+
+export function buildEndpointTarget(values: string[]) {
+  return values.map((value) => value.trim()).join(":");
 }
