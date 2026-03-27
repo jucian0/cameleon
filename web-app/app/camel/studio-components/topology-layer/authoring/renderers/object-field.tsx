@@ -1,7 +1,8 @@
 import { Textarea } from "app/components/ui/textarea";
 import type { FieldRendererProps } from "../types";
 import { parseKeyValueLines } from "../field-registry";
-import { isPlainObject, prettyJson, parseObjectValue } from "../utils";
+import { isPlainObject } from "../utils";
+import { JsonTextareaField } from "./json-textarea-field";
 
 export function MapField({
   label,
@@ -9,6 +10,7 @@ export function MapField({
   errorMessage,
   value,
   onChange,
+  onErrorChange,
 }: FieldRendererProps) {
   const objectValue = isPlainObject(value) ? value : {};
   const entries = Object.entries(objectValue);
@@ -20,7 +22,10 @@ export function MapField({
       errorMessage={errorMessage}
       placeholder={"key=value\nanother=value"}
       value={entries.map(([key, item]) => `${key}=${String(item)}`).join("\n")}
-      onChange={(nextValue) => onChange(parseKeyValueLines(nextValue))}
+      onChange={(nextValue) => {
+        onErrorChange(undefined);
+        onChange(parseKeyValueLines(nextValue));
+      }}
     />
   );
 }
@@ -31,11 +36,12 @@ export function ObjectFallbackField({
   errorMessage,
   value,
   onChange,
+  onErrorChange,
 }: FieldRendererProps) {
   const objectValue = isPlainObject(value) ? value : (value ?? {});
 
   return (
-    <Textarea
+    <JsonTextareaField
       label={label}
       description={
         description
@@ -44,8 +50,10 @@ export function ObjectFallbackField({
       }
       errorMessage={errorMessage}
       placeholder="{}"
-      value={prettyJson(objectValue)}
-      onChange={(nextValue) => onChange(parseObjectValue(nextValue))}
+      value={objectValue}
+      emptyValue={{}}
+      onChange={onChange}
+      onErrorChange={onErrorChange}
     />
   );
 }

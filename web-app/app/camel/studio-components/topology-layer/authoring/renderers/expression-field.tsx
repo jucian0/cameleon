@@ -8,7 +8,8 @@ import {
   SelectTrigger,
 } from "app/components/ui/select";
 import type { FieldRendererProps } from "../types";
-import { isPlainObject, parseObjectValue, prettyJson } from "../utils";
+import { isPlainObject } from "../utils";
+import { JsonTextareaField } from "./json-textarea-field";
 
 const PREFERRED_EXPRESSION_LANGUAGES = [
   "simple",
@@ -83,6 +84,7 @@ export function ExpressionField({
   property,
   value,
   onChange,
+  onErrorChange,
 }: FieldRendererProps) {
   const expressionOptions = React.useMemo(
     () => getExpressionLanguages(property.oneOf ?? [], value),
@@ -139,28 +141,31 @@ export function ExpressionField({
       </Select>
 
       {expressionIsComplex ? (
-        <Textarea
+        <JsonTextareaField
           label={`${label} Value`}
           description="Advanced JSON fallback for complex expression payloads."
           errorMessage={errorMessage}
           placeholder="{}"
-          value={prettyJson(expression)}
+          value={expression}
+          emptyValue={{}}
           onChange={(nextValue) =>
             onChange({
-              [language]: parseObjectValue(nextValue),
+              [language]: nextValue,
             })
           }
+          onErrorChange={onErrorChange}
         />
       ) : (
         <TextField
           label={`${label} Value`}
           errorMessage={errorMessage}
           value={expression?.toString() || ""}
-          onChange={(nextValue) =>
+          onChange={(nextValue) => {
+            onErrorChange(undefined);
             onChange({
               [language]: nextValue,
-            })
-          }
+            });
+          }}
         />
       )}
     </div>

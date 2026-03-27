@@ -57,4 +57,5 @@ export type FieldRendererProps = {
   formData: Record<string, unknown>;
   onChange: (value: unknown) => void;
   onFormDataChange: (nextFormData: Record<string, unknown>) => void;
+  onErrorChange: (errorMessage?: string) => void;
 };

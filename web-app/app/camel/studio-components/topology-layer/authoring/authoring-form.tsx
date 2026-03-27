@@ -124,12 +124,16 @@ export function AuthoringForm({
   onCancel,
 }: Props) {
   const [formData, setFormData] = React.useState(initialFormData);
+  const [transientErrors, setTransientErrors] = React.useState<
+    Record<string, string | undefined>
+  >({});
   const [collapsedGroups, setCollapsedGroups] = React.useState<
     Record<string, boolean>
   >({});
 
   React.useEffect(() => {
     setFormData(initialFormData);
+    setTransientErrors({});
   }, [initialFormData]);
 
   const properties = React.useMemo(
@@ -162,7 +166,7 @@ export function AuthoringForm({
       .map((group) => [group, grouped.get(group) ?? []] as const);
   }, [properties]);
 
-  const fieldErrors = React.useMemo(
+  const schemaErrors = React.useMemo(
     () =>
       Object.fromEntries(
         properties.map(([key, property]) => {
@@ -171,6 +175,13 @@ export function AuthoringForm({
         }),
       ) as Record<string, string | undefined>,
     [formData, properties],
+  );
+  const fieldErrors = React.useMemo(
+    () => ({
+      ...schemaErrors,
+      ...transientErrors,
+    }),
+    [schemaErrors, transientErrors],
   );
   const totalErrors = React.useMemo(
     () => Object.values(fieldErrors).filter(Boolean).length,
@@ -249,6 +260,12 @@ export function AuthoringForm({
                 formData={formData}
                 onChange={(value) => updateField(key, value)}
                 onFormDataChange={(nextFormData) => setFormData(nextFormData)}
+                onErrorChange={(nextErrorMessage) =>
+                  setTransientErrors((current) => ({
+                    ...current,
+                    [key]: nextErrorMessage,
+                  }))
+                }
               />
             );
           })

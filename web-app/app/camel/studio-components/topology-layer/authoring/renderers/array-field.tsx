@@ -1,11 +1,7 @@
 import { Textarea } from "app/components/ui/textarea";
 import type { FieldRendererProps } from "../types";
-import {
-  isPrimitiveValue,
-  parseObjectValue,
-  parsePrimitiveValue,
-  prettyJson,
-} from "../utils";
+import { JsonTextareaField } from "./json-textarea-field";
+import { isPrimitiveValue, parsePrimitiveValue } from "../utils";
 
 export function ArrayField({
   label,
@@ -13,13 +9,14 @@ export function ArrayField({
   errorMessage,
   value,
   onChange,
+  onErrorChange,
 }: FieldRendererProps) {
   const arrayValue = Array.isArray(value) ? value : [];
   const isPrimitiveArray = arrayValue.every((item) => isPrimitiveValue(item));
 
   if (!isPrimitiveArray) {
     return (
-      <Textarea
+      <JsonTextareaField
         label={label}
         description={
           description
@@ -28,8 +25,10 @@ export function ArrayField({
         }
         errorMessage={errorMessage}
         placeholder="[]"
-        value={prettyJson(arrayValue)}
-        onChange={(nextValue) => onChange(parseObjectValue(nextValue) ?? [])}
+        value={arrayValue}
+        emptyValue={[]}
+        onChange={onChange}
+        onErrorChange={onErrorChange}
       />
     );
   }
@@ -41,15 +40,16 @@ export function ArrayField({
       errorMessage={errorMessage}
       placeholder="One item per line"
       value={arrayValue.map((item) => item?.toString() ?? "").join("\n")}
-      onChange={(nextValue) =>
+      onChange={(nextValue) => {
+        onErrorChange(undefined);
         onChange(
           nextValue
             .split("\n")
             .map((item) => item.trim())
             .filter(Boolean)
             .map(parsePrimitiveValue),
-        )
-      }
+        );
+      }}
     />
   );
 }

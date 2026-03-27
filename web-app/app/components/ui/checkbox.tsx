@@ -10,7 +10,15 @@ import {
 } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 import { composeTailwindRenderProps } from "app/components/lib/primitive";
-import { Description, FieldError, type FieldProps, Label } from "./field";
+import {
+  Description,
+  FieldError,
+  fieldStyles,
+  type FieldProps,
+  Label,
+} from "./field";
+
+const { description: descriptionStyles, label: labelStyles } = fieldStyles();
 
 interface CheckboxGroupProps
   extends CheckboxGroupPrimitiveProps,
@@ -57,7 +65,7 @@ const Checkbox = ({
       {...props}
       className={composeTailwindRenderProps(
         className,
-        "group block disabled:opacity-50",
+        "group relative block disabled:opacity-50",
       )}
     >
       {composeRenderProps(
@@ -77,14 +85,28 @@ const Checkbox = ({
 
           const content = hasCustomChildren ? (
             isStringChild ? (
-              <Label>{children}</Label>
+              <span data-slot="label" className={labelStyles()}>
+                {children}
+              </span>
             ) : (
               children
             )
           ) : (
             <>
-              {label && <Label>{label}</Label>}
-              {description && <Description>{description}</Description>}
+              {label && (
+                <span data-slot="label" className={labelStyles()}>
+                  {label}
+                </span>
+              )}
+              {description && (
+                <span
+                  slot="description"
+                  data-slot="description"
+                  className={descriptionStyles()}
+                >
+                  {description}
+                </span>
+              )}
             </>
           );
 

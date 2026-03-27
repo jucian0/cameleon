@@ -4,15 +4,25 @@ import type { FieldRendererProps } from "../types";
 export function BooleanField({
   label,
   description,
+  errorMessage,
   value,
   onChange,
 }: FieldRendererProps) {
   return (
-    <Checkbox
-      isSelected={Boolean(value)}
-      onChange={(nextValue) => onChange(nextValue)}
-      label={label}
-      description={description}
-    />
+    <div
+      className={`rounded-lg border p-3 ${
+        errorMessage ? "border-danger/40 bg-danger/5" : "border-border"
+      }`}
+    >
+      <Checkbox
+        isSelected={Boolean(value)}
+        onChange={onChange}
+        label={label}
+        description={description}
+      />
+      {errorMessage && (
+        <p className="mt-2 text-sm text-danger-foreground">{errorMessage}</p>
+      )}
+    </div>
   );
 }

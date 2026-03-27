@@ -78,8 +78,10 @@ export function EndpointField({
   );
 
   React.useEffect(() => {
-    setRawMode(!parsed);
-  }, [parsed?.component, parsed?.target, uri]);
+    if (!parsed) {
+      setRawMode(true);
+    }
+  }, [parsed]);
 
   const parameters = React.useMemo(
     () => normalizeParameters(formData, uri),
