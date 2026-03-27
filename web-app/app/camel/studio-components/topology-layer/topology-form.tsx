@@ -8,6 +8,7 @@ import {
   fetchEIPsMetadata,
 } from "../../data-requests/fetch-metadata";
 import { tryCatch } from "@/utils/try-catch";
+import type { PropertySchema } from "./authoring/types";
 
 const INLINE_NODE_TYPES = new Set([
   "when",
@@ -56,12 +57,68 @@ export function Form() {
   }, [camelConfig, configPath]);
 
   const formSchema = React.useMemo(() => {
+    const componentName = (node?.stepType ?? "").split(":")[0];
     const entry = metadata.find((item: any) => {
       if (kind === "eip") return item.model?.name === node?.stepType;
-      return item.component?.name === node?.stepType;
+      return item.component?.name === componentName;
     });
-    return entry?.properties ?? {};
-  }, [kind, metadata, node?.stepType]);
+    const entryProperties = (entry?.properties ?? {}) as Record<
+      string,
+      PropertySchema
+    >;
+
+    if (
+      kind === "component" &&
+      formData &&
+      typeof formData === "object" &&
+      "uri" in formData
+    ) {
+      const objectFormData = formData as Record<string, unknown>;
+      const inferredSchema = Object.keys(objectFormData)
+        .filter((key) => key !== "steps")
+        .reduce(
+          (acc, key) => {
+            const existingProperty = entryProperties[key];
+            if (existingProperty) {
+              acc[key] = existingProperty;
+              return acc;
+            }
+
+            const value = objectFormData[key];
+            acc[key] = {
+              displayName: key.replace(/([A-Z])/g, " $1").trim(),
+              group: key === "uri" ? "common" : "advanced",
+              type:
+                typeof value === "boolean"
+                  ? "boolean"
+                  : typeof value === "number"
+                    ? "number"
+                    : Array.isArray(value)
+                      ? "array"
+                      : value && typeof value === "object"
+                        ? "object"
+                        : "string",
+            };
+            return acc;
+          },
+          {} as Record<string, PropertySchema>,
+        );
+
+      if (!inferredSchema.uri) {
+        inferredSchema.uri = {
+          displayName: "Uri",
+          group: "common",
+          type: "string",
+          required: true,
+          description: "The endpoint URI for this Camel endpoint.",
+        };
+      }
+
+      return inferredSchema;
+    }
+
+    return entryProperties;
+  }, [formData, kind, metadata, node?.stepType]);
 
   function handleSubmit(updatedFormData: Record<string, any>) {
     if (!node || !configPath) return;

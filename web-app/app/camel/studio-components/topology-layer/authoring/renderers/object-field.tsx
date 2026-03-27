@@ -29,7 +29,7 @@ export function ObjectFallbackField({
   value,
   onChange,
 }: FieldRendererProps) {
-  const objectValue = isPlainObject(value) ? value : value ?? {};
+  const objectValue = isPlainObject(value) ? value : (value ?? {});
 
   return (
     <Textarea

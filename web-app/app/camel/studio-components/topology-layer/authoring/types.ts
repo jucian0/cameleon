@@ -19,7 +19,8 @@ export type FieldRendererKind =
   | "expression"
   | "array"
   | "map"
-  | "object-fallback";
+  | "object-fallback"
+  | "endpoint";
 
 export type FieldRenderer = {
   kind: FieldRendererKind;
@@ -32,5 +33,7 @@ export type FieldRendererProps = {
   description?: string;
   property: PropertySchema;
   value: unknown;
+  formData: Record<string, unknown>;
   onChange: (value: unknown) => void;
+  onFormDataChange: (nextFormData: Record<string, unknown>) => void;
 };

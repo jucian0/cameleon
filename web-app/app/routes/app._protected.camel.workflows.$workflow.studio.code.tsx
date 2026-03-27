@@ -6,6 +6,7 @@ import React from "react";
 import debounce from "debounce";
 import { withModal } from "app/components/utils/with-modal";
 import { useLocation, useOutletContext } from "react-router";
+import { Badge } from "@/components/ui/badge";
 
 export default withModal(({ isOpen, closeModal }: any) => {
   const { setCamelConfig, camelConfig } = useTopologyStore();
@@ -15,13 +16,35 @@ export default withModal(({ isOpen, closeModal }: any) => {
     visibility: "public" | "private";
   }>();
   const isPublic = visibility === "public";
-  const [debouncedSetCamelConfig] = React.useState(() =>
-    debounce(setCamelConfig, 500),
+  const canonicalYaml = React.useMemo(
+    () => jsonToYaml(camelConfig),
+    [camelConfig],
   );
+  const [editorValue, setEditorValue] = React.useState(canonicalYaml);
+  const [parseError, setParseError] = React.useState<string | null>(null);
+  const [debouncedSetCamelConfig] = React.useState(() =>
+    debounce((nextValue: string) => {
+      try {
+        setCamelConfig(yamlToJson(nextValue));
+        setParseError(null);
+      } catch (error) {
+        setParseError(
+          error instanceof Error ? error.message : "Failed to parse YAML.",
+        );
+      }
+    }, 500),
+  );
+
+  React.useEffect(() => {
+    if (!parseError) {
+      setEditorValue(canonicalYaml);
+    }
+  }, [canonicalYaml, parseError]);
 
   const onChange = (newValue: string | undefined) => {
     if (newValue !== undefined) {
-      debouncedSetCamelConfig(yamlToJson(newValue));
+      setEditorValue(newValue);
+      debouncedSetCamelConfig(newValue);
     }
   };
 
@@ -36,11 +59,19 @@ export default withModal(({ isOpen, closeModal }: any) => {
           <div
             className={`w-full h-full relative rounded-lg py-11 ${isPublic ? "pointer-none" : ""}`}
           >
+            {parseError && (
+              <div className="absolute inset-x-3 top-3 z-10 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2">
+                <Badge intent="danger">Invalid YAML</Badge>
+                <p className="text-sm text-danger-foreground">
+                  Keeping the last valid canvas state. {parseError}
+                </p>
+              </div>
+            )}
             <MonacoEditor
               className={`"w-full h-full" ${isPublic ? "pointer-none" : ""}`}
               language="yaml"
               theme={theme[0] === "dark" ? "vs-dark" : "vs-light"}
-              defaultValue={jsonToYaml(camelConfig)}
+              value={editorValue}
               options={{
                 selectOnLineNumbers: true,
                 readOnly: isPublic,

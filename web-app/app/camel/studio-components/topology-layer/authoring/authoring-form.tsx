@@ -9,6 +9,7 @@ import { MapField, ObjectFallbackField } from "./renderers/object-field";
 import { ScalarField } from "./renderers/scalar-field";
 import { BooleanField } from "./renderers/boolean-field";
 import { EnumField } from "./renderers/enum-field";
+import { EndpointField } from "./renderers/endpoint-field";
 import type { FieldRendererProps, PropertySchema } from "./types";
 
 type Props = {
@@ -38,6 +39,8 @@ function FieldRenderer(props: FieldRendererProps) {
       return <MapField {...props} />;
     case "object-fallback":
       return <ObjectFallbackField {...props} />;
+    case "endpoint":
+      return <EndpointField {...props} />;
     case "boolean":
       return <BooleanField {...props} />;
     case "enum":
@@ -117,7 +120,9 @@ export function AuthoringForm({
                 description={property.description}
                 property={property}
                 value={currentValue}
+                formData={formData}
                 onChange={(value) => updateField(key, value)}
+                onFormDataChange={(nextFormData) => setFormData(nextFormData)}
               />
             );
           })

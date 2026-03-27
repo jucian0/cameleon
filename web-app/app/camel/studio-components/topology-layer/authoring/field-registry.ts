@@ -1,8 +1,4 @@
-import {
-  isPlainObject,
-  isPrimitiveValue,
-  parseObjectValue,
-} from "./utils";
+import { isPlainObject, isPrimitiveValue, parseObjectValue } from "./utils";
 import type { FieldRenderer, PropertySchema } from "./types";
 
 const HIDDEN_STRUCTURAL_KEYS = new Set(["steps", "outputs"]);
@@ -31,6 +27,10 @@ export function getFieldRenderer(
 ): FieldRenderer {
   if (isHiddenStructuralField(property, key)) {
     return { kind: "object-fallback", isHidden: true };
+  }
+
+  if (key === "uri" && property.type === "string") {
+    return { kind: "endpoint" };
   }
 
   if (property.kind === "expression") {
