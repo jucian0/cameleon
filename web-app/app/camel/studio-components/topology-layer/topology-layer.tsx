@@ -50,7 +50,7 @@ export function TopologyLibraryLayer() {
   return (
     <Sheet isOpen={isOpen} onOpenChange={onUnSelectedNode}>
       <Sheet.Content isDismissable>
-        <Sheet.Header>
+        <Sheet.Header className="px-4 py-4 pb-3">
           <div className="flex items-center gap-2 pb-2">
             <Badge
               intent={node?.operation.includes("add") ? "info" : "secondary"}
@@ -74,7 +74,7 @@ export function TopologyLibraryLayer() {
           </Sheet.Title>
           <Sheet.Description>{panelCopy.description}</Sheet.Description>
         </Sheet.Header>
-        <Sheet.Body className="space-y-4">
+        <Sheet.Body className="space-y-4 px-4 py-2 pb-4">
           {node?.absolutePath && (
             <div className="rounded-lg border border-border bg-muted/30 px-3 py-2">
               <p className="text-xs font-medium uppercase tracking-wide text-muted-fg">

@@ -174,10 +174,13 @@ export function AuthoringForm({
         const formattedGroupName = formatGroupName(groupName);
 
         return (
-          <section key={groupName} className="space-y-4">
+          <section
+            key={groupName}
+            className="overflow-hidden rounded-xl border border-border bg-background"
+          >
             <button
               type="button"
-              className="flex w-full items-center justify-between rounded-lg border border-border px-3 py-2 text-left hover:bg-muted/30"
+              className="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-muted/30"
               onClick={() =>
                 setCollapsedGroups((current) => ({
                   ...current,
@@ -200,12 +203,16 @@ export function AuthoringForm({
               />
             </button>
 
-            {!isCollapsed && renderedFields}
+            {!isCollapsed && (
+              <div className="space-y-4 border-t border-border bg-muted/10 px-3 py-3">
+                {renderedFields}
+              </div>
+            )}
           </section>
         );
       })}
 
-      <Sheet.Footer className="flex justify-end gap-2 -m-2">
+      <Sheet.Footer className="flex justify-end gap-2 px-0 py-0 pt-2">
         <Button type="button" intent="plain" onPress={onCancel}>
           Cancel
         </Button>
