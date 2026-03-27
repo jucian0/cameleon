@@ -1,4 +1,4 @@
-import { DynamicForm } from "./dynamic-form";
+import { AuthoringForm } from "./authoring/authoring-form";
 import React from "react";
 import dot from "dot-prop-immutable";
 import { useLayer } from "./topology-layer";
@@ -29,7 +29,9 @@ export function Form() {
   const { camelConfig, setCamelConfig } = useTopologyStore();
   const [metadata, setMetadata] = React.useState<Record<string, any>[]>([]);
 
-  const kind = EIPSListNames.includes(node?.stepType ?? "") ? "eip" : "component";
+  const kind = EIPSListNames.includes(node?.stepType ?? "")
+    ? "eip"
+    : "component";
   const configPath = React.useMemo(() => getNodeConfigPath(node), [node]);
 
   React.useEffect(() => {
@@ -70,7 +72,7 @@ export function Form() {
   if (!node || !configPath) return null;
 
   return (
-    <DynamicForm
+    <AuthoringForm
       schema={formSchema}
       initialFormData={formData}
       onSubmit={handleSubmit}
