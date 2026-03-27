@@ -60,6 +60,30 @@ function hasEmptyExpressionValue(value: unknown) {
   return value == null;
 }
 
+function hasInvalidEnumValue(property: PropertySchema, value: unknown) {
+  if (!Array.isArray(property.oneOf) || property.oneOf.length === 0) {
+    return false;
+  }
+
+  if (value == null || value === "") {
+    return false;
+  }
+
+  return !property.oneOf.includes(String(value));
+}
+
+function hasInvalidNumberValue(property: PropertySchema, value: unknown) {
+  if (property.type !== "number" && property.type !== "integer") {
+    return false;
+  }
+
+  if (value == null || value === "") {
+    return false;
+  }
+
+  return typeof value !== "number" || Number.isNaN(value);
+}
+
 function getFieldError(
   fieldKey: string,
   property: PropertySchema,
@@ -75,6 +99,14 @@ function getFieldError(
 
   if (property.kind === "expression" && hasEmptyExpressionValue(value)) {
     return property.required ? "Expression is required." : undefined;
+  }
+
+  if (hasInvalidEnumValue(property, value)) {
+    return `${property.displayName || fieldKey} must be one of the supported options.`;
+  }
+
+  if (hasInvalidNumberValue(property, value)) {
+    return `${property.displayName || fieldKey} must be a valid number.`;
   }
 
   if (isEmptyRequiredValue(value, property)) {
