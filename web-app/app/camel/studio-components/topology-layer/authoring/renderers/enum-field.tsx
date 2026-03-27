@@ -9,6 +9,7 @@ import type { FieldRendererProps } from "../types";
 export function EnumField({
   label,
   description,
+  errorMessage,
   property,
   value,
   onChange,
@@ -21,6 +22,7 @@ export function EnumField({
       onSelectionChange={(nextValue) => onChange(nextValue?.toString())}
       label={label}
       description={description}
+      errorMessage={errorMessage}
     >
       <SelectTrigger />
       <SelectList>

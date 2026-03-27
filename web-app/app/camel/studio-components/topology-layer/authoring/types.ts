@@ -49,6 +49,7 @@ export type FieldRendererProps = {
   fieldKey: string;
   label: string;
   description?: string;
+  errorMessage?: string;
   property: PropertySchema;
   value: unknown;
   schema: Record<string, PropertySchema>;

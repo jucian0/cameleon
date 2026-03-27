@@ -10,6 +10,7 @@ import {
 export function ArrayField({
   label,
   description,
+  errorMessage,
   value,
   onChange,
 }: FieldRendererProps) {
@@ -25,6 +26,7 @@ export function ArrayField({
             ? `${description} Advanced JSON fallback for complex arrays.`
             : "Advanced JSON fallback for complex arrays."
         }
+        errorMessage={errorMessage}
         placeholder="[]"
         value={prettyJson(arrayValue)}
         onChange={(nextValue) => onChange(parseObjectValue(nextValue) ?? [])}
@@ -36,6 +38,7 @@ export function ArrayField({
     <Textarea
       label={label}
       description={description}
+      errorMessage={errorMessage}
       placeholder="One item per line"
       value={arrayValue.map((item) => item?.toString() ?? "").join("\n")}
       onChange={(nextValue) =>

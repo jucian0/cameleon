@@ -4,6 +4,7 @@ import type { FieldRendererProps } from "../types";
 export function ScalarField({
   label,
   description,
+  errorMessage,
   property,
   value,
   onChange,
@@ -12,6 +13,7 @@ export function ScalarField({
     <TextField
       label={label}
       description={description}
+      errorMessage={errorMessage}
       type={
         property.type === "number"
           ? "number"

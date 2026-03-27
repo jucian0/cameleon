@@ -79,6 +79,7 @@ function getExpressionValue(
 export function ExpressionField({
   label,
   description,
+  errorMessage,
   property,
   value,
   onChange,
@@ -97,7 +98,11 @@ export function ExpressionField({
     isPlainObject(value) && Object.keys(value).length > 1;
 
   return (
-    <div className="space-y-3 rounded-lg border border-border p-3">
+    <div
+      className={`space-y-3 rounded-lg border p-3 ${
+        errorMessage ? "border-danger/40 bg-danger/5" : "border-border"
+      }`}
+    >
       <Select
         selectedKey={language}
         isDisabled={locksLanguageSelection}
@@ -137,6 +142,7 @@ export function ExpressionField({
         <Textarea
           label={`${label} Value`}
           description="Advanced JSON fallback for complex expression payloads."
+          errorMessage={errorMessage}
           placeholder="{}"
           value={prettyJson(expression)}
           onChange={(nextValue) =>
@@ -148,6 +154,7 @@ export function ExpressionField({
       ) : (
         <TextField
           label={`${label} Value`}
+          errorMessage={errorMessage}
           value={expression?.toString() || ""}
           onChange={(nextValue) =>
             onChange({

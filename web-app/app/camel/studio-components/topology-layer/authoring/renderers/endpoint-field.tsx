@@ -57,6 +57,7 @@ function getPathDefinitions(
 export function EndpointField({
   label,
   description,
+  errorMessage,
   value,
   componentMetadata,
   formData,
@@ -127,7 +128,11 @@ export function EndpointField({
     : uri;
 
   return (
-    <div className="space-y-3 rounded-lg border border-border p-3">
+    <div
+      className={`space-y-3 rounded-lg border p-3 ${
+        errorMessage ? "border-danger/40 bg-danger/5" : "border-border"
+      }`}
+    >
       {componentMetadata?.component?.title && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2">
           <Badge intent="secondary">{componentMetadata.component.title}</Badge>
@@ -158,6 +163,7 @@ export function EndpointField({
               ? `${description} Raw edits keep the current parameter state until the URI is modeled again.`
               : "Raw edits keep the current parameter state until the URI is modeled again."
           }
+          errorMessage={errorMessage}
           placeholder="direct:start"
           value={uri}
           onChange={(nextValue) => onChange(nextValue)}
@@ -166,6 +172,7 @@ export function EndpointField({
         <>
           <TextField
             label="Component"
+            errorMessage={errorMessage}
             value={parsed?.component ?? ""}
             onChange={(nextValue) => updateEndpoint({ component: nextValue })}
           />
@@ -174,6 +181,7 @@ export function EndpointField({
               <TextField
                 key={pathDefinition.key}
                 label={pathDefinition.label}
+                errorMessage={index === 0 ? errorMessage : undefined}
                 description={
                   index === 0
                     ? description || pathDefinition.description
@@ -192,6 +200,7 @@ export function EndpointField({
           ) : (
             <TextField
               label="Target"
+              errorMessage={errorMessage}
               description={description}
               value={parsed?.target ?? ""}
               onChange={(nextValue) => updateEndpoint({ target: nextValue })}

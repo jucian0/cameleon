@@ -6,6 +6,7 @@ import { isPlainObject, prettyJson, parseObjectValue } from "../utils";
 export function MapField({
   label,
   description,
+  errorMessage,
   value,
   onChange,
 }: FieldRendererProps) {
@@ -16,6 +17,7 @@ export function MapField({
     <Textarea
       label={label}
       description={description}
+      errorMessage={errorMessage}
       placeholder={"key=value\nanother=value"}
       value={entries.map(([key, item]) => `${key}=${String(item)}`).join("\n")}
       onChange={(nextValue) => onChange(parseKeyValueLines(nextValue))}
@@ -26,6 +28,7 @@ export function MapField({
 export function ObjectFallbackField({
   label,
   description,
+  errorMessage,
   value,
   onChange,
 }: FieldRendererProps) {
@@ -39,6 +42,7 @@ export function ObjectFallbackField({
           ? `${description} Advanced JSON fallback for unsupported Camel structures.`
           : "Advanced JSON fallback for unsupported Camel structures."
       }
+      errorMessage={errorMessage}
       placeholder="{}"
       value={prettyJson(objectValue)}
       onChange={(nextValue) => onChange(parseObjectValue(nextValue))}
