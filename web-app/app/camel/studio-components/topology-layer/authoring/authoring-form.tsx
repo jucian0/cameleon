@@ -1,5 +1,7 @@
 import React from "react";
+import { IconChevronLgDown } from "@intentui/icons";
 import { Button } from "app/components/ui/button";
+import { Badge } from "app/components/ui/badge";
 import { Sheet } from "app/components/ui/sheet";
 import { getFieldRenderer } from "./field-registry";
 import { getFieldValue } from "./utils";
@@ -18,6 +20,14 @@ type Props = {
   onSubmit?: (formData: Record<string, any>) => void;
   onCancel?: () => void;
 };
+
+function isAdvancedGroup(groupName: string) {
+  return groupName.toLowerCase().includes("advanced");
+}
+
+function formatGroupName(groupName: string) {
+  return groupName.replace(/\s+/g, " ").trim();
+}
 
 function FieldRenderer(props: FieldRendererProps) {
   const renderer = getFieldRenderer(
@@ -58,6 +68,9 @@ export function AuthoringForm({
   onCancel,
 }: Props) {
   const [formData, setFormData] = React.useState(initialFormData);
+  const [collapsedGroups, setCollapsedGroups] = React.useState<
+    Record<string, boolean>
+  >({});
 
   React.useEffect(() => {
     setFormData(initialFormData);
@@ -93,6 +106,20 @@ export function AuthoringForm({
       .map((group) => [group, grouped.get(group) ?? []] as const);
   }, [properties]);
 
+  React.useEffect(() => {
+    setCollapsedGroups((current) => {
+      const next = { ...current };
+
+      for (const [groupName] of propertyGroups) {
+        if (!(groupName in next)) {
+          next[groupName] = isAdvancedGroup(groupName);
+        }
+      }
+
+      return next;
+    });
+  }, [propertyGroups]);
+
   function updateField(key: string, value: unknown) {
     setFormData((current) => ({
       ...current,
@@ -107,6 +134,17 @@ export function AuthoringForm({
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {properties.length > 0 ? (
+        <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-fg">
+          Camel-aware editing is enabled for common fields. Unsupported nested
+          structures remain available through advanced JSON fallback.
+        </div>
+      ) : (
+        <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-fg">
+          No editable metadata was found for this node yet.
+        </div>
+      )}
+
       {propertyGroups.map(([groupName, groupProperties]) => {
         const renderedFields = groupProperties
           .map(([key, property]) => {
@@ -132,15 +170,37 @@ export function AuthoringForm({
           return null;
         }
 
+        const isCollapsed = collapsedGroups[groupName] ?? false;
+        const formattedGroupName = formatGroupName(groupName);
+
         return (
           <section key={groupName} className="space-y-4">
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-foreground capitalize">
-                {groupName}
-              </h3>
-            </div>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between rounded-lg border border-border px-3 py-2 text-left hover:bg-muted/30"
+              onClick={() =>
+                setCollapsedGroups((current) => ({
+                  ...current,
+                  [groupName]: !isCollapsed,
+                }))
+              }
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-sm font-medium text-foreground capitalize">
+                  {formattedGroupName}
+                </span>
+                <Badge
+                  intent={isAdvancedGroup(groupName) ? "warning" : "secondary"}
+                >
+                  {renderedFields.length}
+                </Badge>
+              </span>
+              <IconChevronLgDown
+                className={`size-4 transition-transform ${isCollapsed ? "" : "rotate-180"}`}
+              />
+            </button>
 
-            {renderedFields}
+            {!isCollapsed && renderedFields}
           </section>
         );
       })}
