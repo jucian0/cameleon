@@ -57,19 +57,66 @@ export function getFieldRenderer(
 }
 
 export function parseKeyValueLines(value: string) {
+  return Object.fromEntries(parseKeyValueLinesWithIssues(value).entries);
+}
+
+export function parseKeyValueLinesWithIssues(value: string) {
   const parsedEntries = value
     .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const separatorIndex = line.indexOf("=");
-      if (separatorIndex === -1) return null;
-      const entryKey = line.slice(0, separatorIndex).trim();
-      const entryValue = line.slice(separatorIndex + 1).trim();
-      if (!entryKey) return null;
-      return [entryKey, parseObjectValue(entryValue) ?? entryValue] as const;
-    })
-    .filter(Boolean) as Array<readonly [string, unknown]>;
+    .map((line, index) => ({
+      line: line.trim(),
+      lineNumber: index + 1,
+    }))
+    .filter(({ line }) => Boolean(line));
 
-  return Object.fromEntries(parsedEntries);
+  const issues: string[] = [];
+  const parsed = parsedEntries.map(({ line, lineNumber }) => {
+    const separatorIndex = line.indexOf("=");
+    if (separatorIndex === -1) {
+      issues.push(`Line ${lineNumber} must use key=value format.`);
+      return null;
+    }
+
+    const entryKey = line.slice(0, separatorIndex).trim();
+    const entryValue = line.slice(separatorIndex + 1).trim();
+
+    if (!entryKey) {
+      issues.push(`Line ${lineNumber} is missing a key before '='.`);
+      return null;
+    }
+
+    return {
+      key: entryKey,
+      value: parseObjectValue(entryValue) ?? entryValue,
+      lineNumber,
+    };
+  });
+
+  const validEntries = parsed.filter(Boolean) as Array<{
+    key: string;
+    value: unknown;
+    lineNumber: number;
+  }>;
+  const duplicateKeys = validEntries.reduce<Record<string, number[]>>(
+    (acc, { key, lineNumber }) => {
+      const current = acc[key] ?? [];
+      current.push(lineNumber);
+      acc[key] = current;
+      return acc;
+    },
+    {},
+  );
+
+  Object.entries(duplicateKeys).forEach(([key, lineNumbers]) => {
+    if (lineNumbers.length > 1) {
+      issues.push(
+        `Key "${key}" is duplicated on lines ${lineNumbers.join(", ")}.`,
+      );
+    }
+  });
+
+  return {
+    entries: validEntries.map(({ key, value }) => [key, value] as const),
+    issues,
+  };
 }

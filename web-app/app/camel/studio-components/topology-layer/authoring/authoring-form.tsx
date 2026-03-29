@@ -3,6 +3,11 @@ import { IconChevronLgDown } from "@intentui/icons";
 import { Button } from "app/components/ui/button";
 import { Badge } from "app/components/ui/badge";
 import { Sheet } from "app/components/ui/sheet";
+import {
+  getEndpointPathDefinitions,
+  parseEndpointUri,
+  splitEndpointTarget,
+} from "./endpoint-model";
 import { getFieldRenderer } from "./field-registry";
 import { getFieldValue } from "./utils";
 import { ExpressionField } from "./renderers/expression-field";
@@ -84,10 +89,69 @@ function hasInvalidNumberValue(property: PropertySchema, value: unknown) {
   return typeof value !== "number" || Number.isNaN(value);
 }
 
+function getCamelSpecificFieldError(fieldKey: string, value: unknown) {
+  if (fieldKey === "exception") {
+    if (!Array.isArray(value) || value.length === 0) {
+      return "At least one exception class is required.";
+    }
+  }
+
+  return undefined;
+}
+
+function getEndpointError(
+  fieldKey: string,
+  property: PropertySchema,
+  value: unknown,
+  componentMetadata?: ComponentMetadata | null,
+) {
+  if (fieldKey !== "uri" || property.type !== "string") {
+    return undefined;
+  }
+
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return undefined;
+  }
+
+  const parsed = parseEndpointUri(value);
+  if (!parsed) {
+    return undefined;
+  }
+
+  if (parsed.component.trim().length === 0) {
+    return "Component is required.";
+  }
+
+  const pathDefinitions = getEndpointPathDefinitions(
+    componentMetadata,
+    parsed.component,
+  );
+
+  if (pathDefinitions.length === 0) {
+    return undefined;
+  }
+
+  const pathSegments = splitEndpointTarget(parsed.target);
+  const missingPath = pathDefinitions.find((pathDefinition, index) => {
+    if (!pathDefinition.required) {
+      return false;
+    }
+
+    return (pathSegments[index] ?? "").trim().length === 0;
+  });
+
+  if (missingPath) {
+    return `${missingPath.label} is required.`;
+  }
+
+  return undefined;
+}
+
 function getFieldError(
   fieldKey: string,
   property: PropertySchema,
   value: unknown,
+  componentMetadata?: ComponentMetadata | null,
 ): string | undefined {
   if (
     fieldKey === "uri" &&
@@ -107,6 +171,21 @@ function getFieldError(
 
   if (hasInvalidNumberValue(property, value)) {
     return `${property.displayName || fieldKey} must be a valid number.`;
+  }
+
+  const camelSpecificError = getCamelSpecificFieldError(fieldKey, value);
+  if (camelSpecificError) {
+    return camelSpecificError;
+  }
+
+  const endpointError = getEndpointError(
+    fieldKey,
+    property,
+    value,
+    componentMetadata,
+  );
+  if (endpointError) {
+    return endpointError;
   }
 
   if (isEmptyRequiredValue(value, property)) {
@@ -203,10 +282,13 @@ export function AuthoringForm({
       Object.fromEntries(
         properties.map(([key, property]) => {
           const currentValue = getFieldValue(formData[key], property);
-          return [key, getFieldError(key, property, currentValue)];
+          return [
+            key,
+            getFieldError(key, property, currentValue, componentMetadata),
+          ];
         }),
       ) as Record<string, string | undefined>,
-    [formData, properties],
+    [componentMetadata, formData, properties],
   );
   const fieldErrors = React.useMemo(
     () => ({

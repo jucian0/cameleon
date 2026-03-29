@@ -79,9 +79,65 @@ function validateStep(
     });
   }
 
+  if (stepType === "choice") {
+    const whenBranches = Array.isArray(config.when) ? config.when : [];
+    const otherwiseBranch =
+      config.otherwise && typeof config.otherwise === "object"
+        ? config.otherwise
+        : undefined;
+
+    if (whenBranches.length === 0 && !otherwiseBranch) {
+      findings.push({
+        severity: "warning",
+        routeId,
+        nodeId,
+        fieldPath: `${fieldPath}.${stepType}`,
+        message: 'Choice has no "when" or "otherwise" branches.',
+        remediationHint:
+          "Add at least one branch so the choice can route messages.",
+      });
+    }
+  }
+
+  if (stepType === "doCatch") {
+    const exceptions = Array.isArray(config.exception) ? config.exception : [];
+    if (exceptions.length === 0) {
+      findings.push({
+        severity: "error",
+        routeId,
+        nodeId,
+        fieldPath: `${fieldPath}.${stepType}.exception`,
+        message: "doCatch must declare at least one exception class.",
+        remediationHint: "Add one or more exception class names to catch.",
+      });
+    }
+  }
+
+  const branchSteps = Array.isArray(config.steps) ? config.steps : undefined;
+  if (
+    ["when", "otherwise", "doCatch", "doFinally", "fallback"].includes(
+      stepType,
+    ) &&
+    (!branchSteps || branchSteps.length === 0)
+  ) {
+    findings.push({
+      severity: "warning",
+      routeId,
+      nodeId,
+      fieldPath: `${fieldPath}.${stepType}.steps`,
+      message: `Branch "${stepType}" has no child steps.`,
+      remediationHint:
+        "Add steps inside the branch or remove the branch if it is unused.",
+    });
+  }
+
   if ("steps" in config && Array.isArray(config.steps)) {
     config.steps.forEach((nestedStep, index) => {
-      if (nestedStep && typeof nestedStep === "object" && !Array.isArray(nestedStep)) {
+      if (
+        nestedStep &&
+        typeof nestedStep === "object" &&
+        !Array.isArray(nestedStep)
+      ) {
         validateStep(
           nestedStep as Record<string, unknown>,
           `${fieldPath}.${stepType}.steps.${index}`,
@@ -94,7 +150,11 @@ function validateStep(
 
   if ("when" in config && Array.isArray(config.when)) {
     config.when.forEach((nestedStep, index) => {
-      if (nestedStep && typeof nestedStep === "object" && !Array.isArray(nestedStep)) {
+      if (
+        nestedStep &&
+        typeof nestedStep === "object" &&
+        !Array.isArray(nestedStep)
+      ) {
         validateStep(
           { when: nestedStep } as Record<string, unknown>,
           `${fieldPath}.${stepType}.when.${index}`,
@@ -105,7 +165,11 @@ function validateStep(
     });
   }
 
-  if ("otherwise" in config && config.otherwise && typeof config.otherwise === "object") {
+  if (
+    "otherwise" in config &&
+    config.otherwise &&
+    typeof config.otherwise === "object"
+  ) {
     validateStep(
       { otherwise: config.otherwise } as Record<string, unknown>,
       `${fieldPath}.${stepType}.otherwise`,
@@ -116,7 +180,11 @@ function validateStep(
 
   if ("doCatch" in config && Array.isArray(config.doCatch)) {
     config.doCatch.forEach((nestedStep, index) => {
-      if (nestedStep && typeof nestedStep === "object" && !Array.isArray(nestedStep)) {
+      if (
+        nestedStep &&
+        typeof nestedStep === "object" &&
+        !Array.isArray(nestedStep)
+      ) {
         validateStep(
           { doCatch: nestedStep } as Record<string, unknown>,
           `${fieldPath}.${stepType}.doCatch.${index}`,
@@ -127,7 +195,11 @@ function validateStep(
     });
   }
 
-  if ("doFinally" in config && config.doFinally && typeof config.doFinally === "object") {
+  if (
+    "doFinally" in config &&
+    config.doFinally &&
+    typeof config.doFinally === "object"
+  ) {
     validateStep(
       { doFinally: config.doFinally } as Record<string, unknown>,
       `${fieldPath}.${stepType}.doFinally`,
@@ -136,7 +208,11 @@ function validateStep(
     );
   }
 
-  if ("onFallback" in config && config.onFallback && typeof config.onFallback === "object") {
+  if (
+    "onFallback" in config &&
+    config.onFallback &&
+    typeof config.onFallback === "object"
+  ) {
     validateStep(
       { onFallback: config.onFallback } as Record<string, unknown>,
       `${fieldPath}.${stepType}.onFallback`,
@@ -146,7 +222,9 @@ function validateStep(
   }
 }
 
-export function validateCamelConfig(camelConfig: CamelConfig): ValidationItem[] {
+export function validateCamelConfig(
+  camelConfig: CamelConfig,
+): ValidationItem[] {
   const findings: ValidationItem[] = [];
 
   camelConfig.data.forEach((routeEntry, routeIndex) => {

@@ -1,4 +1,5 @@
 import { parsePrimitiveValue } from "./utils";
+import type { ComponentMetadata } from "./types";
 
 export type EndpointModel = {
   component: string;
@@ -12,6 +13,32 @@ export type EndpointPathDefinition = {
   description?: string;
   required?: boolean;
 };
+
+export function getEndpointPathDefinitions(
+  componentMetadata: ComponentMetadata | null | undefined,
+  parsedComponent: string | undefined,
+) {
+  const componentName = componentMetadata?.component?.name;
+  const properties = componentMetadata?.properties ?? {};
+
+  if (!componentName || !parsedComponent || componentName !== parsedComponent) {
+    return [] as EndpointPathDefinition[];
+  }
+
+  return Object.entries(properties)
+    .filter(([, property]) => property.kind === "path")
+    .sort(([, left], [, right]) => {
+      const leftIndex = left.index ?? Number.MAX_SAFE_INTEGER;
+      const rightIndex = right.index ?? Number.MAX_SAFE_INTEGER;
+      return leftIndex - rightIndex;
+    })
+    .map(([key, property]) => ({
+      key,
+      label: property.displayName || key,
+      description: property.description,
+      required: property.required,
+    }));
+}
 
 export function parseEndpointUri(uri: string): EndpointModel | null {
   const trimmed = uri.trim();

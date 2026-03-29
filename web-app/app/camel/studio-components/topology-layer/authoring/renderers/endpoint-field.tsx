@@ -4,13 +4,13 @@ import { Checkbox } from "app/components/ui/checkbox";
 import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
 import type { FieldRendererProps } from "../types";
-import { parseKeyValueLines } from "../field-registry";
+import { parseKeyValueLinesWithIssues } from "../field-registry";
 import {
   buildEndpointTarget,
+  getEndpointPathDefinitions,
   parseEndpointUri,
   serializeEndpointUri,
   splitEndpointTarget,
-  type EndpointPathDefinition,
 } from "../endpoint-model";
 
 function normalizeParameters(formData: Record<string, unknown>, uri: string) {
@@ -28,32 +28,6 @@ function normalizeParameters(formData: Record<string, unknown>, uri: string) {
   return parsed?.parameters ?? {};
 }
 
-function getPathDefinitions(
-  props: FieldRendererProps["componentMetadata"],
-  parsedComponent: string | undefined,
-) {
-  const componentName = props?.component?.name;
-  const properties = props?.properties ?? {};
-
-  if (!componentName || !parsedComponent || componentName !== parsedComponent) {
-    return [] as EndpointPathDefinition[];
-  }
-
-  return Object.entries(properties)
-    .filter(([, property]) => property.kind === "path")
-    .sort(([, left], [, right]) => {
-      const leftIndex = left.index ?? Number.MAX_SAFE_INTEGER;
-      const rightIndex = right.index ?? Number.MAX_SAFE_INTEGER;
-      return leftIndex - rightIndex;
-    })
-    .map(([key, property]) => ({
-      key,
-      label: property.displayName || key,
-      description: property.description,
-      required: property.required,
-    }));
-}
-
 export function EndpointField({
   label,
   description,
@@ -62,6 +36,7 @@ export function EndpointField({
   componentMetadata,
   formData,
   onChange,
+  onErrorChange,
   onFormDataChange,
 }: FieldRendererProps) {
   const uri = typeof value === "string" ? value : "";
@@ -69,7 +44,7 @@ export function EndpointField({
   const [rawMode, setRawMode] = React.useState(() => !parsed);
   const shouldPersistParameters = "parameters" in formData;
   const pathDefinitions = React.useMemo(
-    () => getPathDefinitions(componentMetadata, parsed?.component),
+    () => getEndpointPathDefinitions(componentMetadata, parsed?.component),
     [componentMetadata, parsed?.component],
   );
   const pathSegments = React.useMemo(
@@ -93,6 +68,8 @@ export function EndpointField({
     target?: string;
     parameters?: Record<string, unknown>;
   }) {
+    onErrorChange(undefined);
+
     const currentModel = parsed ?? {
       component: "",
       target: "",
@@ -151,6 +128,7 @@ export function EndpointField({
           if (!nextRawMode && !parseEndpointUri(uri)) {
             return;
           }
+          onErrorChange(undefined);
           setRawMode(nextRawMode);
         }}
         label="Raw URI mode"
@@ -168,7 +146,10 @@ export function EndpointField({
           errorMessage={errorMessage}
           placeholder="direct:start"
           value={uri}
-          onChange={(nextValue) => onChange(nextValue)}
+          onChange={(nextValue) => {
+            onErrorChange(undefined);
+            onChange(nextValue);
+          }}
         />
       ) : (
         <>
@@ -216,11 +197,19 @@ export function EndpointField({
               .sort(([left], [right]) => left.localeCompare(right))
               .map(([key, item]) => `${key}=${String(item)}`)
               .join("\n")}
-            onChange={(nextValue) =>
+            onChange={(nextValue) => {
+              const parsedParameters = parseKeyValueLinesWithIssues(nextValue);
+
+              if (parsedParameters.issues.length > 0) {
+                onErrorChange(parsedParameters.issues[0]);
+                return;
+              }
+
+              onErrorChange(undefined);
               updateEndpoint({
-                parameters: parseKeyValueLines(nextValue),
-              })
-            }
+                parameters: Object.fromEntries(parsedParameters.entries),
+              });
+            }}
           />
           <TextField label="Generated URI Preview" value={preview} isReadOnly />
         </>

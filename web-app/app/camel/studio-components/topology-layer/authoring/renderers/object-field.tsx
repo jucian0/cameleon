@@ -1,6 +1,6 @@
 import { Textarea } from "app/components/ui/textarea";
 import type { FieldRendererProps } from "../types";
-import { parseKeyValueLines } from "../field-registry";
+import { parseKeyValueLinesWithIssues } from "../field-registry";
 import { isPlainObject } from "../utils";
 import { JsonTextareaField } from "./json-textarea-field";
 
@@ -23,8 +23,15 @@ export function MapField({
       placeholder={"key=value\nanother=value"}
       value={entries.map(([key, item]) => `${key}=${String(item)}`).join("\n")}
       onChange={(nextValue) => {
+        const parsed = parseKeyValueLinesWithIssues(nextValue);
+
+        if (parsed.issues.length > 0) {
+          onErrorChange(parsed.issues[0]);
+          return;
+        }
+
         onErrorChange(undefined);
-        onChange(parseKeyValueLines(nextValue));
+        onChange(Object.fromEntries(parsed.entries));
       }}
     />
   );
