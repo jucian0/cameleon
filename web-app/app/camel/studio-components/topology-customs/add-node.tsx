@@ -34,10 +34,10 @@ export const AddNode = React.memo(({ data }: NodeProps<Node>) => {
       <Pressable isDisabled={!canEdit}>
         <div className="w-10 h-10 flex items-center justify-center">
           <button
-            disabled={!canEdit}
             aria-label="Add node"
             onClick={handleClick}
-            className="relative cursor-pointer flex justify-center border-dashed border-primary border rounded bg-transparent transition-all duration-200 ease-in-out w-6 h-6 p-1 px-2 gap-2 disabled:cursor-not-allowed"
+            disabled={!canEdit}
+            className="relative flex w-6 cursor-pointer justify-center gap-2 rounded border border-dashed border-primary bg-transparent p-1 px-2 transition-all duration-200 ease-in-out disabled:cursor-not-allowed"
             type="button"
           >
             {data.iconName && (

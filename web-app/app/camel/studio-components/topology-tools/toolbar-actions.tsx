@@ -23,7 +23,7 @@ export const TopologyToolbarActions = () => {
   const navigation = useNavigation();
   const location = useLocation();
   const { workflow } = useParams();
-  const { canClone, canEdit } = useOutletContext<
+  const { canDuplicate, canEdit, isStarter } = useOutletContext<
     WorkflowAccessContext & { workflowId: string }
   >();
   const findings = React.useMemo(
@@ -64,6 +64,7 @@ export const TopologyToolbarActions = () => {
 
   return (
     <div className="flex items-center gap-2">
+      {isStarter && <Badge intent="warning">Starter</Badge>}
       {findings.length > 0 && (
         <Popover>
           <Tooltip>
@@ -146,7 +147,7 @@ export const TopologyToolbarActions = () => {
           </Button>
           <Tooltip.Content>Export Camel YAML</Tooltip.Content>
         </Tooltip>
-        {canClone && workflow && (
+        {workflow && canDuplicate && (
           <Tooltip>
             <Link
               href={`/app/camel/workflows/${workflow}/clone`}
@@ -155,7 +156,9 @@ export const TopologyToolbarActions = () => {
             >
               <Copy size={16} />
             </Link>
-            <Tooltip.Content>Duplicate workflow</Tooltip.Content>
+            <Tooltip.Content>
+              {isStarter ? "Use as starter" : "Duplicate workflow"}
+            </Tooltip.Content>
           </Tooltip>
         )}
         <Button

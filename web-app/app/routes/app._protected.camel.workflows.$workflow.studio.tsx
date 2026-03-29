@@ -21,7 +21,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
   } = await supabase.auth.getUser();
   const workflow = await supabase
     .from("workflows")
-    .select("id, owner")
+    .select("id, owner, visibility")
     .eq("id", workflowsId)
     .maybeSingle();
 
@@ -36,6 +36,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
   const access = getWorkflowAccess({
     currentUserId: user?.id,
     owner: workflow.data.owner,
+    visibility: workflow.data.visibility,
   });
 
   if (!access.canEdit) {
@@ -53,14 +54,14 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function CamelStudio() {
-  const access = useOutletContext<
+  const context = useOutletContext<
     WorkflowAccessContext & { workflowId: string }
   >();
 
   return (
     <>
       <TopologyBuilder />
-      <Outlet context={access} />
+      <Outlet context={context} />
     </>
   );
 }

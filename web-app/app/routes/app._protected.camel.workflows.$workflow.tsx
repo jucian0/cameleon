@@ -56,6 +56,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const access = getWorkflowAccess({
     currentUserId: user?.id,
     owner: data.owner,
+    visibility: data.visibility,
   });
 
   if (!access.canView) {
@@ -80,8 +81,12 @@ export default function CamelStudio({
     content: unknown;
     name: string;
     workflowId: string;
+    visibility: "public" | "private";
+    isOwner: boolean;
+    isStarter: boolean;
+    canView: boolean;
     canEdit: boolean;
-    canClone: boolean;
+    canDuplicate: boolean;
   };
 }) {
   const { content, name, workflowId, ...access } = loaderData;
@@ -138,7 +143,7 @@ export function ErrorBoundary() {
     : "Unable to open workflow";
   const description = isRouteErrorResponse(error)
     ? error.status === 403
-      ? "This workflow belongs to another user and is not available here."
+      ? "This workflow is not available to your account."
       : error.status === 404
         ? "The requested workflow does not exist or is no longer available."
         : typeof error.data === "object" &&

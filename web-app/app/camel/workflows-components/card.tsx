@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader } from "app/components/ui/card";
+import { Badge } from "app/components/ui/badge";
 import { Edit, Copy, MoreHorizontal, Trash } from "lucide-react";
 import { buttonStyles } from "app/components/ui/button";
 import { Menu } from "app/components/ui/menu";
@@ -14,11 +15,12 @@ type CamelCardProps = {
 };
 
 export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
-  const { id, name, description, owner, updated_at } = camelConfig;
+  const { id, name, description, owner, updated_at, visibility } = camelConfig;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const access = getWorkflowAccess({
     currentUserId,
     owner,
+    visibility,
   });
   const updatedAt = new Date(updated_at).toLocaleDateString();
 
@@ -55,11 +57,11 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
                 Edit Details
               </Menu.Item>
               <Menu.Item
-                isDisabled={!access.canClone}
+                isDisabled={!access.canDuplicate}
                 href={`/app/camel/workflows/${id}/clone`}
               >
                 <Copy className="h-4 w-4 mr-2" />
-                Duplicate
+                {access.isStarter ? "Use as starter" : "Duplicate"}
               </Menu.Item>
               <Menu.Separator />
               <Menu.Item
@@ -77,9 +79,17 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
 
       <CardContent className="relative pt-0">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">
-            {`Updated on ${updatedAt}`}
-          </span>
+          <div className="flex items-center gap-3">
+            <Badge
+              intent={access.isStarter ? "warning" : "secondary"}
+              className="text-xs"
+            >
+              {access.isStarter ? "Starter" : "Personal"}
+            </Badge>
+            <span className="text-xs text-muted-foreground">
+              {`Updated on ${updatedAt}`}
+            </span>
+          </div>
 
           <Link
             href={`/app/camel/workflows/${id}/studio`}

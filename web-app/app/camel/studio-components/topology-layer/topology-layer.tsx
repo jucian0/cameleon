@@ -32,7 +32,9 @@ function getPanelCopy(node?: Node["data"]) {
 
 export function TopologyLibraryLayer() {
   const { node, setNode } = useLayer();
-  useOutletContext<WorkflowAccessContext & { workflowId: string }>();
+  const { canEdit, isStarter } = useOutletContext<
+    WorkflowAccessContext & { workflowId: string }
+  >();
   const isOpen = !!node;
   const onUnSelectedNode = () => {
     setNode();
@@ -56,6 +58,8 @@ export function TopologyLibraryLayer() {
             >
               {node?.operation.includes("add") ? "Insert" : "Edit"}
             </Badge>
+            {isStarter && <Badge intent="warning">Starter</Badge>}
+            {!canEdit && <Badge intent="secondary">Read-only</Badge>}
           </div>
           <Sheet.Title className="flex items-center gap-2">
             {!node?.operation.includes("add") && (

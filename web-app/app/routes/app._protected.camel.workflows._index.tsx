@@ -37,7 +37,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { data, error } = await supabase
     .from("workflows")
     .select("*")
-    .eq("owner", user?.id ?? "");
+    .or(`owner.eq.${user?.id ?? ""},visibility.eq.public`);
   const currentUserId = user?.id ?? null;
   return { data: data ?? [], error, currentUserId };
 }
@@ -114,6 +114,10 @@ export default function CamelWorkflows({
   const filteredItems = filterItems(items ?? [], searchParams);
   const totalWorkflows = filteredItems.length;
   const viewMode = searchParams.get("view") || "cards";
+  const starterCount = filteredItems.filter(
+    (workflow) => workflow.visibility === "public",
+  ).length;
+  const personalCount = totalWorkflows - starterCount;
 
   return (
     <div className="m-6 flex flex-col gap-4">
@@ -121,6 +125,10 @@ export default function CamelWorkflows({
         <p className="text-muted-foreground">{metaData.description}</p>
         <p className="text-sm text-muted-foreground mt-1">
           {totalWorkflows} workflow{totalWorkflows !== 1 ? "s" : ""} total
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {personalCount} personal, {starterCount} starter
+          {starterCount === 1 ? "" : "s"}
         </p>
       </div>
       <form className="mb-6">

@@ -1,21 +1,32 @@
+export type WorkflowVisibility = "public" | "private";
+
 export type WorkflowAccessContext = {
+  visibility: WorkflowVisibility;
+  isOwner: boolean;
+  isStarter: boolean;
   canView: boolean;
   canEdit: boolean;
-  canClone: boolean;
+  canDuplicate: boolean;
 };
 
 export function getWorkflowAccess({
   currentUserId,
   owner,
+  visibility,
 }: {
   currentUserId?: string | null;
   owner?: string | null;
+  visibility: WorkflowVisibility;
 }): WorkflowAccessContext {
   const isOwner = Boolean(currentUserId && owner && currentUserId === owner);
+  const isStarter = visibility === "public";
 
   return {
-    canView: isOwner,
+    visibility,
+    isOwner,
+    isStarter,
+    canView: isOwner || isStarter,
     canEdit: isOwner,
-    canClone: isOwner,
+    canDuplicate: isOwner || isStarter,
   };
 }
