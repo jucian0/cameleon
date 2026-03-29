@@ -81,6 +81,7 @@ export function ExpressionField({
   label,
   description,
   errorMessage,
+  isDisabled,
   property,
   value,
   onChange,
@@ -107,7 +108,7 @@ export function ExpressionField({
     >
       <Select
         selectedKey={language}
-        isDisabled={locksLanguageSelection}
+        isDisabled={isDisabled || locksLanguageSelection}
         onSelectionChange={(nextLanguage) => {
           const selectedLanguage =
             nextLanguage?.toString() || expressionOptions[0] || "simple";
@@ -146,6 +147,7 @@ export function ExpressionField({
           description="Advanced JSON fallback for complex expression payloads."
           errorMessage={errorMessage}
           placeholder="{}"
+          isDisabled={isDisabled}
           value={expression}
           emptyValue={{}}
           onChange={(nextValue) =>
@@ -159,6 +161,7 @@ export function ExpressionField({
         <TextField
           label={`${label} Value`}
           errorMessage={errorMessage}
+          isDisabled={isDisabled}
           value={expression?.toString() || ""}
           onChange={(nextValue) => {
             onErrorChange(undefined);

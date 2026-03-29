@@ -32,6 +32,7 @@ export function EndpointField({
   label,
   description,
   errorMessage,
+  isDisabled,
   value,
   componentMetadata,
   formData,
@@ -124,6 +125,7 @@ export function EndpointField({
       )}
       <Checkbox
         isSelected={rawMode}
+        isDisabled={isDisabled}
         onChange={(nextRawMode) => {
           if (!nextRawMode && !parseEndpointUri(uri)) {
             return;
@@ -145,6 +147,7 @@ export function EndpointField({
           }
           errorMessage={errorMessage}
           placeholder="direct:start"
+          isDisabled={isDisabled}
           value={uri}
           onChange={(nextValue) => {
             onErrorChange(undefined);
@@ -156,6 +159,7 @@ export function EndpointField({
           <TextField
             label="Component"
             errorMessage={errorMessage}
+            isDisabled={isDisabled}
             value={parsed?.component ?? ""}
             onChange={(nextValue) => updateEndpoint({ component: nextValue })}
           />
@@ -165,6 +169,7 @@ export function EndpointField({
                 key={pathDefinition.key}
                 label={pathDefinition.label}
                 errorMessage={index === 0 ? errorMessage : undefined}
+                isDisabled={isDisabled}
                 description={
                   index === 0
                     ? description || pathDefinition.description
@@ -184,6 +189,7 @@ export function EndpointField({
             <TextField
               label="Target"
               errorMessage={errorMessage}
+              isDisabled={isDisabled}
               description={description}
               value={parsed?.target ?? ""}
               onChange={(nextValue) => updateEndpoint({ target: nextValue })}
@@ -193,6 +199,7 @@ export function EndpointField({
             label="Query Parameters"
             description="One key=value entry per line. Serialized in deterministic key order."
             placeholder={"timeout=1000\nbridgeErrorHandler=true"}
+            isDisabled={isDisabled}
             value={Object.entries(parameters)
               .sort(([left], [right]) => left.localeCompare(right))
               .map(([key, item]) => `${key}=${String(item)}`)

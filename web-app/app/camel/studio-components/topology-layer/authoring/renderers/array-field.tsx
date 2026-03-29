@@ -7,6 +7,7 @@ export function ArrayField({
   label,
   description,
   errorMessage,
+  isDisabled,
   value,
   onChange,
   onErrorChange,
@@ -25,6 +26,7 @@ export function ArrayField({
         }
         errorMessage={errorMessage}
         placeholder="[]"
+        isDisabled={isDisabled}
         value={arrayValue}
         emptyValue={[]}
         onChange={onChange}
@@ -38,6 +40,7 @@ export function ArrayField({
       label={label}
       description={description}
       errorMessage={errorMessage}
+      isDisabled={isDisabled}
       placeholder="One item per line"
       value={arrayValue.map((item) => item?.toString() ?? "").join("\n")}
       onChange={(nextValue) => {

@@ -8,6 +8,7 @@ export function MapField({
   label,
   description,
   errorMessage,
+  isDisabled,
   value,
   onChange,
   onErrorChange,
@@ -20,6 +21,7 @@ export function MapField({
       label={label}
       description={description}
       errorMessage={errorMessage}
+      isDisabled={isDisabled}
       placeholder={"key=value\nanother=value"}
       value={entries.map(([key, item]) => `${key}=${String(item)}`).join("\n")}
       onChange={(nextValue) => {
@@ -41,6 +43,7 @@ export function ObjectFallbackField({
   label,
   description,
   errorMessage,
+  isDisabled,
   value,
   onChange,
   onErrorChange,
@@ -57,6 +60,7 @@ export function ObjectFallbackField({
       }
       errorMessage={errorMessage}
       placeholder="{}"
+      isDisabled={isDisabled}
       value={objectValue}
       emptyValue={{}}
       onChange={onChange}

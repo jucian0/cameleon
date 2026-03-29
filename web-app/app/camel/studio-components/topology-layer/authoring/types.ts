@@ -50,6 +50,7 @@ export type FieldRendererProps = {
   label: string;
   description?: string;
   errorMessage?: string;
+  isDisabled?: boolean;
   property: PropertySchema;
   value: unknown;
   schema: Record<string, PropertySchema>;

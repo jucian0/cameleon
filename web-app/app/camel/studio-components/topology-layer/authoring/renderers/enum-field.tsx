@@ -10,6 +10,7 @@ export function EnumField({
   label,
   description,
   errorMessage,
+  isDisabled,
   property,
   value,
   onChange,
@@ -19,6 +20,7 @@ export function EnumField({
   return (
     <Select
       selectedKey={value?.toString() || null}
+      isDisabled={isDisabled}
       onSelectionChange={(nextValue) => onChange(nextValue?.toString())}
       label={label}
       description={description}

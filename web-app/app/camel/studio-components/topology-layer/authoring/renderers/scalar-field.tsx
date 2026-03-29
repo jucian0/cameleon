@@ -5,6 +5,7 @@ export function ScalarField({
   label,
   description,
   errorMessage,
+  isDisabled,
   property,
   value,
   onChange,
@@ -14,6 +15,7 @@ export function ScalarField({
       label={label}
       description={description}
       errorMessage={errorMessage}
+      isDisabled={isDisabled}
       type={
         property.type === "number"
           ? "number"

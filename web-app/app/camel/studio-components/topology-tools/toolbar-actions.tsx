@@ -8,56 +8,104 @@ import {
 } from "react-router";
 import { Loader } from "app/components/ui/loader";
 import { Link } from "app/components/ui/link";
-import { AlertTriangle, Code2 } from "lucide-react";
+import { AlertTriangle, Code2, Copy, Download, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
+import { Tooltip } from "app/components/ui/tooltip";
 import { validateCamelConfig } from "../topology-layer/authoring/validation";
 import React from "react";
+import { useParams } from "react-router";
+import type { WorkflowAccessContext } from "@/camel/workflows-access";
 
 export const TopologyToolbarActions = () => {
   const { getCamelConfigYaml, camelConfig } = useTopologyStore();
   const submit = useSubmit();
   const navigation = useNavigation();
   const location = useLocation();
-  const { visibility } = useOutletContext<{
-    visibility: "public" | "private";
-  }>();
+  const { workflow } = useParams();
+  const { canClone, canEdit, visibility } = useOutletContext<
+    WorkflowAccessContext & { workflowId: string }
+  >();
   const findings = React.useMemo(
     () => validateCamelConfig(camelConfig),
     [camelConfig],
   );
+  const [shareLabel, setShareLabel] = React.useState("Share");
+  const [copyLabel, setCopyLabel] = React.useState("Copy YAML");
   const errors = findings.filter((item) => item.severity === "error");
   const warnings = findings.filter((item) => item.severity === "warning");
   const hasBlockingErrors = errors.length > 0;
 
   function handleSave() {
-    if (hasBlockingErrors) return;
+    if (hasBlockingErrors || !canEdit) return;
     submit({ content: getCamelConfigYaml() }, { method: "post" });
   }
 
+  async function handleShare() {
+    const shareUrl = `${window.location.origin}${location.pathname}${location.search}`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareLabel("Link copied");
+    } catch {
+      setShareLabel("Copy failed");
+    }
+
+    window.setTimeout(() => setShareLabel("Share"), 1500);
+  }
+
+  async function handleCopyYaml() {
+    try {
+      await navigator.clipboard.writeText(getCamelConfigYaml());
+      setCopyLabel("YAML copied");
+    } catch {
+      setCopyLabel("Copy failed");
+    }
+
+    window.setTimeout(() => setCopyLabel("Copy YAML"), 1500);
+  }
+
+  function handleExportYaml() {
+    const content = getCamelConfigYaml();
+    const blob = new Blob([content], { type: "application/yaml" });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${workflow ?? "workflow"}.camel.yaml`;
+    anchor.click();
+    window.URL.revokeObjectURL(url);
+  }
+
   return (
-    <div className="flex items-center gap-1">
-      {visibility === "private" && (
-        <Badge className="px-3 py-2" intent="info">
-          Private
-        </Badge>
-      )}
-      {visibility === "public" && (
-        <Badge className="px-3 py-2" intent="warning">
-          Public
-        </Badge>
-      )}
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 rounded-lg border border-border bg-background/80 px-2 py-1">
+        {visibility === "private" && (
+          <Badge className="px-2 py-1" intent="info">
+            Private
+          </Badge>
+        )}
+        {visibility === "public" && (
+          <Badge className="px-2 py-1" intent="warning">
+            Public
+          </Badge>
+        )}
+      </div>
       {findings.length > 0 && (
         <Popover>
-          <Button
-            intent={hasBlockingErrors ? "warning" : "secondary"}
-            size="sm"
-          >
-            <AlertTriangle className="h-4 w-4" />
-            {hasBlockingErrors
-              ? `${errors.length} error`
-              : `${warnings.length} warning`}
-          </Button>
+          <Tooltip>
+            <Button
+              intent={hasBlockingErrors ? "warning" : "secondary"}
+              size="sq-sm"
+              aria-label="Validation summary"
+            >
+              <AlertTriangle className="h-4 w-4" />
+            </Button>
+            <Tooltip.Content>
+              {hasBlockingErrors
+                ? `${errors.length} blocking error${errors.length === 1 ? "" : "s"}`
+                : `${warnings.length} warning${warnings.length === 1 ? "" : "s"}`}
+            </Tooltip.Content>
+          </Tooltip>
           <Popover.Content className="w-96 min-w-96 p-0">
             <Popover.Header className="border-b px-4 py-3">
               <Popover.Title>Validation</Popover.Title>
@@ -91,21 +139,72 @@ export const TopologyToolbarActions = () => {
           </Popover.Content>
         </Popover>
       )}
-      <Button
-        size="sm"
-        onPress={handleSave}
-        isDisabled={hasBlockingErrors}
-        isPending={navigation.state === "submitting"}
-      >
-        {navigation.state === "submitting" && <Loader />}
-        Save
-      </Button>
-      <Link
-        href={`${location.pathname}/code${location.search}`}
-        className={buttonStyles({ size: "lg", intent: "secondary" })}
-      >
-        <Code2 size={16} />
-      </Link>
+      <div className="ml-auto flex items-center gap-1">
+        <Tooltip>
+          <Link
+            href={`${location.pathname}/code${location.search}`}
+            aria-label="Open code view"
+            className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
+          >
+            <Code2 size={16} />
+          </Link>
+          <Tooltip.Content>Code view</Tooltip.Content>
+        </Tooltip>
+        <Tooltip>
+          <Button
+            intent="secondary"
+            size="sq-sm"
+            aria-label="Share workflow link"
+            onPress={handleShare}
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+          <Tooltip.Content>{shareLabel}</Tooltip.Content>
+        </Tooltip>
+        <Tooltip>
+          <Button
+            intent="secondary"
+            size="sq-sm"
+            aria-label="Copy Camel YAML"
+            onPress={handleCopyYaml}
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+          <Tooltip.Content>{copyLabel}</Tooltip.Content>
+        </Tooltip>
+        <Tooltip>
+          <Button
+            intent="secondary"
+            size="sq-sm"
+            aria-label="Export Camel YAML"
+            onPress={handleExportYaml}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Tooltip.Content>Export Camel YAML</Tooltip.Content>
+        </Tooltip>
+        {!canEdit && canClone && workflow && (
+          <Tooltip>
+            <Link
+              href={`/app/camel/workflows/${workflow}/clone`}
+              aria-label="Clone workflow"
+              className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
+            >
+              <Share2 size={16} />
+            </Link>
+            <Tooltip.Content>Clone workflow</Tooltip.Content>
+          </Tooltip>
+        )}
+        <Button
+          size="sm"
+          onPress={handleSave}
+          isDisabled={hasBlockingErrors || !canEdit}
+          isPending={navigation.state === "submitting"}
+        >
+          {navigation.state === "submitting" && <Loader />}
+          Save
+        </Button>
+      </div>
     </div>
   );
 };

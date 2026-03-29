@@ -6,13 +6,14 @@ import {
   SelectOption,
   SelectTrigger,
 } from "app/components/ui/select";
-import { Grid2X2, List, Plus } from "lucide-react";
+import { Grid2X2, List, Plus, Upload } from "lucide-react";
 import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import { Link } from "app/components/ui/link";
 import { CamelCard } from "@/camel/workflows-components/card";
 import type { CamelConfig } from "@/modules/supabase/supabase-db";
+import { Menu } from "app/components/ui/menu";
 
 const metaData = {
   title: "Workflows | Chameleon",
@@ -30,8 +31,16 @@ export const handle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data, error } = await supabase.from("workflows").select("*");
-  return { data, error };
+  const currentUserId = user?.id ?? null;
+  const accessibleData = (data ?? []).filter(
+    (workflow) =>
+      workflow.visibility === "public" || workflow.owner === currentUserId,
+  );
+  return { data: accessibleData, error, currentUserId };
 }
 
 export async function action({ request }: LoaderFunctionArgs) {
@@ -39,7 +48,28 @@ export async function action({ request }: LoaderFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("action");
   const id = formData.get("id");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (action === "delete" && id) {
+    const workflow = await supabase
+      .from("workflows")
+      .select("id, owner")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (workflow.error) {
+      throw new Error(`Failed to load workflow: ${workflow.error.message}`);
+    }
+
+    if (!workflow.data) {
+      throw new Error("Workflow not found.");
+    }
+
+    if (!user?.id || workflow.data.owner !== user.id) {
+      throw new Error("You do not have permission to delete this workflow.");
+    }
+
     const { error } = await supabase.from("workflows").delete().eq("id", id);
     if (error) {
       throw new Error(`Failed to delete workflow: ${error.message}`);
@@ -52,8 +82,16 @@ const filterItems = (items: CamelConfig[], searchParams: URLSearchParams) => {
   return items
     ?.filter((item) => {
       const query = searchParams.get("query")?.toLowerCase();
+      const visibility = searchParams.get("visibility");
 
       if (query && !item.name.toLowerCase().includes(query)) return false;
+      if (
+        visibility &&
+        visibility !== "all" &&
+        item.visibility !== visibility
+      ) {
+        return false;
+      }
 
       return true;
     })
@@ -71,9 +109,10 @@ const filterItems = (items: CamelConfig[], searchParams: URLSearchParams) => {
 export default function CamelWorkflows({
   loaderData,
 }: {
-  loaderData: { data: CamelConfig[] };
+  loaderData: { data: CamelConfig[]; currentUserId: string | null };
 }) {
   const items = loaderData.data;
+  const { currentUserId } = loaderData;
   const [searchParams, setSearchParams] = useSearchParams();
 
   function handleSearchChange(params: { [key: string]: string }) {
@@ -84,6 +123,7 @@ export default function CamelWorkflows({
   const filteredItems = filterItems(items ?? [], searchParams);
   const totalWorkflows = filteredItems.length;
   const viewMode = searchParams.get("view") || "cards";
+  const visibilityFilter = searchParams.get("visibility") || "all";
 
   return (
     <div className="m-6 flex flex-col gap-4">
@@ -92,6 +132,12 @@ export default function CamelWorkflows({
         <p className="text-sm text-muted-foreground mt-1">
           {totalWorkflows} workflow{totalWorkflows !== 1 ? "s" : ""} total
         </p>
+        {visibilityFilter === "public" && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            Public workflows open in read-only mode and should be cloned before
+            editing.
+          </p>
+        )}
       </div>
       <form className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -116,6 +162,20 @@ export default function CamelWorkflows({
                 <SelectOption id="name">Name A-Z</SelectOption>
               </SelectList>
             </Select>
+            <Select
+              className="flex-1"
+              defaultSelectedKey={searchParams.get("visibility") ?? "all"}
+              onSelectionChange={(v) =>
+                handleSearchChange({ visibility: v?.toString() ?? "all" })
+              }
+            >
+              <SelectTrigger className="w-40" aria-label="Filter visibility" />
+              <SelectList>
+                <SelectOption id="all">All</SelectOption>
+                <SelectOption id="private">Private</SelectOption>
+                <SelectOption id="public">Public</SelectOption>
+              </SelectList>
+            </Select>
           </div>
 
           <div className="flex items-center justify-end gap-2">
@@ -137,17 +197,27 @@ export default function CamelWorkflows({
                 <List className="h-4 w-4" />
               </ToggleGroupItem>
             </ToggleGroup>
-            <Link
-              href="/app/camel/workflows/create"
-              aria-label="Settings"
-              className={buttonStyles({
-                size: "md",
-                intent: "primary",
-              })}
-            >
-              <Plus className="h-4 w-4" />
-              New Workflow
-            </Link>
+            <Menu>
+              <Menu.Trigger
+                className={buttonStyles({
+                  size: "md",
+                  intent: "primary",
+                })}
+              >
+                <Plus className="h-4 w-4" />
+                New Workflow
+              </Menu.Trigger>
+              <Menu.Content placement="bottom end">
+                <Menu.Item href="/app/camel/workflows/create">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create from scratch
+                </Menu.Item>
+                <Menu.Item href="/app/camel/workflows/import">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import Camel YAML
+                </Menu.Item>
+              </Menu.Content>
+            </Menu>
           </div>
         </div>
       </form>
@@ -160,7 +230,11 @@ export default function CamelWorkflows({
           }
         >
           {filteredItems?.map((c) => (
-            <CamelCard key={c.id} camelConfig={c} />
+            <CamelCard
+              key={c.id}
+              camelConfig={c}
+              currentUserId={currentUserId}
+            />
           ))}
         </div>
       </section>

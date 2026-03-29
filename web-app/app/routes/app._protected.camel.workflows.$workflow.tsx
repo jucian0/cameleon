@@ -8,7 +8,9 @@ import {
 } from "core";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
+  isRouteErrorResponse,
   Outlet,
+  useRouteError,
   useSearchParams,
   type LoaderFunctionArgs,
   type MetaArgs,
@@ -17,6 +19,9 @@ import { decode } from "js-base64";
 import { yamlToJson } from "core";
 import React from "react";
 import { data as routerData } from "react-router";
+import { getWorkflowAccess } from "@/camel/workflows-access";
+import { Link } from "app/components/ui/link";
+import { buttonStyles } from "app/components/ui/button";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -32,6 +37,9 @@ export const handle = {
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
   const workflowsId = params.workflow;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data, error } = await supabase
     .from("workflows")
     .select("*")
@@ -45,10 +53,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const decodedData = decode(data.content ?? "");
+  const access = getWorkflowAccess({
+    currentUserId: user?.id,
+    owner: data.owner,
+    visibility: data.visibility,
+  });
+
+  if (!access.canView) {
+    throw routerData(
+      { message: "You do not have access to this workflow." },
+      { status: 403 },
+    );
+  }
+
   return {
     content: yamlToJson(decodedData),
     name: data.name,
-    visibility: data.visibility,
+    workflowId: data.id,
+    ...access,
   };
 }
 
@@ -58,10 +80,14 @@ export default function CamelStudio({
   loaderData: {
     content: unknown;
     name: string;
+    workflowId: string;
     visibility: "public" | "private";
+    accessMode: "editable" | "read-only";
+    canEdit: boolean;
+    canClone: boolean;
   };
 }) {
-  const { content, name, visibility } = loaderData;
+  const { content, name, workflowId, ...access } = loaderData;
   const { setCamelConfig, canvas, camelConfig } = useTopologyStore();
   const [query] = useSearchParams();
   const routeId = query.get("route");
@@ -101,5 +127,44 @@ export default function CamelStudio({
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
   }, [routeId, camelConfig]);
 
-  return <Outlet context={{ visibility }} />;
+  return <Outlet context={{ workflowId, ...access }} />;
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  const title = isRouteErrorResponse(error)
+    ? error.status === 403
+      ? "Read-only access denied"
+      : error.status === 404
+        ? "Workflow not found"
+        : "Unable to open workflow"
+    : "Unable to open workflow";
+  const description = isRouteErrorResponse(error)
+    ? error.status === 403
+      ? "You do not have access to this workflow."
+      : error.status === 404
+        ? "The requested workflow does not exist or is no longer available."
+        : typeof error.data === "object" &&
+            error.data &&
+            "message" in error.data
+          ? String(error.data.message)
+          : "An unexpected error happened while loading the workflow."
+    : error instanceof Error
+      ? error.message
+      : "An unexpected error happened while loading the workflow.";
+
+  return (
+    <div className="m-6 rounded-xl border border-border bg-background p-6">
+      <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+      <p className="mt-2 text-sm text-muted-fg">{description}</p>
+      <div className="mt-4">
+        <Link
+          href="/app/camel/workflows"
+          className={buttonStyles({ intent: "secondary", size: "sm" })}
+        >
+          Back to Workflows
+        </Link>
+      </div>
+    </div>
+  );
 }

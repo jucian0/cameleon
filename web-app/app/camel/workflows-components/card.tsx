@@ -7,24 +7,36 @@ import { Link } from "app/components/ui/link";
 import React from "react";
 import { DeleteModal } from "./delete-modal";
 import type { CamelConfig } from "@/modules/supabase/supabase-db";
+import { getWorkflowAccess } from "../workflows-access";
 
 type CamelCardProps = {
   camelConfig: CamelConfig;
-}
+  currentUserId: string | null;
+};
 
-export const CamelCard = ({
-  camelConfig
-}: CamelCardProps) => {
-  const {
-    id,
-    name,
-    description,
-    visibility,
-    updated_at
-  } = camelConfig;
+export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
+  const { id, name, description, visibility, owner, updated_at } = camelConfig;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
-  const isDisabled = visibility === "public";
+  const [shareLabel, setShareLabel] = React.useState("Share");
+  const access = getWorkflowAccess({
+    currentUserId,
+    owner,
+    visibility,
+  });
   const updatedAt = new Date(updated_at).toLocaleDateString();
+
+  async function handleShare() {
+    const shareUrl = `${window.location.origin}/app/camel/workflows/${id}/studio`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareLabel("Link copied");
+      window.setTimeout(() => setShareLabel("Share"), 1500);
+    } catch {
+      setShareLabel("Copy failed");
+      window.setTimeout(() => setShareLabel("Share"), 1500);
+    }
+  }
 
   return (
     <Card className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card hover:-translate-y-0.5">
@@ -51,20 +63,30 @@ export const CamelCard = ({
               <MoreHorizontal size={16} />
             </Menu.Trigger>
             <Menu.Content className="justify-end">
-              <Menu.Item isDisabled={isDisabled} href={`/app/camel/workflows/${id}/edit`}>
+              <Menu.Item
+                isDisabled={!access.canEdit}
+                href={`/app/camel/workflows/${id}/edit`}
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Details
               </Menu.Item>
-              <Menu.Item href={`/app/camel/workflows/${id}/clone`}>
+              <Menu.Item
+                isDisabled={!access.canClone}
+                href={`/app/camel/workflows/${id}/clone`}
+              >
                 <Copy className="h-4 w-4 mr-2" />
                 Clone
               </Menu.Item>
-              <Menu.Item>
+              <Menu.Item onAction={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
-                Share
+                {shareLabel}
               </Menu.Item>
               <Menu.Separator />
-              <Menu.Item isDisabled={isDisabled} isDanger onPress={() => setIsDeleteModalOpen(true)}>
+              <Menu.Item
+                isDisabled={!access.canEdit}
+                isDanger
+                onPress={() => setIsDeleteModalOpen(true)}
+              >
                 <Trash className="h-4 w-4 mr-2" />
                 Delete
               </Menu.Item>
@@ -76,7 +98,10 @@ export const CamelCard = ({
       <CardContent className="relative pt-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Badge intent={visibility === "public" ? "warning" : "info"} className="text-xs">
+            <Badge
+              intent={visibility === "public" ? "warning" : "info"}
+              className="text-xs"
+            >
               {visibility === "public" ? "Public" : "Private"}
             </Badge>
             <span className="text-xs text-muted-foreground">

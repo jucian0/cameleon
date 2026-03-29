@@ -27,6 +27,7 @@ type Props = {
   schema: Record<string, PropertySchema>;
   componentMetadata?: ComponentMetadata | null;
   initialFormData: Record<string, any>;
+  canEdit?: boolean;
   onSubmit?: (formData: Record<string, any>) => void;
   onCancel?: () => void;
 };
@@ -231,6 +232,7 @@ export function AuthoringForm({
   schema,
   componentMetadata,
   initialFormData,
+  canEdit = true,
   onSubmit,
   onCancel,
 }: Props) {
@@ -324,6 +326,7 @@ export function AuthoringForm({
   }, [fieldErrors, propertyGroups]);
 
   function updateField(key: string, value: unknown) {
+    if (!canEdit) return;
     setFormData((current) => ({
       ...current,
       [key]: value,
@@ -332,6 +335,7 @@ export function AuthoringForm({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canEdit) return;
     onSubmit?.(formData);
   }
 
@@ -367,6 +371,7 @@ export function AuthoringForm({
                 label={property.displayName || key}
                 description={property.description}
                 errorMessage={fieldErrors[key]}
+                isDisabled={!canEdit}
                 property={property}
                 value={currentValue}
                 schema={schema}
@@ -441,7 +446,11 @@ export function AuthoringForm({
         <Button type="button" intent="plain" onPress={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" intent="primary" isDisabled={totalErrors > 0}>
+        <Button
+          type="submit"
+          intent="primary"
+          isDisabled={totalErrors > 0 || !canEdit}
+        >
           Save Changes
         </Button>
       </Sheet.Footer>

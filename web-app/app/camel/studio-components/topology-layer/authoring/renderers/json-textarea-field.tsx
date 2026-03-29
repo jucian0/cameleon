@@ -6,6 +6,7 @@ type Props = {
   label: string;
   description?: string;
   errorMessage?: string;
+  isDisabled?: boolean;
   placeholder?: string;
   value: unknown;
   emptyValue: unknown;
@@ -17,6 +18,7 @@ export function JsonTextareaField({
   label,
   description,
   errorMessage,
+  isDisabled,
   placeholder,
   value,
   emptyValue,
@@ -34,6 +36,7 @@ export function JsonTextareaField({
       label={label}
       description={description}
       errorMessage={errorMessage}
+      isDisabled={isDisabled}
       placeholder={placeholder}
       value={rawValue}
       onChange={(nextValue) => {

@@ -10,6 +10,7 @@ import { Menu } from "app/components/ui/menu";
 import { Tooltip } from "app/components/ui/tooltip";
 import { FallbackImage } from "app/components/fallback-image";
 import { useOutletContext, useSearchParams } from "react-router";
+import type { WorkflowAccessContext } from "@/camel/workflows-access";
 
 export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -17,8 +18,9 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
   const direction = query.get("direction") || "LR";
   const targetPosition = direction === "LR" ? Position.Left : Position.Top;
   const sourcePosition = direction === "LR" ? Position.Right : Position.Bottom;
-  const { visibility } = useOutletContext<{ visibility: "public" | "private" }>();
-  const isDisabled = visibility === "public";
+  const { canEdit } = useOutletContext<
+    WorkflowAccessContext & { workflowId: string }
+  >();
 
   const iconPath = React.useMemo(() => {
     if (EIPSListNames.includes(data.stepType)) {
@@ -50,10 +52,9 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
       <Menu isOpen={isOpen} onOpenChange={setIsOpen}>
         <Tooltip>
           <Menu.Trigger
-            isDisabled={isDisabled}
             data-slot="menu-trigger"
             onPress={handleMenuOpen}
-            className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center disabled:cursor-not-allowed"
+            className="cursor-pointer relative flex border rounded-lg bg-secondary shadow-sm hover:shadow-md transition-all duration-200 ease-in-out w-10 h-10 justify-center"
           >
             {data.iconName && (
               <FallbackImage
@@ -79,12 +80,14 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
             <IconPencilBox /> Edit
           </Menu.Item>
           <Menu.Item
+            isDisabled={!canEdit}
             onAction={handleClick("add-step")}
             textValue={`Replace ${data.label}`}
           >
             <IconRepeat /> Replace
           </Menu.Item>
           <Menu.Item
+            isDisabled={!canEdit}
             isDanger
             onAction={() => setIsDeleteOpen(true)}
             textValue={`Delete ${data.label}`}

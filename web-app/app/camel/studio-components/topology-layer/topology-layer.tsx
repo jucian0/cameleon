@@ -7,6 +7,7 @@ import React from "react";
 import { FallbackImage } from "app/components/fallback-image";
 import { Badge } from "@/components/ui/badge";
 import { useOutletContext } from "react-router";
+import type { WorkflowAccessContext } from "@/camel/workflows-access";
 
 function getPanelCopy(node?: Node["data"]) {
   if (!node) {
@@ -31,9 +32,9 @@ function getPanelCopy(node?: Node["data"]) {
 
 export function TopologyLibraryLayer() {
   const { node, setNode } = useLayer();
-  const { visibility } = useOutletContext<{
-    visibility: "public" | "private";
-  }>();
+  const { accessMode, canEdit, visibility } = useOutletContext<
+    WorkflowAccessContext & { workflowId: string }
+  >();
   const isOpen = !!node;
   const onUnSelectedNode = () => {
     setNode();
@@ -60,6 +61,7 @@ export function TopologyLibraryLayer() {
             <Badge intent={visibility === "public" ? "warning" : "info"}>
               {visibility}
             </Badge>
+            {!canEdit && <Badge intent="secondary">{accessMode}</Badge>}
           </div>
           <Sheet.Title className="flex items-center gap-2">
             {!node?.operation.includes("add") && (

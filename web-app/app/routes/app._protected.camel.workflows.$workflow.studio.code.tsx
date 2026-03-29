@@ -7,15 +7,16 @@ import debounce from "debounce";
 import { withModal } from "app/components/utils/with-modal";
 import { useLocation, useOutletContext } from "react-router";
 import { Badge } from "@/components/ui/badge";
+import type { WorkflowAccessContext } from "@/camel/workflows-access";
 
 export default withModal(({ isOpen, closeModal }: any) => {
   const { setCamelConfig, camelConfig } = useTopologyStore();
   const theme = useTheme();
   const location = useLocation();
-  const { visibility } = useOutletContext<{
-    visibility: "public" | "private";
-  }>();
-  const isPublic = visibility === "public";
+  const { canEdit, visibility } = useOutletContext<
+    WorkflowAccessContext & { workflowId: string }
+  >();
+  const isReadOnly = !canEdit;
   const canonicalYaml = React.useMemo(
     () => jsonToYaml(camelConfig),
     [camelConfig],
@@ -57,7 +58,7 @@ export default withModal(({ isOpen, closeModal }: any) => {
       <Sheet.Content>
         <Sheet.Body className="p-0!">
           <div
-            className={`w-full h-full relative rounded-lg py-11 ${isPublic ? "pointer-none" : ""}`}
+            className={`w-full h-full relative rounded-lg py-11 ${isReadOnly ? "pointer-events-none" : ""}`}
           >
             {parseError && (
               <div className="absolute inset-x-3 top-3 z-10 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2">
@@ -68,13 +69,13 @@ export default withModal(({ isOpen, closeModal }: any) => {
               </div>
             )}
             <MonacoEditor
-              className={`"w-full h-full" ${isPublic ? "pointer-none" : ""}`}
+              className={`w-full h-full ${isReadOnly ? "pointer-events-none" : ""}`}
               language="yaml"
               theme={theme[0] === "dark" ? "vs-dark" : "vs-light"}
               value={editorValue}
               options={{
                 selectOnLineNumbers: true,
-                readOnly: isPublic,
+                readOnly: isReadOnly,
               }}
               onChange={onChange}
             />

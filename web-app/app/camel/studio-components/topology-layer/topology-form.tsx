@@ -9,6 +9,8 @@ import {
 } from "../../data-requests/fetch-metadata";
 import { tryCatch } from "@/utils/try-catch";
 import type { ComponentMetadata, PropertySchema } from "./authoring/types";
+import { useOutletContext } from "react-router";
+import type { WorkflowAccessContext } from "@/camel/workflows-access";
 
 function normalizePropertySchema(
   property: Record<string, unknown>,
@@ -49,6 +51,9 @@ function getNodeConfigPath(node?: { absolutePath: string; stepType: string }) {
 export function Form() {
   const { node, setNode } = useLayer();
   const { camelConfig, setCamelConfig } = useTopologyStore();
+  const { canEdit } = useOutletContext<
+    WorkflowAccessContext & { workflowId: string }
+  >();
   const [metadata, setMetadata] = React.useState<Record<string, any>[]>([]);
 
   const kind = EIPSListNames.includes(node?.stepType ?? "")
@@ -176,6 +181,7 @@ export function Form() {
       schema={formSchema}
       componentMetadata={componentMetadata}
       initialFormData={formData}
+      canEdit={canEdit}
       onSubmit={handleSubmit}
       onCancel={() => setNode()}
     />

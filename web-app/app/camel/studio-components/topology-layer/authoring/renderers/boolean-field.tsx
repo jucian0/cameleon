@@ -5,6 +5,7 @@ export function BooleanField({
   label,
   description,
   errorMessage,
+  isDisabled,
   value,
   onChange,
 }: FieldRendererProps) {
@@ -16,6 +17,7 @@ export function BooleanField({
     >
       <Checkbox
         isSelected={Boolean(value)}
+        isDisabled={isDisabled}
         onChange={onChange}
         label={label}
         description={description}
