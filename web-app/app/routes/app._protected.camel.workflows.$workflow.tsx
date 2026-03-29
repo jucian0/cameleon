@@ -56,7 +56,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const access = getWorkflowAccess({
     currentUserId: user?.id,
     owner: data.owner,
-    visibility: data.visibility,
   });
 
   if (!access.canView) {
@@ -81,8 +80,6 @@ export default function CamelStudio({
     content: unknown;
     name: string;
     workflowId: string;
-    visibility: "public" | "private";
-    accessMode: "editable" | "read-only";
     canEdit: boolean;
     canClone: boolean;
   };
@@ -134,14 +131,14 @@ export function ErrorBoundary() {
   const error = useRouteError();
   const title = isRouteErrorResponse(error)
     ? error.status === 403
-      ? "Read-only access denied"
+      ? "Access denied"
       : error.status === 404
         ? "Workflow not found"
         : "Unable to open workflow"
     : "Unable to open workflow";
   const description = isRouteErrorResponse(error)
     ? error.status === 403
-      ? "You do not have access to this workflow."
+      ? "This workflow belongs to another user and is not available here."
       : error.status === 404
         ? "The requested workflow does not exist or is no longer available."
         : typeof error.data === "object" &&

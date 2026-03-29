@@ -6,7 +6,7 @@ import {
   SelectOption,
   SelectTrigger,
 } from "app/components/ui/select";
-import { Grid2X2, List, Plus, Upload } from "lucide-react";
+import { Grid2X2, LayoutTemplate, List, Plus, Upload } from "lucide-react";
 import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useSearchParams, type LoaderFunctionArgs } from "react-router";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
@@ -34,13 +34,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const { data, error } = await supabase.from("workflows").select("*");
+  const { data, error } = await supabase
+    .from("workflows")
+    .select("*")
+    .eq("owner", user?.id ?? "");
   const currentUserId = user?.id ?? null;
-  const accessibleData = (data ?? []).filter(
-    (workflow) =>
-      workflow.visibility === "public" || workflow.owner === currentUserId,
-  );
-  return { data: accessibleData, error, currentUserId };
+  return { data: data ?? [], error, currentUserId };
 }
 
 export async function action({ request }: LoaderFunctionArgs) {
@@ -82,16 +81,8 @@ const filterItems = (items: CamelConfig[], searchParams: URLSearchParams) => {
   return items
     ?.filter((item) => {
       const query = searchParams.get("query")?.toLowerCase();
-      const visibility = searchParams.get("visibility");
 
       if (query && !item.name.toLowerCase().includes(query)) return false;
-      if (
-        visibility &&
-        visibility !== "all" &&
-        item.visibility !== visibility
-      ) {
-        return false;
-      }
 
       return true;
     })
@@ -123,7 +114,6 @@ export default function CamelWorkflows({
   const filteredItems = filterItems(items ?? [], searchParams);
   const totalWorkflows = filteredItems.length;
   const viewMode = searchParams.get("view") || "cards";
-  const visibilityFilter = searchParams.get("visibility") || "all";
 
   return (
     <div className="m-6 flex flex-col gap-4">
@@ -132,12 +122,6 @@ export default function CamelWorkflows({
         <p className="text-sm text-muted-foreground mt-1">
           {totalWorkflows} workflow{totalWorkflows !== 1 ? "s" : ""} total
         </p>
-        {visibilityFilter === "public" && (
-          <p className="mt-1 text-sm text-muted-foreground">
-            Public workflows open in read-only mode and should be cloned before
-            editing.
-          </p>
-        )}
       </div>
       <form className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -160,20 +144,6 @@ export default function CamelWorkflows({
               <SelectList>
                 <SelectOption id="updatedAt">Recent first</SelectOption>
                 <SelectOption id="name">Name A-Z</SelectOption>
-              </SelectList>
-            </Select>
-            <Select
-              className="flex-1"
-              defaultSelectedKey={searchParams.get("visibility") ?? "all"}
-              onSelectionChange={(v) =>
-                handleSearchChange({ visibility: v?.toString() ?? "all" })
-              }
-            >
-              <SelectTrigger className="w-40" aria-label="Filter visibility" />
-              <SelectList>
-                <SelectOption id="all">All</SelectOption>
-                <SelectOption id="private">Private</SelectOption>
-                <SelectOption id="public">Public</SelectOption>
               </SelectList>
             </Select>
           </div>
@@ -209,11 +179,15 @@ export default function CamelWorkflows({
               </Menu.Trigger>
               <Menu.Content placement="bottom end">
                 <Menu.Item href="/app/camel/workflows/create">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create from scratch
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create blank workflow
+                </Menu.Item>
+                <Menu.Item href="/app/camel/workflows/create?mode=template">
+                  <LayoutTemplate className="mr-2 h-4 w-4" />
+                  Start from template
                 </Menu.Item>
                 <Menu.Item href="/app/camel/workflows/import">
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="mr-2 h-4 w-4" />
                   Import Camel YAML
                 </Menu.Item>
               </Menu.Content>

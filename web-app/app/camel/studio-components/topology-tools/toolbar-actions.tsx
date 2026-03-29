@@ -8,7 +8,7 @@ import {
 } from "react-router";
 import { Loader } from "app/components/ui/loader";
 import { Link } from "app/components/ui/link";
-import { AlertTriangle, Code2, Copy, Download, Share2 } from "lucide-react";
+import { AlertTriangle, Code2, Copy, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
 import { Tooltip } from "app/components/ui/tooltip";
@@ -23,14 +23,13 @@ export const TopologyToolbarActions = () => {
   const navigation = useNavigation();
   const location = useLocation();
   const { workflow } = useParams();
-  const { canClone, canEdit, visibility } = useOutletContext<
+  const { canClone, canEdit } = useOutletContext<
     WorkflowAccessContext & { workflowId: string }
   >();
   const findings = React.useMemo(
     () => validateCamelConfig(camelConfig),
     [camelConfig],
   );
-  const [shareLabel, setShareLabel] = React.useState("Share");
   const [copyLabel, setCopyLabel] = React.useState("Copy YAML");
   const errors = findings.filter((item) => item.severity === "error");
   const warnings = findings.filter((item) => item.severity === "warning");
@@ -39,19 +38,6 @@ export const TopologyToolbarActions = () => {
   function handleSave() {
     if (hasBlockingErrors || !canEdit) return;
     submit({ content: getCamelConfigYaml() }, { method: "post" });
-  }
-
-  async function handleShare() {
-    const shareUrl = `${window.location.origin}${location.pathname}${location.search}`;
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setShareLabel("Link copied");
-    } catch {
-      setShareLabel("Copy failed");
-    }
-
-    window.setTimeout(() => setShareLabel("Share"), 1500);
   }
 
   async function handleCopyYaml() {
@@ -78,18 +64,6 @@ export const TopologyToolbarActions = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center gap-1 rounded-lg border border-border bg-background/80 px-2 py-1">
-        {visibility === "private" && (
-          <Badge className="px-2 py-1" intent="info">
-            Private
-          </Badge>
-        )}
-        {visibility === "public" && (
-          <Badge className="px-2 py-1" intent="warning">
-            Public
-          </Badge>
-        )}
-      </div>
       {findings.length > 0 && (
         <Popover>
           <Tooltip>
@@ -154,17 +128,6 @@ export const TopologyToolbarActions = () => {
           <Button
             intent="secondary"
             size="sq-sm"
-            aria-label="Share workflow link"
-            onPress={handleShare}
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
-          <Tooltip.Content>{shareLabel}</Tooltip.Content>
-        </Tooltip>
-        <Tooltip>
-          <Button
-            intent="secondary"
-            size="sq-sm"
             aria-label="Copy Camel YAML"
             onPress={handleCopyYaml}
           >
@@ -183,16 +146,16 @@ export const TopologyToolbarActions = () => {
           </Button>
           <Tooltip.Content>Export Camel YAML</Tooltip.Content>
         </Tooltip>
-        {!canEdit && canClone && workflow && (
+        {canClone && workflow && (
           <Tooltip>
             <Link
               href={`/app/camel/workflows/${workflow}/clone`}
-              aria-label="Clone workflow"
+              aria-label="Duplicate workflow"
               className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
             >
-              <Share2 size={16} />
+              <Copy size={16} />
             </Link>
-            <Tooltip.Content>Clone workflow</Tooltip.Content>
+            <Tooltip.Content>Duplicate workflow</Tooltip.Content>
           </Tooltip>
         )}
         <Button

@@ -13,7 +13,7 @@ export default withModal(({ isOpen, closeModal }: any) => {
   const { setCamelConfig, camelConfig } = useTopologyStore();
   const theme = useTheme();
   const location = useLocation();
-  const { canEdit, visibility } = useOutletContext<
+  const { canEdit } = useOutletContext<
     WorkflowAccessContext & { workflowId: string }
   >();
   const isReadOnly = !canEdit;

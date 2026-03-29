@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader } from "app/components/ui/card";
-import { Badge } from "app/components/ui/badge";
-import { Edit, Share2, Copy, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, Copy, MoreHorizontal, Trash } from "lucide-react";
 import { buttonStyles } from "app/components/ui/button";
 import { Menu } from "app/components/ui/menu";
 import { Link } from "app/components/ui/link";
@@ -15,28 +14,13 @@ type CamelCardProps = {
 };
 
 export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
-  const { id, name, description, visibility, owner, updated_at } = camelConfig;
+  const { id, name, description, owner, updated_at } = camelConfig;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
-  const [shareLabel, setShareLabel] = React.useState("Share");
   const access = getWorkflowAccess({
     currentUserId,
     owner,
-    visibility,
   });
   const updatedAt = new Date(updated_at).toLocaleDateString();
-
-  async function handleShare() {
-    const shareUrl = `${window.location.origin}/app/camel/workflows/${id}/studio`;
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setShareLabel("Link copied");
-      window.setTimeout(() => setShareLabel("Share"), 1500);
-    } catch {
-      setShareLabel("Copy failed");
-      window.setTimeout(() => setShareLabel("Share"), 1500);
-    }
-  }
 
   return (
     <Card className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card hover:-translate-y-0.5">
@@ -75,11 +59,7 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
                 href={`/app/camel/workflows/${id}/clone`}
               >
                 <Copy className="h-4 w-4 mr-2" />
-                Clone
-              </Menu.Item>
-              <Menu.Item onAction={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                {shareLabel}
+                Duplicate
               </Menu.Item>
               <Menu.Separator />
               <Menu.Item
@@ -97,17 +77,9 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
 
       <CardContent className="relative pt-0">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Badge
-              intent={visibility === "public" ? "warning" : "info"}
-              className="text-xs"
-            >
-              {visibility === "public" ? "Public" : "Private"}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
-              {`Updated on ${updatedAt}`}
-            </span>
-          </div>
+          <span className="text-xs text-muted-foreground">
+            {`Updated on ${updatedAt}`}
+          </span>
 
           <Link
             href={`/app/camel/workflows/${id}/studio`}

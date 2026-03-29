@@ -21,7 +21,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
   } = await supabase.auth.getUser();
   const workflow = await supabase
     .from("workflows")
-    .select("id, owner, visibility")
+    .select("id, owner")
     .eq("id", workflowsId)
     .maybeSingle();
 
@@ -36,7 +36,6 @@ export async function action({ request, params }: LoaderFunctionArgs) {
   const access = getWorkflowAccess({
     currentUserId: user?.id,
     owner: workflow.data.owner,
-    visibility: workflow.data.visibility,
   });
 
   if (!access.canEdit) {
