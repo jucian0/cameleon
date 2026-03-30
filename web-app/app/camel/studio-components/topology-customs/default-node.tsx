@@ -1,7 +1,13 @@
 import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
 
-import { EIPSListNames, type Node, type StepType } from "core";
+import {
+  EIPSListNames,
+  getStructuralBranchCapability,
+  type Node,
+  type StepType,
+  useTopologyStore,
+} from "core";
 import { DefaultHandle } from "./default-handle";
 import { DeleteNodeModal } from "./delete-node-modal";
 import { useLayer } from "../topology-layer/topology-layer";
@@ -28,6 +34,16 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
     }
     return `/camel-icons/components/${data.stepType}.svg`;
   }, [data.stepType]);
+  const camelConfig = useTopologyStore((state) => state.camelConfig);
+  const structuralBranchCapability = React.useMemo(
+    () =>
+      getStructuralBranchCapability(
+        camelConfig,
+        data.absolutePath,
+        data.stepType as StepType,
+      ),
+    [camelConfig, data.absolutePath, data.stepType],
+  );
 
   const { setNode } = useLayer();
 
@@ -80,14 +96,14 @@ export const DefaultNode = React.memo(({ data, ...props }: NodeProps<Node>) => {
             <IconPencilBox /> Edit
           </Menu.Item>
           <Menu.Item
-            isDisabled={!canEdit}
+            isDisabled={!canEdit || !structuralBranchCapability.canReplace}
             onAction={handleClick("add-step")}
             textValue={`Replace ${data.label}`}
           >
             <IconRepeat /> Replace
           </Menu.Item>
           <Menu.Item
-            isDisabled={!canEdit}
+            isDisabled={!canEdit || !structuralBranchCapability.canDelete}
             isDanger
             onAction={() => setIsDeleteOpen(true)}
             textValue={`Delete ${data.label}`}

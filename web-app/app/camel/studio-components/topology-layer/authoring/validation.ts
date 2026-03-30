@@ -86,15 +86,57 @@ function validateStep(
         ? config.otherwise
         : undefined;
 
-    if (whenBranches.length === 0 && !otherwiseBranch) {
+    if (whenBranches.length === 0) {
       findings.push({
-        severity: "warning",
+        severity: "error",
         routeId,
         nodeId,
-        fieldPath: `${fieldPath}.${stepType}`,
-        message: 'Choice has no "when" or "otherwise" branches.',
+        fieldPath: `${fieldPath}.${stepType}.when`,
+        message: 'Choice must keep at least one "when" branch.',
+        remediationHint: 'Add a "when" branch before saving the route.',
+      });
+    }
+
+    if (!otherwiseBranch) {
+      findings.push({
+        severity: "error",
+        routeId,
+        nodeId,
+        fieldPath: `${fieldPath}.${stepType}.otherwise`,
+        message: 'Choice must keep an "otherwise" branch.',
         remediationHint:
-          "Add at least one branch so the choice can route messages.",
+          'Restore the "otherwise" branch so unmatched messages have a path.',
+      });
+    }
+  }
+
+  if (stepType === "doTry") {
+    const doCatchBranches = Array.isArray(config.doCatch) ? config.doCatch : [];
+    const doFinallyBranch =
+      config.doFinally && typeof config.doFinally === "object"
+        ? config.doFinally
+        : undefined;
+
+    if (doCatchBranches.length === 0) {
+      findings.push({
+        severity: "error",
+        routeId,
+        nodeId,
+        fieldPath: `${fieldPath}.${stepType}.doCatch`,
+        message: 'doTry must keep at least one "doCatch" branch.',
+        remediationHint: 'Add a "doCatch" branch before saving the route.',
+      });
+    }
+
+    if (!doFinallyBranch) {
+      findings.push({
+        severity: "error",
+        routeId,
+        nodeId,
+        fieldPath: `${fieldPath}.${stepType}.doFinally`,
+        message: 'doTry must keep a "doFinally" branch.',
+        remediationHint:
+          'Restore the "doFinally" branch so the route has a merge path.',
       });
     }
   }

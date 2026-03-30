@@ -20,6 +20,14 @@ import {
 import { Card } from "app/components/ui/card";
 import React from "react";
 
+const HIDDEN_STRUCTURAL_EIPS = new Set([
+  "when",
+  "otherwise",
+  "doCatch",
+  "doFinally",
+  "fallback",
+]);
+
 export function TopologyLibrary() {
   const { node, setNode } = useLayer();
   const { camelConfig, setCamelConfig } = useTopologyStore();
@@ -46,9 +54,7 @@ export function TopologyLibrary() {
         return setNode();
       }
 
-      if (
-        ["add-between", "add-when", "add-doCatch"].includes(node.operation)
-      ) {
+      if (["add-between", "add-when", "add-doCatch"].includes(node.operation)) {
         setCamelConfig(
           addBetween(camelConfig, node.absolutePath, newStepConfig),
         );
@@ -159,7 +165,11 @@ function CamelEIPsTab({
       if (error) {
         return { items: [] };
       }
-      return { items: Object.values(data.data) };
+      return {
+        items: Object.values(data.data).filter(
+          (item) => !HIDDEN_STRUCTURAL_EIPS.has(item.model.name),
+        ),
+      };
     },
   });
 
