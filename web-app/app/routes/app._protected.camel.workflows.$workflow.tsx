@@ -16,7 +16,7 @@ import {
   type MetaArgs,
 } from "react-router";
 import { decode } from "js-base64";
-import { yamlToJson } from "core";
+import { jsonToYaml, yamlToJson } from "core";
 import React from "react";
 import { data as routerData } from "react-router";
 import { getWorkflowAccess } from "@/camel/workflows-access";
@@ -53,6 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const decodedData = decode(data.content ?? "");
+  const parsedContent = yamlToJson(decodedData);
   const access = getWorkflowAccess({
     currentUserId: user?.id,
     owner: data.owner,
@@ -67,7 +68,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   return {
-    content: yamlToJson(decodedData),
+    content: parsedContent,
+    initialYaml: jsonToYaml(parsedContent as CamelConfig),
     name: data.name,
     workflowId: data.id,
     ...access,
@@ -79,6 +81,7 @@ export default function CamelStudio({
 }: {
   loaderData: {
     content: unknown;
+    initialYaml: string;
     name: string;
     workflowId: string;
     visibility: "public" | "private";
@@ -89,7 +92,7 @@ export default function CamelStudio({
     canDuplicate: boolean;
   };
 }) {
-  const { content, name, workflowId, ...access } = loaderData;
+  const { content, initialYaml, name, workflowId, ...access } = loaderData;
   const { setCamelConfig, canvas, camelConfig } = useTopologyStore();
   const [query] = useSearchParams();
   const routeId = query.get("route");
@@ -129,7 +132,7 @@ export default function CamelStudio({
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
   }, [routeId, camelConfig]);
 
-  return <Outlet context={{ workflowId, ...access }} />;
+  return <Outlet context={{ workflowId, initialYaml, ...access }} />;
 }
 
 export function ErrorBoundary() {

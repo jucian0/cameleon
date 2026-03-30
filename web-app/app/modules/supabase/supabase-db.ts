@@ -1,37 +1,38 @@
 export type Database = {
   public: {
     Tables: {
-      camel_config_projects: {
+      workflows: {
         Row: {
           id: string;
           name: string;
           owner: string;
-          tags: string[] | null;
-          environment: string;
           created_at: string;
           updated_at: string;
           description: string | null;
+          content: string | null;
           visibility: "public" | "private";
         };
         Insert: {
           id?: string;
           name: string;
           owner: string;
-          tags?: string[] | null;
-          environment: string;
+          description?: string | null;
+          content?: string | null;
+          visibility?: "public" | "private";
         };
         Update: {
           id?: string;
           name?: string;
           owner?: string;
-          tags?: string[] | null;
-          environment?: string;
+          description?: string | null;
+          content?: string | null;
+          visibility?: "public" | "private";
         };
       };
-      camel_config_versions: {
+      workflow_versions: {
         Row: {
           id: string;
-          config_id: string;
+          workflow_id: string;
           version: string;
           status: string;
           updated_at: string;
@@ -40,7 +41,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          config_id: string;
+          workflow_id: string;
           version: string;
           status: string;
           updated_at?: string;
@@ -49,7 +50,7 @@ export type Database = {
         };
         Update: {
           id?: string;
-          config_id?: string;
+          workflow_id?: string;
           version?: string;
           status?: string;
           updated_at?: string;
@@ -59,10 +60,10 @@ export type Database = {
       };
     };
     Views: {
-      camel_config_latest_versions: {
+      workflow_latest_versions: {
         Row: {
           id: string;
-          config_id: string;
+          workflow_id: string;
           version: string;
           status: string;
           updated_at: string;
@@ -74,11 +75,10 @@ export type Database = {
   };
 };
 
-export type CamelConfig =
-  Database["public"]["Tables"]["camel_config_projects"]["Row"];
+export type CamelConfig = Database["public"]["Tables"]["workflows"]["Row"];
 
 export type ConfigVersion =
-  Database["public"]["Tables"]["camel_config_versions"]["Row"];
+  Database["public"]["Tables"]["workflow_versions"]["Row"];
 
 export type CamelConfigView = CamelConfig & {
   latest_version: ConfigVersion[];

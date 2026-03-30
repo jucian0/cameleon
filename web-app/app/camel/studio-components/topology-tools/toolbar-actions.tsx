@@ -1,14 +1,15 @@
 import { useTopologyStore } from "core";
 import { Button, buttonStyles } from "app/components/ui/button";
-import {
-  useLocation,
-  useNavigation,
-  useOutletContext,
-  useSubmit,
-} from "react-router";
-import { Loader } from "app/components/ui/loader";
+import { useFetcher, useLocation, useOutletContext } from "react-router";
 import { Link } from "app/components/ui/link";
-import { AlertTriangle, Code2, Copy, Download } from "lucide-react";
+import {
+  AlertTriangle,
+  Code2,
+  Copy,
+  CopyPlus,
+  Download,
+  History,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
 import { Tooltip } from "app/components/ui/tooltip";
@@ -19,26 +20,111 @@ import type { WorkflowAccessContext } from "@/camel/workflows-access";
 
 export const TopologyToolbarActions = () => {
   const { getCamelConfigYaml, camelConfig } = useTopologyStore();
-  const submit = useSubmit();
-  const navigation = useNavigation();
+  const saveFetcher = useFetcher<{
+    ok?: boolean;
+    error?: string;
+    versionError?: string | null;
+  }>();
   const location = useLocation();
   const { workflow } = useParams();
-  const { canDuplicate, canEdit, isStarter } = useOutletContext<
-    WorkflowAccessContext & { workflowId: string }
+  const { canDuplicate, canEdit, initialYaml, isStarter } = useOutletContext<
+    WorkflowAccessContext & { workflowId: string; initialYaml: string }
   >();
   const findings = React.useMemo(
     () => validateCamelConfig(camelConfig),
     [camelConfig],
   );
+  const currentYaml = React.useMemo(
+    () => getCamelConfigYaml(),
+    [camelConfig, getCamelConfigYaml],
+  );
   const [copyLabel, setCopyLabel] = React.useState("Copy YAML");
+  const [saveState, setSaveState] = React.useState<
+    "unsaved" | "saving" | "synced" | "failed"
+  >("synced");
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [saveWarning, setSaveWarning] = React.useState<string | null>(null);
   const errors = findings.filter((item) => item.severity === "error");
   const warnings = findings.filter((item) => item.severity === "warning");
   const hasBlockingErrors = errors.length > 0;
+  const lastSavedYamlRef = React.useRef(initialYaml);
+  const pendingYamlRef = React.useRef<string | null>(null);
+  const isHydratedRef = React.useRef(false);
 
-  function handleSave() {
-    if (hasBlockingErrors || !canEdit) return;
-    submit({ content: getCamelConfigYaml() }, { method: "post" });
-  }
+  React.useEffect(() => {
+    lastSavedYamlRef.current = initialYaml;
+    pendingYamlRef.current = null;
+    setSaveError(null);
+    setSaveWarning(null);
+    setSaveState("synced");
+    isHydratedRef.current = false;
+  }, [initialYaml]);
+
+  React.useEffect(() => {
+    if (!isHydratedRef.current && currentYaml === initialYaml) {
+      isHydratedRef.current = true;
+    }
+  }, [currentYaml, initialYaml]);
+
+  React.useEffect(() => {
+    if (saveFetcher.state !== "idle" || pendingYamlRef.current == null) {
+      return;
+    }
+
+    if (saveFetcher.data?.ok === false) {
+      setSaveState("failed");
+      setSaveError(saveFetcher.data.error ?? "Failed to save workflow.");
+      pendingYamlRef.current = null;
+      return;
+    }
+
+    lastSavedYamlRef.current = pendingYamlRef.current;
+    pendingYamlRef.current = null;
+    setSaveError(null);
+    setSaveWarning(saveFetcher.data?.versionError ?? null);
+    setSaveState(
+      currentYaml === lastSavedYamlRef.current ? "synced" : "unsaved",
+    );
+  }, [currentYaml, saveFetcher.data, saveFetcher.state]);
+
+  React.useEffect(() => {
+    if (!canEdit || !isHydratedRef.current || saveFetcher.state !== "idle") {
+      return;
+    }
+
+    if (currentYaml === lastSavedYamlRef.current) {
+      if (saveState !== "synced") {
+        setSaveState("synced");
+      }
+      return;
+    }
+
+    if (!hasBlockingErrors) {
+      setSaveState("unsaved");
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (hasBlockingErrors) return;
+
+      pendingYamlRef.current = currentYaml;
+      setSaveState("saving");
+      setSaveError(null);
+      setSaveWarning(null);
+      saveFetcher.submit(
+        { content: currentYaml, saveMode: "autosave" },
+        { method: "post" },
+      );
+    }, 1200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [
+    canEdit,
+    currentYaml,
+    hasBlockingErrors,
+    saveFetcher,
+    saveFetcher.state,
+    saveState,
+  ]);
 
   async function handleCopyYaml() {
     try {
@@ -52,8 +138,7 @@ export const TopologyToolbarActions = () => {
   }
 
   function handleExportYaml() {
-    const content = getCamelConfigYaml();
-    const blob = new Blob([content], { type: "application/yaml" });
+    const blob = new Blob([currentYaml], { type: "application/yaml" });
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -65,6 +150,40 @@ export const TopologyToolbarActions = () => {
   return (
     <div className="flex items-center gap-2">
       {isStarter && <Badge intent="warning">Starter</Badge>}
+      {!isStarter && (
+        <Tooltip>
+          <Badge
+            intent={
+              saveState === "failed"
+                ? "danger"
+                : saveState === "saving"
+                  ? "warning"
+                  : saveState === "unsaved"
+                    ? "secondary"
+                    : "success"
+            }
+          >
+            {saveState === "failed"
+              ? "Sync failed"
+              : saveState === "saving"
+                ? "Syncing"
+                : saveState === "unsaved"
+                  ? "Unsaved"
+                  : "Synced"}
+          </Badge>
+          <Tooltip.Content>
+            {saveError
+              ? saveError
+              : saveWarning
+                ? `Draft synced, but milestone failed: ${saveWarning}`
+                : saveState === "unsaved"
+                  ? "Changes will autosave shortly."
+                  : saveState === "saving"
+                    ? "Syncing workflow changes."
+                    : "All changes synced."}
+          </Tooltip.Content>
+        </Tooltip>
+      )}
       {findings.length > 0 && (
         <Popover>
           <Tooltip>
@@ -86,8 +205,8 @@ export const TopologyToolbarActions = () => {
               <Popover.Title>Validation</Popover.Title>
               <Popover.Description>
                 {hasBlockingErrors
-                  ? "Blocking errors must be fixed before save."
-                  : "Warnings do not block save."}
+                  ? "Blocking errors must be fixed before syncing."
+                  : "Warnings do not block syncing."}
               </Popover.Description>
             </Popover.Header>
             <Popover.Body className="max-h-96 space-y-3 overflow-auto px-4 py-3">
@@ -126,6 +245,16 @@ export const TopologyToolbarActions = () => {
           <Tooltip.Content>Code view</Tooltip.Content>
         </Tooltip>
         <Tooltip>
+          <Link
+            href={`${location.pathname}/history${location.search}`}
+            aria-label="Open version history"
+            className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
+          >
+            <History size={16} />
+          </Link>
+          <Tooltip.Content>Version history</Tooltip.Content>
+        </Tooltip>
+        <Tooltip>
           <Button
             intent="secondary"
             size="sq-sm"
@@ -154,22 +283,13 @@ export const TopologyToolbarActions = () => {
               aria-label="Duplicate workflow"
               className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
             >
-              <Copy size={16} />
+              <CopyPlus size={16} />
             </Link>
             <Tooltip.Content>
               {isStarter ? "Use as starter" : "Duplicate workflow"}
             </Tooltip.Content>
           </Tooltip>
         )}
-        <Button
-          size="sm"
-          onPress={handleSave}
-          isDisabled={hasBlockingErrors || !canEdit}
-          isPending={navigation.state === "submitting"}
-        >
-          {navigation.state === "submitting" && <Loader />}
-          Save
-        </Button>
       </div>
     </div>
   );

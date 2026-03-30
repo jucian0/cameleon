@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "app/components/ui/card";
 import { Badge } from "app/components/ui/badge";
-import { Edit, Copy, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, CopyPlus, MoreHorizontal, Trash } from "lucide-react";
 import { buttonStyles } from "app/components/ui/button";
 import { Menu } from "app/components/ui/menu";
 import { Link } from "app/components/ui/link";
@@ -60,7 +60,7 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
                 isDisabled={!access.canDuplicate}
                 href={`/app/camel/workflows/${id}/clone`}
               >
-                <Copy className="h-4 w-4 mr-2" />
+                <CopyPlus className="h-4 w-4 mr-2" />
                 {access.isStarter ? "Use as starter" : "Duplicate"}
               </Menu.Item>
               <Menu.Separator />

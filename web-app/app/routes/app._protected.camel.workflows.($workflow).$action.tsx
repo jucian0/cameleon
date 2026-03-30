@@ -1,5 +1,6 @@
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import { getWorkflowAccess } from "@/camel/workflows-access";
+import { createWorkflowVersion } from "@/camel/workflow-versions";
 import {
   buildWorkflowTemplateConfig,
   getWorkflowTemplateCatalog,
@@ -27,7 +28,7 @@ import {
   yamlToJson,
   type CamelConfig,
 } from "core";
-import { encode } from "js-base64";
+import { decode, encode } from "js-base64";
 import React from "react";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
@@ -230,6 +231,34 @@ export async function action({ request, params }: LoaderFunctionArgs) {
     return {
       error: error.details || "Failed to save workflow. Please try again.",
     };
+  }
+
+  if (savedWorkflow?.id) {
+    const versionResult = await createWorkflowVersion(
+      supabase,
+      savedWorkflow.id,
+      decode(payload.content),
+      {
+        status: isImport
+          ? "imported"
+          : isClone
+            ? "duplicated"
+            : isEdit
+              ? "updated"
+              : "created",
+        description: isImport
+          ? "Imported workflow snapshot"
+          : isClone
+            ? "Duplicated workflow snapshot"
+            : isEdit
+              ? "Updated workflow snapshot"
+              : "Initial workflow snapshot",
+      },
+    );
+
+    if (versionResult.error) {
+      console.error("Error creating workflow version:", versionResult.error);
+    }
   }
 
   if (!isEdit && savedWorkflow?.id) {

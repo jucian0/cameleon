@@ -3,6 +3,7 @@ import {
   getWorkflowAccess,
   type WorkflowAccessContext,
 } from "@/camel/workflows-access";
+import { createWorkflowVersion } from "@/camel/workflow-versions";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
   Outlet,
@@ -45,12 +46,45 @@ export async function action({ request, params }: LoaderFunctionArgs) {
     });
   }
 
-  await supabase
+  const { error } = await supabase
     .from("workflows")
     .update({
       content: encode(content as string),
     })
     .eq("id", workflowsId);
+
+  if (error) {
+    return {
+      ok: false,
+      error: error.message || "Failed to save workflow.",
+    };
+  }
+
+  const saveMode = String(formData.get("saveMode") ?? "manual");
+  let versionResult: Awaited<ReturnType<typeof createWorkflowVersion>> | null =
+    null;
+
+  if (saveMode !== "autosave") {
+    versionResult = await createWorkflowVersion(
+      supabase,
+      workflowsId ?? "",
+      String(content),
+      {
+        status: "milestone",
+        description: "Manual milestone snapshot",
+      },
+    );
+  }
+
+  if (versionResult?.error) {
+    console.error("Error creating workflow version:", versionResult.error);
+  }
+
+  return {
+    ok: true,
+    savedAt: new Date().toISOString(),
+    versionError: versionResult?.error?.message ?? null,
+  };
 }
 
 export default function CamelStudio() {
