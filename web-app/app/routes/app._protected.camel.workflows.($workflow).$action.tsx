@@ -2,16 +2,23 @@ import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import { getWorkflowAccess } from "@/camel/workflows-access";
 import { createWorkflowVersion } from "@/camel/workflow-versions";
 import {
-  buildWorkflowTemplateConfig,
-  getWorkflowTemplateCatalog,
-} from "@/camel/workflow-templates";
+  getWorkflowTemplateById,
+  listWorkflowTemplates,
+} from "@/camel/workflow-template-records";
+import type { WorkflowTemplate } from "@/modules/supabase/supabase-db";
 import { Badge } from "app/components/ui/badge";
 import { Button } from "app/components/ui/button";
 import { Modal } from "app/components/ui/modal";
+import {
+  Select,
+  SelectList,
+  SelectOption,
+  SelectTrigger,
+} from "app/components/ui/select";
 import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
 import { withModal } from "app/components/utils/with-modal";
-import { Save, Upload } from "lucide-react";
+import { CopyPlus, Save, Upload } from "lucide-react";
 import {
   redirect,
   useNavigation,
@@ -44,6 +51,15 @@ export const handle = {
   breadcrumb: () => "Create Workflow",
 };
 
+type CloneSourceWorkflow = {
+  id: string;
+  name: string;
+  description: string | null;
+  owner: string;
+  visibility: "public" | "private";
+  content: string | null;
+};
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = createServerSupabase(request);
   const workflowId = params.workflow;
@@ -51,6 +67,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const templates = workflowId
+    ? []
+    : ((await listWorkflowTemplates(supabase, user?.id)).data ?? []);
+  const accessibleWorkflowOptions = workflowId
+    ? []
+    : ((
+        await supabase
+          .from("workflows")
+          .select("id, name, description, owner, visibility, content")
+          .or(`owner.eq.${user?.id ?? ""},visibility.eq.public`)
+          .order("updated_at", { ascending: false })
+      ).data ?? []);
+
   if (workflowId) {
     const workflow = await supabase
       .from("workflows")
@@ -80,13 +109,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       : workflow.data;
     return {
       workflow: data,
-      templates: getWorkflowTemplateCatalog(),
+      templates,
+      cloneOptions: accessibleWorkflowOptions,
     };
   }
 
   return {
     workflow: {},
-    templates: getWorkflowTemplateCatalog(),
+    templates,
+    cloneOptions: accessibleWorkflowOptions,
   };
 }
 
@@ -163,6 +194,55 @@ export async function action({ request, params }: LoaderFunctionArgs) {
   formData.set("visibility", "private");
   const creationSource = String(formData.get("creationSource") ?? "blank");
   const templateId = String(formData.get("templateId") ?? "");
+  const sourceWorkflowId = String(formData.get("sourceWorkflowId") ?? "");
+  let selectedTemplate: WorkflowTemplate | null = null;
+
+  if (!workflowId && creationSource === "clone") {
+    const cloneSource = await supabase
+      .from("workflows")
+      .select("id, owner, visibility, content")
+      .eq("id", sourceWorkflowId)
+      .maybeSingle();
+
+    if (cloneSource.error) {
+      throw new Response(cloneSource.error.message, { status: 500 });
+    }
+
+    sourceWorkflow = cloneSource.data;
+
+    if (!sourceWorkflow) {
+      return { error: "Select a workflow to duplicate." };
+    }
+
+    const access = getWorkflowAccess({
+      currentUserId: user?.id,
+      owner: sourceWorkflow.owner,
+      visibility: sourceWorkflow.visibility,
+    });
+
+    if (!access.canDuplicate) {
+      throw new Response(
+        "You do not have permission to duplicate this workflow.",
+        {
+          status: 403,
+        },
+      );
+    }
+  }
+
+  if (!workflowId && creationSource === "template") {
+    const template = await getWorkflowTemplateById(supabase, templateId);
+
+    if (template.error) {
+      throw new Response(template.error.message, { status: 500 });
+    }
+
+    selectedTemplate = template.data;
+
+    if (!selectedTemplate) {
+      return { error: "Select a template to continue." };
+    }
+  }
 
   if (isImport) {
     const importFile = formData.get("yamlFile");
@@ -201,11 +281,23 @@ export async function action({ request, params }: LoaderFunctionArgs) {
       "content",
       sourceWorkflow.content ?? encode(INITIAL_STATE_YAML),
     );
-  } else if (!isEdit && !isImport && creationSource === "template") {
+  } else if (
+    !isEdit &&
+    !isImport &&
+    creationSource === "clone" &&
+    sourceWorkflow
+  ) {
     formData.set(
       "content",
-      encode(jsonToYaml(buildWorkflowTemplateConfig(templateId))),
+      sourceWorkflow.content ?? encode(INITIAL_STATE_YAML),
     );
+  } else if (
+    !isEdit &&
+    !isImport &&
+    creationSource === "template" &&
+    selectedTemplate
+  ) {
+    formData.set("content", encode(selectedTemplate.content));
   } else if (!isEdit && !isImport) {
     formData.set("content", encode(INITIAL_STATE_YAML));
   } else if (!formData.get("content") && sourceWorkflow?.content) {
@@ -280,11 +372,20 @@ export default withModal(function ModalPage({
   const pageAction = action?.toUpperCase() || "CREATE";
   const isCreate = action === "create";
   const isImport = action === "import";
-  const templates = loaderData.templates ?? [];
+  const templates = (loaderData.templates ?? []) as WorkflowTemplate[];
+  const cloneOptions = (loaderData.cloneOptions ?? []) as CloneSourceWorkflow[];
   const isTemplateCreate = searchParams.get("mode") === "template";
-  const creationSource = isTemplateCreate ? "template" : "blank";
+  const isCloneCreate = searchParams.get("mode") === "clone";
+  const creationSource = isTemplateCreate
+    ? "template"
+    : isCloneCreate
+      ? "clone"
+      : "blank";
   const [selectedTemplateId, setSelectedTemplateId] = React.useState(
     templates[0]?.id ?? "",
+  );
+  const [selectedCloneSourceId, setSelectedCloneSourceId] = React.useState(
+    cloneOptions[0]?.id ?? "",
   );
 
   function handleClose() {
@@ -293,7 +394,7 @@ export default withModal(function ModalPage({
 
   return (
     <Modal isOpen={isOpen} onOpenChange={handleClose}>
-      <Modal.Content isBlurred size="lg">
+      <Modal.Content isBlurred size="2xl" className="sm:max-w-2xl">
         <form
           method="post"
           className="flex max-h-[inherit] flex-col overflow-hidden"
@@ -305,9 +406,11 @@ export default withModal(function ModalPage({
                 ? "Paste Camel YAML or upload a file to create a workflow from existing content."
                 : isTemplateCreate
                   ? "Choose a practical Camel template and create your workflow from it."
-                  : isCreate
-                    ? "Create a blank workflow and open it directly in the studio."
-                    : "Enter a name and description for your new workflow. You can change it later."}
+                  : isCloneCreate
+                    ? "Pick an existing workflow and create a new duplicate that opens directly in the studio."
+                    : isCreate
+                      ? "Create a blank workflow and open it directly in the studio."
+                      : "Enter a name and description for your new workflow. You can change it later."}
             </Modal.Description>
           </Modal.Header>
           <Modal.Body>
@@ -323,6 +426,11 @@ export default withModal(function ModalPage({
             />
             <input type="hidden" name="creationSource" value={creationSource} />
             <input type="hidden" name="templateId" value={selectedTemplateId} />
+            <input
+              type="hidden"
+              name="sourceWorkflowId"
+              value={selectedCloneSourceId}
+            />
             <TextField
               autoFocus
               aria-label="Name"
@@ -348,37 +456,137 @@ export default withModal(function ModalPage({
                     the route structure.
                   </p>
                 </div>
-                <div className="grid gap-3">
-                  {templates.map((template: any) => {
-                    const isSelected = selectedTemplateId === template.id;
+                {templates.length > 0 ? (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {templates.map((template) => {
+                      const isSelected = selectedTemplateId === template.id;
 
-                    return (
-                      <button
-                        key={template.id}
-                        type="button"
-                        onClick={() => setSelectedTemplateId(template.id)}
-                        className={`rounded-lg border p-4 text-left transition ${
-                          isSelected
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/40 hover:bg-muted/30"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-medium text-foreground">
-                            {template.name}
-                          </p>
-                          <Badge intent="secondary">{template.category}</Badge>
-                        </div>
-                        <p className="mt-2 text-sm text-foreground">
-                          {template.description}
-                        </p>
-                        <p className="mt-2 text-sm text-muted-fg">
-                          {template.explanation}
-                        </p>
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={template.id}
+                          type="button"
+                          onClick={() => setSelectedTemplateId(template.id)}
+                          className={`rounded-lg border p-4 text-left transition ${
+                            isSelected
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-primary/40 hover:bg-muted/30"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-medium text-foreground">
+                              {template.name}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              {template.owner ? (
+                                <Badge intent="secondary">Custom</Badge>
+                              ) : (
+                                <Badge intent="warning">System</Badge>
+                              )}
+                              {template.category && (
+                                <Badge intent="secondary">
+                                  {template.category}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          {template.description && (
+                            <p className="mt-2 text-sm text-foreground">
+                              {template.description}
+                            </p>
+                          )}
+                          {template.explanation && (
+                            <p className="mt-2 text-sm text-muted-fg">
+                              {template.explanation}
+                            </p>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-fg">
+                    No templates are available yet. Add records to
+                    `workflow_templates` to populate this list.
+                  </p>
+                )}
+              </div>
+            )}
+            {isCloneCreate && (
+              <div className="mt-4 space-y-4 rounded-lg border border-border p-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">
+                    Duplicate from
+                  </p>
+                  <p className="text-sm text-muted-fg">
+                    Start from one of your workflows or a starter and create a
+                    new editable copy.
+                  </p>
                 </div>
+                {cloneOptions.length > 0 ? (
+                  <>
+                    <Select
+                      aria-label="Workflow to duplicate"
+                      selectedKey={selectedCloneSourceId}
+                      onSelectionChange={(key) =>
+                        setSelectedCloneSourceId(key?.toString() ?? "")
+                      }
+                    >
+                      <SelectTrigger />
+                      <SelectList items={cloneOptions}>
+                        {(workflow) => (
+                          <SelectOption
+                            id={workflow.id}
+                            textValue={workflow.name}
+                          >
+                            <div className="flex flex-col">
+                              <span>{workflow.name}</span>
+                              {workflow.description && (
+                                <span className="text-xs text-muted-fg">
+                                  {workflow.description}
+                                </span>
+                              )}
+                            </div>
+                          </SelectOption>
+                        )}
+                      </SelectList>
+                    </Select>
+                    {cloneOptions.find(
+                      (workflow) => workflow.id === selectedCloneSourceId,
+                    ) && (
+                      <div className="rounded-lg border border-border bg-muted/20 px-3 py-3">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            intent={
+                              cloneOptions.find(
+                                (workflow) =>
+                                  workflow.id === selectedCloneSourceId,
+                              )?.visibility === "public"
+                                ? "warning"
+                                : "secondary"
+                            }
+                          >
+                            {cloneOptions.find(
+                              (workflow) =>
+                                workflow.id === selectedCloneSourceId,
+                            )?.visibility === "public"
+                              ? "Starter"
+                              : "Personal"}
+                          </Badge>
+                        </div>
+                        <p className="mt-2 text-sm text-muted-fg">
+                          {cloneOptions.find(
+                            (workflow) => workflow.id === selectedCloneSourceId,
+                          )?.description ||
+                            "This workflow has no description yet."}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-fg">
+                    No workflows are available to duplicate yet.
+                  </p>
+                )}
               </div>
             )}
             {isImport && (
@@ -422,16 +630,22 @@ export default withModal(function ModalPage({
                     <ProgressCircle isIndeterminate aria-label="Creating..." />
                   ) : isImport ? (
                     <Upload size={16} />
+                  ) : isCloneCreate ? (
+                    <CopyPlus size={16} />
                   ) : (
                     <Save size={16} />
                   )}
                   {isPending
                     ? isImport
                       ? "Importing workflow..."
-                      : "Saving workflow..."
+                      : isCloneCreate
+                        ? "Duplicating workflow..."
+                        : "Saving workflow..."
                     : isImport
                       ? "Import workflow"
-                      : "Save workflow"}
+                      : isCloneCreate
+                        ? "Clone workflow"
+                        : "Save workflow"}
                 </>
               )}
             </Button>

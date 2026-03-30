@@ -58,6 +58,44 @@ export type Database = {
           content?: string;
         };
       };
+      workflow_templates: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          content: string;
+          category: string | null;
+          explanation: string | null;
+          owner: string | null;
+          source_workflow_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          content: string;
+          category?: string | null;
+          explanation?: string | null;
+          owner?: string | null;
+          source_workflow_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          content?: string;
+          category?: string | null;
+          explanation?: string | null;
+          owner?: string | null;
+          source_workflow_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       workflow_latest_versions: {
@@ -79,6 +117,9 @@ export type CamelConfig = Database["public"]["Tables"]["workflows"]["Row"];
 
 export type ConfigVersion =
   Database["public"]["Tables"]["workflow_versions"]["Row"];
+
+export type WorkflowTemplate =
+  Database["public"]["Tables"]["workflow_templates"]["Row"];
 
 export type CamelConfigView = CamelConfig & {
   latest_version: ConfigVersion[];

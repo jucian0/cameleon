@@ -9,6 +9,7 @@ import {
   CopyPlus,
   Download,
   History,
+  LayoutTemplate,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
@@ -254,6 +255,18 @@ export const TopologyToolbarActions = () => {
           </Link>
           <Tooltip.Content>Version history</Tooltip.Content>
         </Tooltip>
+        {canEdit && (
+          <Tooltip>
+            <Link
+              href={`${location.pathname}/template${location.search}`}
+              aria-label="Save as template"
+              className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
+            >
+              <LayoutTemplate size={16} />
+            </Link>
+            <Tooltip.Content>Save as template</Tooltip.Content>
+          </Tooltip>
+        )}
         <Tooltip>
           <Button
             intent="secondary"
@@ -280,13 +293,13 @@ export const TopologyToolbarActions = () => {
           <Tooltip>
             <Link
               href={`/app/camel/workflows/${workflow}/clone`}
-              aria-label="Duplicate workflow"
+              aria-label="Clone workflow"
               className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
             >
               <CopyPlus size={16} />
             </Link>
             <Tooltip.Content>
-              {isStarter ? "Use as starter" : "Duplicate workflow"}
+              {isStarter ? "Use as starter" : "Clone workflow"}
             </Tooltip.Content>
           </Tooltip>
         )}

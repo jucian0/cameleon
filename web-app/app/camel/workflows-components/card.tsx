@@ -61,7 +61,7 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
                 href={`/app/camel/workflows/${id}/clone`}
               >
                 <CopyPlus className="h-4 w-4 mr-2" />
-                {access.isStarter ? "Use as starter" : "Duplicate"}
+                {access.isStarter ? "Use as starter" : "Clone"}
               </Menu.Item>
               <Menu.Separator />
               <Menu.Item

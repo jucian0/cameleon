@@ -31,7 +31,8 @@ export function meta({ loaderData }: MetaArgs<typeof loader>) {
 }
 
 export const handle = {
-  breadcrumb: ({ name }: typeof loader) => `Camel Studio - ${name}`,
+  breadcrumb: (data?: { name?: string }) =>
+    data?.name ? `Camel Studio - ${data.name}` : "Camel Studio",
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
