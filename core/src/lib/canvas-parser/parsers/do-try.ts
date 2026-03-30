@@ -23,6 +23,8 @@ export function parseDoTryStep(
   const { doTry } = step;
   const doCatchList = Array.isArray(doTry?.doCatch) ? doTry.doCatch : [];
   const branchEndIds: string[] = [];
+  const emptyDoCatchBranches: Array<{ id: string; absolutePath: string }> = [];
+  const hasTrySteps = (doTry?.steps ?? []).length > 0;
 
   const betweenId = ensurePlaceholderNext(
     nodes,
@@ -33,7 +35,7 @@ export function parseDoTryStep(
   );
 
   // Main try path.
-  if ((doTry?.steps ?? []).length > 0) {
+  if (hasTrySteps) {
     const doTryResult = parseSteps(
       doTry?.steps ?? [],
       nodes,
@@ -68,6 +70,7 @@ export function parseDoTryStep(
         branchEndIds.push(doCatchResult.lastStepId);
       } else {
         branchEndIds.push(doCatchId);
+        emptyDoCatchBranches.push({ id: doCatchId, absolutePath });
       }
     }
   }
@@ -80,7 +83,35 @@ export function parseDoTryStep(
 
     nodes.push(createNode(doFinallyId, STEP_TYPE.DO_FINALLY, absolutePath));
 
+    if (!hasTrySteps) {
+      ensurePlaceholderBetween(
+        nodes,
+        edges,
+        stepId,
+        doFinallyId,
+        `${initialAbsolutePath}.steps.0`,
+      );
+    }
+
     for (const endId of branchEndIds) {
+      if (!hasTrySteps && endId === stepId) {
+        continue;
+      }
+
+      const emptyDoCatchBranch = emptyDoCatchBranches.find(
+        (branch) => branch.id === endId,
+      );
+      if (emptyDoCatchBranch) {
+        ensurePlaceholderBetween(
+          nodes,
+          edges,
+          endId,
+          doFinallyId,
+          `${emptyDoCatchBranch.absolutePath}.steps.0`,
+        );
+        continue;
+      }
+
       if (endId !== doFinallyId) {
         edges.push(createEdge(generateUniqueId("edge"), endId, doFinallyId));
       }
@@ -106,8 +137,19 @@ export function parseDoTryStep(
         );
       }
     } else if (nextOrAddId) {
-      edges.push(
-        createEdge(generateUniqueId("edge"), doFinallyId, nextOrAddId),
+      ensurePlaceholderBetween(
+        nodes,
+        edges,
+        doFinallyId,
+        nextOrAddId,
+        `${absolutePath}.steps.0`,
+      );
+    } else {
+      ensurePlaceholderNext(
+        nodes,
+        edges,
+        doFinallyId,
+        `${absolutePath}.steps.0`,
       );
     }
 
@@ -115,13 +157,59 @@ export function parseDoTryStep(
   }
 
   if (nextOrAddId) {
+    if (!hasTrySteps) {
+      ensurePlaceholderBetween(
+        nodes,
+        edges,
+        stepId,
+        nextOrAddId,
+        `${initialAbsolutePath}.steps.0`,
+      );
+    }
+
     for (const endId of branchEndIds) {
+      if (!hasTrySteps && endId === stepId) {
+        continue;
+      }
+
+      const emptyDoCatchBranch = emptyDoCatchBranches.find(
+        (branch) => branch.id === endId,
+      );
+      if (emptyDoCatchBranch) {
+        ensurePlaceholderBetween(
+          nodes,
+          edges,
+          endId,
+          nextOrAddId,
+          `${emptyDoCatchBranch.absolutePath}.steps.0`,
+        );
+        continue;
+      }
+
       ensurePlaceholderBetween(
         nodes,
         edges,
         endId,
         nextOrAddId,
         `${initialAbsolutePath}.steps.${doTry?.steps?.length ?? 0}`,
+      );
+    }
+  } else {
+    if (!hasTrySteps) {
+      ensurePlaceholderNext(
+        nodes,
+        edges,
+        stepId,
+        `${initialAbsolutePath}.steps.0`,
+      );
+    }
+
+    for (const emptyDoCatchBranch of emptyDoCatchBranches) {
+      ensurePlaceholderNext(
+        nodes,
+        edges,
+        emptyDoCatchBranch.id,
+        `${emptyDoCatchBranch.absolutePath}.steps.0`,
       );
     }
   }

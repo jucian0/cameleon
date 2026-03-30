@@ -30,6 +30,8 @@ export function parseChoiceStep(
     STEP_TYPE.ADD_WHEN,
   );
   const joinTargetId = nextOrAddId;
+  const emptyWhenBranches: Array<{ id: string; absolutePath: string }> = [];
+  let emptyOtherwiseBranch: { id: string; absolutePath: string } | null = null;
 
   for (const [i, when] of whenBranches.entries()) {
     const absolutePath = `${initialAbsolutePath}.when.${i}`;
@@ -59,6 +61,7 @@ export function parseChoiceStep(
         );
       }
     } else {
+      emptyWhenBranches.push({ id: whenId, absolutePath });
       if (joinTargetId) {
         ensurePlaceholderBetween(
           nodes,
@@ -67,6 +70,8 @@ export function parseChoiceStep(
           joinTargetId,
           `${absolutePath}.steps.0`,
         );
+      } else {
+        ensurePlaceholderNext(nodes, edges, whenId, `${absolutePath}.steps.0`);
       }
     }
   }
@@ -99,12 +104,20 @@ export function parseChoiceStep(
         );
       }
     } else {
+      emptyOtherwiseBranch = { id: otherwiseId, absolutePath };
       if (joinTargetId) {
         ensurePlaceholderBetween(
           nodes,
           edges,
           otherwiseId,
           joinTargetId,
+          `${absolutePath}.steps.0`,
+        );
+      } else {
+        ensurePlaceholderNext(
+          nodes,
+          edges,
+          otherwiseId,
           `${absolutePath}.steps.0`,
         );
       }
@@ -116,6 +129,15 @@ export function parseChoiceStep(
       edges.push(createEdge(generateUniqueId("edge"), stepId, joinTargetId));
     }
     return joinTargetId;
+  }
+
+  if (whenBranches.length > 0 || choice?.otherwise) {
+    return (
+      emptyOtherwiseBranch?.id ??
+      emptyWhenBranches[emptyWhenBranches.length - 1]?.id ??
+      addWhenId ??
+      stepId
+    );
   }
 
   return addWhenId || stepId;

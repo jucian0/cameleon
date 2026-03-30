@@ -43,7 +43,13 @@ export function getDefaultConfig(stepType: string): any {
     doTry: {
       id: generateStepId(stepType),
       steps: [],
-      doCatch: [],
+      doCatch: [
+        {
+          id: generateStepId("doCatch"),
+          exception: ["java.lang.Exception"],
+          steps: [],
+        },
+      ],
       doFinally: {
         id: generateStepId("doFinally"),
         steps: [],

@@ -1,6 +1,7 @@
 import React from "react";
 import { Position, type NodeProps } from "@xyflow/react";
-import type { Node } from "core";
+import { STEP_TYPE, generateStepId, type Node, useTopologyStore } from "core";
+import { addBetween } from "core/operations";
 import { DefaultHandle } from "./default-handle";
 import { useLayer } from "../topology-layer/topology-layer";
 import { IconPlus } from "@intentui/icons";
@@ -16,10 +17,30 @@ export const AddNode = React.memo(({ data }: NodeProps<Node>) => {
   const { canEdit } = useOutletContext<
     WorkflowAccessContext & { workflowId: string }
   >();
-
+  const { camelConfig, setCamelConfig } = useTopologyStore();
   const { setNode } = useLayer();
 
   function handleClick() {
+    if (
+      data.stepType === STEP_TYPE.ADD_WHEN ||
+      data.stepType === STEP_TYPE.ADD_DO_CATCH
+    ) {
+      const branchConfig =
+        data.stepType === STEP_TYPE.ADD_WHEN
+          ? {
+              id: generateStepId("when"),
+              steps: [],
+            }
+          : {
+              id: generateStepId("doCatch"),
+              exception: ["java.lang.Exception"],
+              steps: [],
+            };
+
+      setCamelConfig(addBetween(camelConfig, data.absolutePath, branchConfig));
+      return;
+    }
+
     setNode({ ...data, operation: "add-step" });
   }
 
