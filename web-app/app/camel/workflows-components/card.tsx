@@ -25,7 +25,7 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
   const updatedAt = new Date(updated_at).toLocaleDateString();
 
   return (
-    <Card className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card hover:-translate-y-0.5">
+    <Card className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
       <CardHeader className="relative pb-3">

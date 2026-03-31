@@ -71,3 +71,17 @@ export async function createWorkflowVersion(
     content,
   });
 }
+
+export async function deleteWorkflowVersion(
+  supabase: SupabaseClient,
+  workflowId: string,
+  versionId: string,
+) {
+  return supabase
+    .from("workflow_versions")
+    .delete()
+    .select("id")
+    .eq("id", versionId)
+    .eq("workflow_id", workflowId)
+    .maybeSingle();
+}

@@ -9,17 +9,19 @@ import { Button } from "@/components/ui/button";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import {
   createWorkflowVersion,
+  deleteWorkflowVersion,
   listWorkflowVersions,
 } from "@/camel/workflow-versions";
 import {
   getWorkflowAccess,
   type WorkflowAccessContext,
 } from "@/camel/workflows-access";
-import { History, RotateCcw } from "lucide-react";
+import { History, RotateCcw, Trash2 } from "lucide-react";
 import {
   useFetcher,
   useLocation,
   useOutletContext,
+  useRevalidator,
   type LoaderFunctionArgs,
 } from "react-router";
 
@@ -132,6 +134,31 @@ export async function action({ request, params }: LoaderFunctionArgs) {
     };
   }
 
+  if (intent === "delete-version") {
+    const deleteResult = await deleteWorkflowVersion(
+      supabase,
+      workflowId ?? "",
+      versionId,
+    );
+
+    if (deleteResult.error) {
+      return { ok: false, error: deleteResult.error.message };
+    }
+
+    if (!deleteResult.data) {
+      return {
+        ok: false,
+        error:
+          "Version could not be deleted. Check the workflow_versions delete policy.",
+      };
+    }
+
+    return {
+      ok: true,
+      deletedVersion: true,
+    };
+  }
+
   const version = await supabase
     .from("workflow_versions")
     .select("id, version, content")
@@ -197,6 +224,12 @@ export default withModal(function WorkflowHistoryModal({
     createdVersion?: boolean;
     versionError?: string | null;
   }>();
+  const deleteFetcher = useFetcher<{
+    ok?: boolean;
+    error?: string;
+    deletedVersion?: boolean;
+  }>();
+  const revalidator = useRevalidator();
   const { camelConfig, setCamelConfig } = useTopologyStore();
   const { canEdit } = useOutletContext<
     WorkflowAccessContext & { workflowId: string; initialYaml: string }
@@ -291,6 +324,31 @@ export default withModal(function WorkflowHistoryModal({
     setCamelConfig,
   ]);
 
+  React.useEffect(() => {
+    if (!versionFetcher.data?.createdVersion) {
+      return;
+    }
+
+    revalidator.revalidate();
+  }, [revalidator, versionFetcher.data?.createdVersion]);
+
+  React.useEffect(() => {
+    if (!deleteFetcher.data?.deletedVersion) {
+      return;
+    }
+
+    if (selectedVersionId === selectedVersion?.id) {
+      setSelectedVersionId(null);
+    }
+
+    revalidator.revalidate();
+  }, [
+    deleteFetcher.data?.deletedVersion,
+    revalidator,
+    selectedVersion?.id,
+    selectedVersionId,
+  ]);
+
   function handleClose() {
     closeModal(
       `${location.pathname.replace("/history", "")}${location.search}`,
@@ -322,6 +380,11 @@ export default withModal(function WorkflowHistoryModal({
           {loaderData.versionsError && (
             <div className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger-foreground">
               {loaderData.versionsError}
+            </div>
+          )}
+          {deleteFetcher.data?.error && (
+            <div className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger-foreground">
+              {deleteFetcher.data.error}
             </div>
           )}
           {loaderData.versions.length === 0 && !loaderData.versionsError && (
@@ -377,40 +440,80 @@ export default withModal(function WorkflowHistoryModal({
                   </p>
                 </button>
                 {canEdit && index === 0 ? (
-                  <Button
-                    size="sm"
-                    isDisabled={
-                      versionFetcher.state !== "idle" ||
-                      currentDraftYaml === version.content
-                    }
-                    isPending={versionFetcher.state !== "idle"}
-                    onPress={() =>
-                      versionFetcher.submit(
-                        {
-                          intent: "create-version",
-                          content: currentDraftYaml,
-                        },
-                        { method: "post" },
-                      )
-                    }
-                  >
-                    New version
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      isDisabled={
+                        versionFetcher.state !== "idle" ||
+                        currentDraftYaml === version.content
+                      }
+                      isPending={versionFetcher.state !== "idle"}
+                      onPress={() =>
+                        versionFetcher.submit(
+                          {
+                            intent: "create-version",
+                            content: currentDraftYaml,
+                          },
+                          { method: "post" },
+                        )
+                      }
+                    >
+                      New version
+                    </Button>
+                    <Button
+                      size="sq-sm"
+                      intent="plain"
+                      className="text-danger hover:text-danger"
+                      isDisabled={deleteFetcher.state !== "idle"}
+                      isPending={deleteFetcher.state !== "idle"}
+                      onPress={() =>
+                        deleteFetcher.submit(
+                          {
+                            intent: "delete-version",
+                            versionId: version.id,
+                          },
+                          { method: "post" },
+                        )
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ) : canEdit ? (
-                  <Button
-                    size="sm"
-                    intent="secondary"
-                    isDisabled={restoreFetcher.state !== "idle"}
-                    onPress={() =>
-                      restoreFetcher.submit(
-                        { versionId: version.id },
-                        { method: "post" },
-                      )
-                    }
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    Restore
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      intent="secondary"
+                      isDisabled={restoreFetcher.state !== "idle"}
+                      onPress={() =>
+                        restoreFetcher.submit(
+                          { versionId: version.id },
+                          { method: "post" },
+                        )
+                      }
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Restore
+                    </Button>
+                    <Button
+                      size="sq-sm"
+                      intent="plain"
+                      className="text-danger hover:text-danger"
+                      isDisabled={deleteFetcher.state !== "idle"}
+                      isPending={deleteFetcher.state !== "idle"}
+                      onPress={() =>
+                        deleteFetcher.submit(
+                          {
+                            intent: "delete-version",
+                            versionId: version.id,
+                          },
+                          { method: "post" },
+                        )
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ) : null}
               </div>
             </section>
@@ -455,6 +558,11 @@ export default withModal(function WorkflowHistoryModal({
                 New version created.
               </div>
             )}
+          {deleteFetcher.data?.deletedVersion && (
+            <div className="rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm text-success-foreground">
+              Version deleted.
+            </div>
+          )}
         </Sheet.Body>
       </Sheet.Content>
     </Sheet>

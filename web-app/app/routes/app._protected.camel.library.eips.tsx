@@ -1,11 +1,6 @@
 import { tryCatch } from "@/utils/try-catch";
 import { type Key, type Selection } from "react-stately";
-import {
-  GridLayout,
-  ListBox,
-  ListBoxItem,
-  Virtualizer,
-} from "react-aria-components";
+import { ListBox, ListBoxItem } from "react-aria-components";
 import { Badge } from "app/components/ui/badge";
 import { Card } from "app/components/ui/card";
 import { LibraryItemDetailsModal } from "@/camel/library-components/library-item-details-modal";
@@ -87,56 +82,54 @@ export default function CamelEIPsTab({
 
   return (
     <>
-      <Virtualizer layout={GridLayout}>
-        <ListBox
-          selectionMode="single"
-          onSelectionChange={handleSelectionChange}
-          items={eips}
-          renderEmptyState={() => (
-            <span className="m-4">No EIPs to display</span>
-          )}
-          className="-m-4"
-        >
-          {(item: any) => (
-            <ListBoxItem
-              textValue={String(item.model.name)}
-              key={String(item.model.name)}
-              id={String(item.model.name)}
-            >
-              {({ isSelected, isFocusVisible }) => (
-                <Card
-                  className={`h-44 gap-0 overflow-hidden border-border/60 bg-bg/80 py-0 transition-all duration-200 ${
-                    isSelected
-                      ? "border-primary bg-primary/5 shadow-sm shadow-primary/10"
-                      : "hover:border-primary/40 hover:bg-muted/20"
-                  } ${isFocusVisible ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background" : ""}`}
-                >
-                  <Card.Header className="grid-cols-[auto_1fr] gap-3 px-3 py-3">
-                    <img
-                      src={`/camel-icons/eips/${String(item.model.name)}.svg`}
-                      alt={String(item.model.name)}
-                      className="h-9 w-9 rounded-md border border-border/60 bg-secondary/40 p-1.5"
-                    />
-                    <div className="min-w-0">
-                      <Card.Title className="truncate text-sm/5">
-                        {String(item.model.title)}
-                      </Card.Title>
-                    </div>
-                  </Card.Header>
-                  <Card.Content className="flex flex-1 flex-col px-3 pb-3">
-                    <p className="line-clamp-2 text-sm text-muted-fg">
-                      {String(item.model.description)}
-                    </p>
-                    <div className="mt-auto pt-3">
-                      <Badge intent="info">EIP</Badge>
-                    </div>
-                  </Card.Content>
-                </Card>
-              )}
-            </ListBoxItem>
-          )}
-        </ListBox>
-      </Virtualizer>
+      <ListBox
+        layout="grid"
+        selectionMode="single"
+        onSelectionChange={handleSelectionChange}
+        items={eips}
+        renderEmptyState={() => <span>No EIPs to display</span>}
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+      >
+        {(item: any) => (
+          <ListBoxItem
+            textValue={String(item.model.name)}
+            key={String(item.model.name)}
+            id={String(item.model.name)}
+          >
+            {({ isSelected, isFocusVisible }) => (
+              <Card
+                className={`group relative h-44 gap-0 overflow-hidden border-border/60 bg-gradient-card py-0 transition-all duration-300 hover:border-primary/50 hover:shadow-card ${
+                  isSelected
+                    ? "border-primary bg-primary/5 shadow-sm shadow-primary/10"
+                    : ""
+                } ${isFocusVisible ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background" : ""}`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <Card.Header className="grid-cols-[auto_1fr] gap-3 px-3 py-3">
+                  <img
+                    src={`/camel-icons/eips/${String(item.model.name)}.svg`}
+                    alt={String(item.model.name)}
+                    className="h-9 w-9 rounded-md border border-border/60 bg-secondary/40 p-1.5"
+                  />
+                  <div className="min-w-0">
+                    <Card.Title className="truncate text-sm/5">
+                      {String(item.model.title)}
+                    </Card.Title>
+                  </div>
+                </Card.Header>
+                <Card.Content className="flex flex-1 flex-col px-3 pb-3">
+                  <p className="line-clamp-2 text-sm text-muted-fg">
+                    {String(item.model.description)}
+                  </p>
+                  <div className="mt-auto pt-3">
+                    <Badge intent="info">EIP</Badge>
+                  </div>
+                </Card.Content>
+              </Card>
+            )}
+          </ListBoxItem>
+        )}
+      </ListBox>
       <LibraryItemDetailsModal
         item={detailsItem}
         isOpen={selectedEip != null}

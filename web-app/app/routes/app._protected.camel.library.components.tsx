@@ -1,11 +1,6 @@
 import { tryCatch } from "@/utils/try-catch";
 import { type Key, type Selection } from "react-stately";
-import {
-  GridLayout,
-  ListBox,
-  ListBoxItem,
-  Virtualizer,
-} from "react-aria-components";
+import { ListBox, ListBoxItem } from "react-aria-components";
 import { Badge } from "app/components/ui/badge";
 import { Card } from "app/components/ui/card";
 import { FallbackImage } from "app/components/fallback-image";
@@ -92,56 +87,54 @@ export default function CamelComponentsTab({
 
   return (
     <>
-      <Virtualizer layout={GridLayout}>
-        <ListBox
-          className="-m-4"
-          selectionMode="single"
-          onSelectionChange={handleSelectionChange}
-          renderEmptyState={() => (
-            <span className="m-4">No components to display</span>
-          )}
-        >
-          {components.map((item: any) => (
-            <ListBoxItem
-              textValue={String(item.component.name)}
-              key={String(item.component.name)}
-              id={String(item.component.name)}
-            >
-              {({ isSelected, isFocusVisible }) => (
-                <Card
-                  className={`h-44 gap-0 overflow-hidden border-border/60 bg-bg/80 py-0 transition-all duration-200 ${
-                    isSelected
-                      ? "border-primary bg-primary/5 shadow-sm shadow-primary/10"
-                      : "hover:border-primary/40 hover:bg-muted/20"
-                  } ${isFocusVisible ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background" : ""}`}
-                >
-                  <Card.Header className="grid-cols-[auto_1fr] gap-3 px-3 py-3">
-                    <FallbackImage
-                      src={`/camel-icons/components/${String(item.component.name)}.svg`}
-                      alt={String(item.component.name ?? "component icon")}
-                      className="h-9 w-9 rounded-md border border-border/60 bg-secondary/40 p-1.5"
-                      fallback="/camel-icons/components/generic.svg"
-                    />
-                    <div className="min-w-0">
-                      <Card.Title className="truncate text-sm/5">
-                        {String(item.component.title)}
-                      </Card.Title>
-                    </div>
-                  </Card.Header>
-                  <Card.Content className="flex flex-1 flex-col px-3 pb-3">
-                    <p className="line-clamp-2 text-sm text-muted-fg">
-                      {String(item.component.description)}
-                    </p>
-                    <div className="mt-auto pt-3">
-                      <Badge intent="secondary">Component</Badge>
-                    </div>
-                  </Card.Content>
-                </Card>
-              )}
-            </ListBoxItem>
-          ))}
-        </ListBox>
-      </Virtualizer>
+      <ListBox
+        layout="grid"
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+        selectionMode="single"
+        onSelectionChange={handleSelectionChange}
+        renderEmptyState={() => <span>No components to display</span>}
+      >
+        {components.map((item: any) => (
+          <ListBoxItem
+            textValue={String(item.component.name)}
+            key={String(item.component.name)}
+            id={String(item.component.name)}
+          >
+            {({ isSelected, isFocusVisible }) => (
+              <Card
+                className={`group relative h-44 gap-0 overflow-hidden border-border/60 bg-gradient-card py-0 transition-all duration-300 hover:border-primary/50 hover:shadow-card ${
+                  isSelected
+                    ? "border-primary bg-primary/5 shadow-sm shadow-primary/10"
+                    : ""
+                } ${isFocusVisible ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background" : ""}`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <Card.Header className="grid-cols-[auto_1fr] gap-3 px-3 py-3">
+                  <FallbackImage
+                    src={`/camel-icons/components/${String(item.component.name)}.svg`}
+                    alt={String(item.component.name ?? "component icon")}
+                    className="h-9 w-9 rounded-md border border-border/60 bg-secondary/40 p-1.5"
+                    fallback="/camel-icons/components/generic.svg"
+                  />
+                  <div className="min-w-0">
+                    <Card.Title className="truncate text-sm/5">
+                      {String(item.component.title)}
+                    </Card.Title>
+                  </div>
+                </Card.Header>
+                <Card.Content className="flex flex-1 flex-col px-3 pb-3">
+                  <p className="line-clamp-2 text-sm text-muted-fg">
+                    {String(item.component.description)}
+                  </p>
+                  <div className="mt-auto pt-3">
+                    <Badge intent="secondary">Component</Badge>
+                  </div>
+                </Card.Content>
+              </Card>
+            )}
+          </ListBoxItem>
+        ))}
+      </ListBox>
       <LibraryItemDetailsModal
         item={detailsItem}
         isOpen={selectedComponent != null}
