@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "app/components/ui/card";
 import { Badge } from "app/components/ui/badge";
-import { Edit, CopyPlus, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, CopyPlus, MoreHorizontal, Trash, Workflow } from "lucide-react";
 import { buttonStyles } from "app/components/ui/button";
 import { Menu } from "app/components/ui/menu";
 import { Link } from "app/components/ui/link";
@@ -25,18 +25,23 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
   const updatedAt = new Date(updated_at).toLocaleDateString();
 
   return (
-    <Card className="group relative overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-card">
+    <Card className="group relative gap-0 overflow-hidden border-border/50 bg-gradient-card py-0 transition-all duration-300 hover:border-primary/50 hover:shadow-card">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <CardHeader className="relative pb-3">
+      <CardHeader className="relative gap-3 px-4 py-4">
         <div className="flex items-start justify-between">
-          <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-lg text-foreground truncate">
-              {name}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {description}
-            </p>
+          <div className="min-w-0 flex flex-1 items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/40">
+              <Workflow className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="truncate text-lg font-semibold text-foreground">
+                {name}
+              </h3>
+              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                {description}
+              </p>
+            </div>
           </div>
 
           <Menu>
@@ -77,7 +82,7 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
         </div>
       </CardHeader>
 
-      <CardContent className="relative pt-0">
+      <CardContent className="relative px-4 pb-4 pt-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Badge

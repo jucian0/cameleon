@@ -76,7 +76,6 @@ export default function TopologyLibrary() {
               <ResourcesIcon /> Components
             </Tab>
           </TabList>
-          <TabPanel id="eips" />
           <TabPanel id={currentCamelRoute}>
             <Outlet />
           </TabPanel>

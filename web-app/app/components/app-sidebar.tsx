@@ -36,6 +36,7 @@ import { useState } from "react";
 import { createClient } from "@/modules/supabase/supabase-client";
 import type { Loader } from "@/root";
 import { ThemeMenu } from "./theme-menu";
+import { Workflow } from "lucide-react";
 
 export default function AppSidebar(
   props: Readonly<React.ComponentProps<typeof Sidebar>>,
@@ -90,13 +91,24 @@ export default function AppSidebar(
                   tooltip="Workflows"
                   isCurrent={pathname.includes("workflows")}
                 >
-                  <StudioIcon className="size-4" />
+                  <Workflow className="size-4" />
                   <SidebarLabel>Workflows</SidebarLabel>
+                </SidebarItem>
+                <SidebarItem
+                  href="/app/camel/library/templates"
+                  tooltip="Templates"
+                  isCurrent={pathname.includes("library/templates")}
+                >
+                  <StudioIcon className="size-4" />
+                  <SidebarLabel>Templates</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem
                   href="/app/camel/library/eips"
                   tooltip="Library"
-                  isCurrent={pathname.includes("library")}
+                  isCurrent={
+                    pathname.includes("library/eips") ||
+                    pathname.includes("library/components")
+                  }
                 >
                   <ProcessorIcon className="size-4" />
                   <SidebarLabel>Library</SidebarLabel>

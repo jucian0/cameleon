@@ -109,7 +109,7 @@ export default function CamelComponentsTab({
                 } ${isFocusVisible ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background" : ""}`}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <Card.Header className="grid-cols-[auto_1fr] gap-3 px-3 py-3">
+                <Card.Header className="grid-cols-[auto_1fr] gap-3 px-4 py-4">
                   <FallbackImage
                     src={`/camel-icons/components/${String(item.component.name)}.svg`}
                     alt={String(item.component.name ?? "component icon")}
@@ -122,7 +122,7 @@ export default function CamelComponentsTab({
                     </Card.Title>
                   </div>
                 </Card.Header>
-                <Card.Content className="flex flex-1 flex-col px-3 pb-3">
+                <Card.Content className="flex flex-1 flex-col px-4 pb-4 pt-0">
                   <p className="line-clamp-2 text-sm text-muted-fg">
                     {String(item.component.description)}
                   </p>

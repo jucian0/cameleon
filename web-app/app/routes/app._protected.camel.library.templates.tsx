@@ -153,9 +153,9 @@ export default function CamelTemplatesTab() {
                 onClick={() => setSelectedTemplate(template)}
                 className="text-left"
               >
-                <Card className="group relative h-56 overflow-hidden border-border/50 bg-gradient-card transition-all duration-300 hover:border-primary/50 hover:shadow-card">
+                <Card className="group relative h-56 gap-0 overflow-hidden border-border/50 bg-gradient-card py-0 transition-all duration-300 hover:border-primary/50 hover:shadow-card">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <CardHeader className="relative">
+                  <CardHeader className="relative gap-3 px-4 py-4">
                     <div className="flex items-start gap-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/40">
                         <LayoutTemplate className="h-5 w-5 text-primary" />
@@ -171,7 +171,7 @@ export default function CamelTemplatesTab() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="relative pt-0">
+                  <CardContent className="relative px-4 pb-4 pt-0">
                     <p className="line-clamp-3 text-sm text-foreground">
                       {template.explanation ||
                         "Use this template as a starting point for a new workflow."}
