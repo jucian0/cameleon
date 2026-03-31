@@ -95,14 +95,6 @@ export default function AppSidebar(
                   <SidebarLabel>Workflows</SidebarLabel>
                 </SidebarItem>
                 <SidebarItem
-                  href="/app/camel/library/templates"
-                  tooltip="Templates"
-                  isCurrent={pathname.includes("library/templates")}
-                >
-                  <StudioIcon className="size-4" />
-                  <SidebarLabel>Templates</SidebarLabel>
-                </SidebarItem>
-                <SidebarItem
                   href="/app/camel/library/eips"
                   tooltip="Library"
                   isCurrent={
