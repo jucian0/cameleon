@@ -80,8 +80,8 @@ export async function deleteWorkflowVersion(
   return supabase
     .from("workflow_versions")
     .delete()
-    .select("id")
     .eq("id", versionId)
     .eq("workflow_id", workflowId)
+    .select("id")
     .maybeSingle();
 }

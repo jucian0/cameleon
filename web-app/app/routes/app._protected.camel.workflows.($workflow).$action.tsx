@@ -306,7 +306,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
     creationSource === "template" &&
     selectedTemplate
   ) {
-    formData.set("content", encode(selectedTemplate.content));
+    formData.set("content", selectedTemplate.content);
   } else if (!isEdit && !isImport) {
     formData.set("content", encode(INITIAL_STATE_YAML));
   } else if (!formData.get("content") && sourceWorkflow?.content) {

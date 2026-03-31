@@ -324,31 +324,6 @@ export default withModal(function WorkflowHistoryModal({
     setCamelConfig,
   ]);
 
-  React.useEffect(() => {
-    if (!versionFetcher.data?.createdVersion) {
-      return;
-    }
-
-    revalidator.revalidate();
-  }, [revalidator, versionFetcher.data?.createdVersion]);
-
-  React.useEffect(() => {
-    if (!deleteFetcher.data?.deletedVersion) {
-      return;
-    }
-
-    if (selectedVersionId === selectedVersion?.id) {
-      setSelectedVersionId(null);
-    }
-
-    revalidator.revalidate();
-  }, [
-    deleteFetcher.data?.deletedVersion,
-    revalidator,
-    selectedVersion?.id,
-    selectedVersionId,
-  ]);
-
   function handleClose() {
     closeModal(
       `${location.pathname.replace("/history", "")}${location.search}`,

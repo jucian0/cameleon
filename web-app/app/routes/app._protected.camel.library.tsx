@@ -4,6 +4,7 @@ import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useLocation, useSearchParams } from "react-router";
 import { ProcessorIcon } from "app/components/icons/processor";
 import { ResourcesIcon } from "app/components/icons/resources";
+import { LayoutTemplate } from "lucide-react";
 
 const metaData = {
   title: "Topology Library | Cameleon",
@@ -54,6 +55,13 @@ export default function TopologyLibrary() {
           selectedKey={currentCamelRoute}
         >
           <TabList>
+            <Tab
+              id="templates"
+              href={`/app/camel/library/templates?${filter.toString()}`}
+            >
+              <LayoutTemplate />
+              Templates
+            </Tab>
             <Tab
               id="eips"
               href={`/app/camel/library/eips?${filter.toString()}`}

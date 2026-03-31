@@ -26,14 +26,25 @@ export async function getWorkflowTemplateById(
 
 export async function createWorkflowTemplate(
   supabase: SupabaseClient,
-  template: Omit<
-    WorkflowTemplate,
-    "id" | "created_at" | "updated_at"
-  >,
+  template: Omit<WorkflowTemplate, "id" | "created_at" | "updated_at">,
 ) {
   return supabase
     .from("workflow_templates")
     .insert(template)
+    .select("id")
+    .maybeSingle();
+}
+
+export async function deleteWorkflowTemplate(
+  supabase: SupabaseClient,
+  templateId: string,
+  ownerId: string,
+) {
+  return supabase
+    .from("workflow_templates")
+    .delete()
+    .eq("id", templateId)
+    .eq("owner", ownerId)
     .select("id")
     .maybeSingle();
 }
