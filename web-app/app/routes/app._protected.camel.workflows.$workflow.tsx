@@ -22,6 +22,7 @@ import { data as routerData } from "react-router";
 import { getWorkflowAccess } from "@/camel/workflows-access";
 import { Link } from "app/components/ui/link";
 import { buttonStyles } from "app/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -54,7 +55,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const decodedData = decode(data.content ?? "");
-  const parsedContent = yamlToJson(decodedData);
   const access = getWorkflowAccess({
     currentUserId: user?.id,
     owner: data.owner,
@@ -68,13 +68,32 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     );
   }
 
-  return {
-    content: parsedContent,
-    initialYaml: jsonToYaml(parsedContent as CamelConfig),
-    name: data.name,
-    workflowId: data.id,
-    ...access,
-  };
+  try {
+    const parsedContent = yamlToJson(decodedData);
+
+    return {
+      content: parsedContent,
+      initialYaml: jsonToYaml(parsedContent as CamelConfig),
+      name: data.name,
+      workflowId: data.id,
+      rawContent: decodedData,
+      contentError: null,
+      ...access,
+    };
+  } catch (error) {
+    return {
+      content: null,
+      initialYaml: "",
+      name: data.name,
+      workflowId: data.id,
+      rawContent: decodedData,
+      contentError:
+        error instanceof Error
+          ? error.message
+          : "Failed to parse stored workflow content.",
+      ...access,
+    };
+  }
 }
 
 export default function CamelStudio({
@@ -85,6 +104,8 @@ export default function CamelStudio({
     initialYaml: string;
     name: string;
     workflowId: string;
+    rawContent: string;
+    contentError: string | null;
     visibility: "public" | "private";
     isOwner: boolean;
     isStarter: boolean;
@@ -93,7 +114,15 @@ export default function CamelStudio({
     canDuplicate: boolean;
   };
 }) {
-  const { content, initialYaml, name, workflowId, ...access } = loaderData;
+  const {
+    content,
+    initialYaml,
+    name,
+    workflowId,
+    rawContent,
+    contentError,
+    ...access
+  } = loaderData;
   const { setCamelConfig, canvas, camelConfig } = useTopologyStore();
   const [query] = useSearchParams();
   const routeId = query.get("route");
@@ -124,14 +153,55 @@ export default function CamelStudio({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: initialized from loader result
   React.useEffect(() => {
+    if (contentError || !content) {
+      return;
+    }
     setCamelConfig(content as CamelConfig);
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
-  }, [name]);
+  }, [contentError, content, name]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: canvas state follows route and store changes
   React.useEffect(() => {
+    if (contentError) {
+      return;
+    }
     canvas.setCanvas(workflowCanvas.nodes, workflowCanvas.edges);
-  }, [routeId, camelConfig]);
+  }, [contentError, routeId, camelConfig]);
+
+  if (contentError) {
+    return (
+      <div className="m-6 rounded-xl border border-warning/30 bg-warning/10 p-6">
+        <div className="flex items-center gap-2">
+          <Badge intent="warning">Invalid workflow content</Badge>
+          <Badge intent="outline">{workflowId}</Badge>
+        </div>
+        <h1 className="mt-4 text-lg font-semibold text-foreground">
+          This workflow could not be parsed safely
+        </h1>
+        <p className="mt-2 text-sm text-muted-fg">{contentError}</p>
+        <p className="mt-2 text-sm text-muted-fg">
+          The workflow still exists, but the stored content is malformed for the
+          editor. You can inspect the raw content below.
+        </p>
+        <div className="mt-4 rounded-lg border border-border bg-muted/20 px-4 py-3">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-fg">
+            Raw content
+          </p>
+          <pre className="mt-2 max-h-[50vh] overflow-auto text-xs text-foreground">
+            <code>{rawContent}</code>
+          </pre>
+        </div>
+        <div className="mt-4">
+          <Link
+            href="/app/camel/workflows"
+            className={buttonStyles({ intent: "secondary", size: "sm" })}
+          >
+            Back to Workflows
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return <Outlet context={{ workflowId, initialYaml, ...access }} />;
 }

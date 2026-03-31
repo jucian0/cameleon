@@ -5,9 +5,16 @@ import { useTheme } from "remix-themes";
 import React from "react";
 import debounce from "debounce";
 import { withModal } from "app/components/utils/with-modal";
-import { useLocation, useOutletContext } from "react-router";
+import {
+  isRouteErrorResponse,
+  useLocation,
+  useOutletContext,
+  useRouteError,
+} from "react-router";
 import { Badge } from "@/components/ui/badge";
 import type { WorkflowAccessContext } from "@/camel/workflows-access";
+import { Link } from "app/components/ui/link";
+import { buttonStyles } from "app/components/ui/button";
 
 export default withModal(({ isOpen, closeModal }: any) => {
   const { setCamelConfig, camelConfig } = useTopologyStore();
@@ -85,3 +92,33 @@ export default withModal(({ isOpen, closeModal }: any) => {
     </Sheet>
   );
 });
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  const description = isRouteErrorResponse(error)
+    ? typeof error.data === "string"
+      ? error.data
+      : "message" in (error.data ?? {})
+        ? String((error.data as { message?: string }).message)
+        : "The code editor could not be opened."
+    : error instanceof Error
+      ? error.message
+      : "The code editor could not be opened.";
+
+  return (
+    <div className="m-6 rounded-xl border border-border bg-background p-6">
+      <h1 className="text-lg font-semibold text-foreground">
+        Code editor unavailable
+      </h1>
+      <p className="mt-2 text-sm text-muted-fg">{description}</p>
+      <div className="mt-4">
+        <Link
+          href="/app/camel/workflows"
+          className={buttonStyles({ intent: "secondary", size: "sm" })}
+        >
+          Back to Workflows
+        </Link>
+      </div>
+    </div>
+  );
+}
