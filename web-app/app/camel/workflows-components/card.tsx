@@ -30,7 +30,7 @@ export const CamelCard = ({ camelConfig, currentUserId }: CamelCardProps) => {
 
       <CardHeader className="relative pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-lg text-foreground truncate">
               {name}
             </h3>

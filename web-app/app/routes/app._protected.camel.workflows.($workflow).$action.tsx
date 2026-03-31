@@ -9,6 +9,7 @@ import type { WorkflowTemplate } from "@/modules/supabase/supabase-db";
 import { Badge } from "app/components/ui/badge";
 import { Button } from "app/components/ui/button";
 import { Modal } from "app/components/ui/modal";
+import { SearchField } from "app/components/ui/search-field";
 import {
   Select,
   SelectList,
@@ -27,6 +28,14 @@ import {
   type LoaderFunctionArgs,
   type MetaArgs,
 } from "react-router";
+import {
+  Autocomplete,
+  ListBox,
+  ListBoxItem,
+  useFilter,
+  type Key,
+  type Selection,
+} from "react-aria-components";
 import { ProgressCircle } from "app/components/ui/progress-circle";
 import {
   INITIAL_STATE_YAML,
@@ -387,6 +396,33 @@ export default withModal(function ModalPage({
   const [selectedCloneSourceId, setSelectedCloneSourceId] = React.useState(
     cloneOptions[0]?.id ?? "",
   );
+  const [templateFilter, setTemplateFilter] = React.useState("");
+  const { contains } = useFilter({ sensitivity: "base" });
+  const filteredTemplates = React.useMemo(
+    () =>
+      templates.filter((template) => {
+        if (!templateFilter.trim()) return true;
+
+        return [
+          template.name,
+          template.description ?? "",
+          template.explanation ?? "",
+          template.category ?? "",
+        ].some((value) => contains(value, templateFilter));
+      }),
+    [contains, templateFilter, templates],
+  );
+
+  function handleTemplateSelectionChange(selectedKeys: Selection) {
+    if (selectedKeys === "all") return;
+
+    const [selectedItem] = Array.from(selectedKeys as Set<Key>)
+      .map((key) => filteredTemplates.find((template) => template.id === key))
+      .filter(Boolean);
+
+    if (!selectedItem) return;
+    setSelectedTemplateId(selectedItem.id);
+  }
 
   function handleClose() {
     closeModal("/app/camel/workflows");
@@ -457,52 +493,78 @@ export default withModal(function ModalPage({
                   </p>
                 </div>
                 {templates.length > 0 ? (
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {templates.map((template) => {
-                      const isSelected = selectedTemplateId === template.id;
-
-                      return (
-                        <button
+                  <Autocomplete
+                    aria-label="Template library"
+                    inputValue={templateFilter}
+                    onInputChange={setTemplateFilter}
+                    filter={contains}
+                  >
+                    <SearchField
+                      aria-label="Search templates"
+                      placeholder="Filter templates"
+                    />
+                    <ListBox
+                      aria-label="Workflow templates"
+                      selectionMode="single"
+                      layout="grid"
+                      selectionBehavior="replace"
+                      disallowEmptySelection
+                      shouldFocusWrap
+                      onSelectionChange={handleTemplateSelectionChange}
+                      className="grid gap-3 md:grid-cols-2"
+                      items={filteredTemplates}
+                      renderEmptyState={() => (
+                        <p className="text-sm text-muted-fg">
+                          No templates match your filter.
+                        </p>
+                      )}
+                    >
+                      {(template: WorkflowTemplate) => (
+                        <ListBoxItem
                           key={template.id}
-                          type="button"
-                          onClick={() => setSelectedTemplateId(template.id)}
-                          className={`rounded-lg border p-4 text-left transition ${
-                            isSelected
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-primary/40 hover:bg-muted/30"
-                          }`}
+                          id={template.id}
+                          textValue={template.name}
+                          className="h-full outline-none"
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-medium text-foreground">
-                              {template.name}
-                            </p>
-                            <div className="flex items-center gap-2">
-                              {template.owner ? (
-                                <Badge intent="secondary">Custom</Badge>
-                              ) : (
-                                <Badge intent="warning">System</Badge>
+                          {({ isSelected }) => (
+                            <div
+                              className={`flex h-full min-h-56 flex-col rounded-lg border p-4 text-left transition ${
+                                isSelected
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-primary/40 hover:bg-muted/30"
+                              }`}
+                            >
+                              <p className="text-sm font-medium text-foreground">
+                                {template.name}
+                              </p>
+                              {template.description && (
+                                <p className="mt-2 text-sm text-foreground">
+                                  {template.description}
+                                </p>
                               )}
-                              {template.category && (
-                                <Badge intent="secondary">
-                                  {template.category}
-                                </Badge>
+                              {template.explanation && (
+                                <p className="mt-2 text-sm text-muted-fg">
+                                  {template.explanation}
+                                </p>
                               )}
+                              <div className="mt-auto flex items-center gap-2 pt-4">
+                                {template.owner ? (
+                                  <Badge intent="secondary">Custom</Badge>
+                                ) : (
+                                  <Badge intent="warning">System</Badge>
+                                )}
+                                {template.category && (
+                                  <Badge intent="secondary">
+                                    {template.category}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          {template.description && (
-                            <p className="mt-2 text-sm text-foreground">
-                              {template.description}
-                            </p>
                           )}
-                          {template.explanation && (
-                            <p className="mt-2 text-sm text-muted-fg">
-                              {template.explanation}
-                            </p>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+                        </ListBoxItem>
+                      )}
+                    </ListBox>
+                  </Autocomplete>
                 ) : (
                   <p className="text-sm text-muted-fg">
                     No templates are available yet. Add records to

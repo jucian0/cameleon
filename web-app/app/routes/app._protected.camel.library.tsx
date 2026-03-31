@@ -2,7 +2,6 @@ import { Autocomplete, useFilter } from "react-aria-components";
 import { Tab, TabList, TabPanel, Tabs } from "app/components/ui/tabs";
 import { SearchField } from "app/components/ui/search-field";
 import { Outlet, useLocation, useSearchParams } from "react-router";
-import { PresetIcon } from "app/components/icons/preset";
 import { ProcessorIcon } from "app/components/icons/processor";
 import { ResourcesIcon } from "app/components/icons/resources";
 
@@ -67,12 +66,6 @@ export default function TopologyLibrary() {
               href={`/app/camel/library/components?${filter.toString()}`}
             >
               <ResourcesIcon /> Components
-            </Tab>
-            <Tab
-              id="presets"
-              href={`/app/camel/library/presets?${filter.toString()}`}
-            >
-              <PresetIcon /> Presets
             </Tab>
           </TabList>
           <TabPanel id="eips" />

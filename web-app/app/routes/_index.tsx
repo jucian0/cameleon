@@ -153,7 +153,7 @@ export default function Landing() {
       icon: Library,
       title: "Reusable Templates",
       description:
-        "Save workflows as presets and reuse integration patterns. Community templates welcome!",
+        "Save workflows as templates and reuse integration patterns across new flows.",
     },
     {
       icon: Users,
