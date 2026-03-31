@@ -147,7 +147,7 @@ function renderWorkflowSection({
       <div
         className={
           viewMode === "cards"
-            ? "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            ? "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
             : "space-y-4"
         }
       >

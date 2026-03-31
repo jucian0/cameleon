@@ -8,7 +8,7 @@ import {
 } from "react-aria-components";
 import { Badge } from "app/components/ui/badge";
 import { Card } from "app/components/ui/card";
-import { Modal } from "app/components/ui/modal";
+import { LibraryItemDetailsModal } from "@/camel/library-components/library-item-details-modal";
 import axios from "axios";
 import type { EPIDefinition } from "core";
 import type { LoaderFunctionArgs } from "react-router";
@@ -60,6 +60,30 @@ export default function CamelEIPsTab({
     ? Object.entries(selectedEip.properties ?? {})
     : [];
   const highlightedProperties = properties.slice(0, 8);
+  const detailsItem = selectedEip
+    ? {
+        kind: "eip" as const,
+        title: String(selectedEip.model.title),
+        name: String(selectedEip.model.name),
+        description: String(selectedEip.model.description),
+        propertyCount: properties.length,
+        requiredCount: properties.filter(([, property]) => property.required)
+          .length,
+        groupCount: new Set(
+          properties.map(([, property]) => property.group).filter(Boolean),
+        ).size,
+        highlightedProperties: highlightedProperties.map(
+          ([propertyName, property]) => ({
+            name: propertyName,
+            title: property.title ? String(property.title) : undefined,
+            description: property.description
+              ? String(property.description)
+              : undefined,
+            required: Boolean(property.required),
+          }),
+        ),
+      }
+    : null;
 
   return (
     <>
@@ -113,95 +137,13 @@ export default function CamelEIPsTab({
           )}
         </ListBox>
       </Virtualizer>
-      <Modal.Content
+      <LibraryItemDetailsModal
+        item={detailsItem}
         isOpen={selectedEip != null}
         onOpenChange={(isOpen) => {
           if (!isOpen) setSelectedEip(null);
         }}
-        size="2xl"
-        isBlurred
-      >
-        <Modal.Header>
-          <div className="flex items-center gap-2">
-            <Badge intent="info">EIP</Badge>
-            {selectedEip && (
-              <Badge intent="outline">{String(selectedEip.model.name)}</Badge>
-            )}
-          </div>
-          <Modal.Title>
-            {selectedEip ? String(selectedEip.model.title) : ""}
-          </Modal.Title>
-          <Modal.Description>
-            {selectedEip ? String(selectedEip.model.description) : ""}
-          </Modal.Description>
-        </Modal.Header>
-        <Modal.Body className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-fg">
-                Properties
-              </p>
-              <p className="mt-1 text-lg font-semibold text-foreground">
-                {properties.length}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-fg">
-                Required
-              </p>
-              <p className="mt-1 text-lg font-semibold text-foreground">
-                {properties.filter(([, property]) => property.required).length}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-fg">
-                Groups
-              </p>
-              <p className="mt-1 text-lg font-semibold text-foreground">
-                {
-                  new Set(
-                    properties
-                      .map(([, property]) => property.group)
-                      .filter(Boolean),
-                  ).size
-                }
-              </p>
-            </div>
-          </div>
-          {highlightedProperties.length > 0 ? (
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-foreground">
-                Key properties
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {highlightedProperties.map(([propertyName, property]) => (
-                  <div
-                    key={propertyName}
-                    className="rounded-lg border border-border bg-muted/10 px-4 py-3"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-foreground">
-                        {String(property.title || propertyName)}
-                      </span>
-                      {property.required && (
-                        <Badge intent="warning">Required</Badge>
-                      )}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-fg">
-                      {String(
-                        property.description || "No description available.",
-                      )}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </Modal.Body>
-        <Modal.Footer>
-          <Modal.Close>Close</Modal.Close>
-        </Modal.Footer>
-      </Modal.Content>
+      />
     </>
   );
 }
