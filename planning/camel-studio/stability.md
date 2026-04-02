@@ -4,6 +4,23 @@
 
 Make route loading, parsing, canvas generation, and persistence reliable enough that users can trust the editor with real Camel workflows.
 
+## Status
+
+- Overall: `Mostly Done`
+- Product-facing hardening: `Done`
+- Automated execution of parser and round-trip tests: `Later`
+
+## Current State
+
+Already covered in product behavior:
+
+- route loader hardening
+- explicit workflow error states
+- invalid content recovery
+- save/reopen hardening
+- structural branch safeguards
+- safer code/canvas synchronization
+
 ## Scope
 
 This document covers:
@@ -84,3 +101,8 @@ This area is successful when:
 - save/reopen is trustworthy
 - parser regressions are caught before release
 - the editor no longer feels fragile during normal use
+
+## Next
+
+- formalize test execution for parser and round-trip coverage
+- keep this document as a regression guardrail, not a large active roadmap

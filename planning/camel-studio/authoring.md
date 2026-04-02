@@ -4,6 +4,22 @@
 
 Make the studio capable of editing real Camel routes without forcing users back into raw YAML for common tasks.
 
+## Status
+
+- Overall: `Mostly Done`
+- Foundation and major renderers: `Done`
+- Long-tail Camel-specific refinements: `Next`
+
+## Current State
+
+Already established:
+
+- renderer registry
+- grouped metadata-driven forms
+- endpoint-aware editing
+- inline validation
+- structural branch rules for sensitive operators
+
 ## Scope
 
 This document covers:
@@ -112,3 +128,8 @@ This area is successful when:
 - most daily editing no longer requires raw YAML
 - the side panel feels Camel-aware rather than generic
 - users can safely configure real route nodes through the UI
+
+## Next
+
+- extend specialized renderers only where common Camel patterns still fall back too early
+- keep avoiding generic UI where a structural Camel-specific control is clearer

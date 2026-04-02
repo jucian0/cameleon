@@ -4,6 +4,22 @@
 
 Reduce the time and effort required to create, understand, and evolve workflows in the studio.
 
+## Status
+
+- Overall: `Strong`
+- Create flow, templates, autosave, and version history: `Done`
+- Dashboard and deeper reuse patterns: `Next`
+
+## Current State
+
+Already shipped or materially covered:
+
+- template-backed creation
+- clone and import flows
+- autosave draft safety
+- explicit milestone versions
+- template library and save-as-template
+
 ## Scope
 
 This document covers:
@@ -114,3 +130,8 @@ This area is successful when:
 - users can get started quickly
 - repeated tasks become faster over time
 - workflow editing feels safe and recoverable
+
+## Next
+
+- revisit workspace home only when there is a clear resume-work need
+- consider snippet-level reuse later if repeated authoring patterns justify it

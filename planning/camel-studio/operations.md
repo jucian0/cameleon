@@ -4,6 +4,16 @@
 
 Give the team enough visibility and feedback loops to operate the app reliably, debug failures quickly, and prioritize work based on actual usage.
 
+## Status
+
+- Overall: `Not Started`
+- Scope clarified: `Done`
+- Instrumentation and dashboards: `Next`
+
+## Current State
+
+This document covers app/editor observability, not runtime execution of Camel integrations.
+
 ## Scope
 
 This document covers:
@@ -129,3 +139,8 @@ This area is successful when:
 - regressions are detected early
 - roadmap priorities are informed by real behavior data
 - environment-specific failures can be diagnosed without trial and error
+
+## Next
+
+- add a minimal diagnostics layer for auth, open, save, and parse flows
+- define the smallest useful event set before choosing any vendor or dashboard tooling

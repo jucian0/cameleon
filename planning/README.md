@@ -4,6 +4,15 @@ This folder is the structured entry point for product and engineering planning i
 
 Use it as the canonical navigation layer for planning work.
 
+## Status Model
+
+Use this lightweight language across planning documents:
+
+- `Done`
+- `In Progress`
+- `Next`
+- `Later`
+
 ## Planning Families
 
 ### Camel Studio
@@ -18,6 +27,6 @@ Planning for the new REST API design product surface:
 
 - [API Studio Planning](/Users/jucianobarbosa/personal/camelion/planning/api-studio/README.md)
 
-## Current Root Documents
+## Working Rule
 
-The root `PLANNING*.md` files remain in place for compatibility, but new planning navigation should start here.
+Start planning navigation from this folder, not from legacy root filenames.

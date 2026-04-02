@@ -4,6 +4,21 @@
 
 Make workflows shareable, reviewable, and reusable across people and environments without losing control over editing rights or DSL integrity.
 
+## Status
+
+- Overall: `Partially Done`
+- Public starter and clone behavior: `Done`
+- True team collaboration: `Later`
+
+## Current State
+
+The current product direction is narrower than full collaboration:
+
+- personal workflows
+- public starter workflows
+- clone and reuse
+- import and export
+
 ## Scope
 
 This document covers:
@@ -103,3 +118,7 @@ This area is successful when:
 - public and private workflows behave predictably
 - users can safely share and clone workflows
 - the app fits into a real Camel workflow outside its own UI
+
+## Next
+
+- keep only the starter/public reuse path active unless true multi-user collaboration becomes a product priority again

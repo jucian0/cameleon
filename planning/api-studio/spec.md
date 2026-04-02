@@ -4,6 +4,21 @@
 
 Add a new product surface to Cameleon for designing REST APIs with the same quality bar as Camel Studio, while keeping its domain model separate from Camel route authoring.
 
+## Status
+
+- Overall: `Defined`
+- Product spec: `Done`
+- Canonical model freeze and phase-1 backlog: `Next`
+
+## Immediate Next Step
+
+Before writing code:
+
+1. freeze the first version of `ApiSpec`
+2. define the resource and operation layout in more detail
+3. define validation rules
+4. decide whether first code view is read-only generated OpenAPI
+
 ## Product Direction
 
 The intended direction is:
