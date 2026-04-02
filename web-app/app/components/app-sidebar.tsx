@@ -17,14 +17,7 @@ import {
   SidebarSectionGroup,
   useSidebar,
 } from "./ui/sidebar";
-import {
-  IconChevronLgDown,
-  IconDashboard,
-  IconHeadphones,
-  IconLogout,
-  IconSettings,
-  IconShield,
-} from "@intentui/icons";
+import { IconChevronLgDown, IconHeadphones, IconLogout } from "@intentui/icons";
 import { twMerge } from "tailwind-merge";
 import { CameleonIcon } from "./icons/cameleon";
 import { StudioIcon } from "./icons/studio";
@@ -154,28 +147,13 @@ export default function AppSidebar(
                   {loaderData?.user?.user_metadata?.full_name}
                 </span>
                 <span className="font-normal text-muted-fg">
-                  @{loaderData?.user?.user_metadata?.email}
+                  {loaderData?.user?.email}
                 </span>
               </Menu.Header>
             </Menu.Section>
-
-            <Menu.Item href="#dashboard">
-              <IconDashboard />
-              Dashboard
-            </Menu.Item>
-            <Menu.Item href="#settings">
-              <IconSettings />
-              Settings
-            </Menu.Item>
-            <Menu.Item href="#security">
-              <IconShield />
-              Security
-            </Menu.Item>
-            <Menu.Separator />
-
-            <Menu.Item href="#contact">
+            <Menu.Item href="mailto:hi@juciano.com">
               <IconHeadphones />
-              Customer Support
+              Contact support
             </Menu.Item>
             <Menu.Separator />
             <ThemeMenu />

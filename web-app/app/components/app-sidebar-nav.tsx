@@ -4,13 +4,10 @@ import { Menu } from "./ui/menu";
 import { Separator } from "./ui/separator";
 import { SidebarNav, SidebarTrigger } from "./ui/sidebar";
 
-import {
-  IconCommandRegular,
-  IconDashboard,
-  IconLogout,
-  IconSettings,
-} from "@intentui/icons";
-import { useMatches, useRouteLoaderData } from "react-router";
+import { IconLogout } from "@intentui/icons";
+import { useMatches, useNavigate, useRouteLoaderData } from "react-router";
+import { useState } from "react";
+import { createClient } from "@/modules/supabase/supabase-client";
 import type { Loader } from "@/root";
 import { Link } from "react-aria-components";
 import { ThemeMenu } from "./theme-menu";
@@ -54,6 +51,26 @@ export default function AppSidebarNav() {
 
 function UserMenu() {
   const loaderData = useRouteLoaderData<Loader>("root");
+  const navigate = useNavigate();
+  const [supabase] = useState(
+    createClient(
+      loaderData?.env.SUPABASE_URL as "",
+      loaderData?.env.SUPABASE_KEY as "",
+    ),
+  );
+
+  async function handleLogout() {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw new Error(error.message);
+      }
+      navigate("/");
+    } catch {
+      navigate("/app");
+    }
+  }
+
   return (
     <Menu>
       <Menu.Trigger className="ml-auto md:hidden" aria-label="Open Menu">
@@ -69,30 +86,17 @@ function UserMenu() {
               {loaderData?.user?.user_metadata?.full_name}
             </span>
             <span className="font-normal text-muted-fg">
-              @{loaderData?.user?.user_metadata?.email}
+              {loaderData?.user?.email}
             </span>
           </Menu.Header>
         </Menu.Section>
-        <Menu.Item href="#dashboard">
-          <IconDashboard />
-          <Menu.Label>Dashboard</Menu.Label>
-        </Menu.Item>
-        <Menu.Item href="#settings">
-          <IconSettings />
-          <Menu.Label>Settings</Menu.Label>
-        </Menu.Item>
         <Menu.Separator />
-        <Menu.Item>
-          <IconCommandRegular />
-          <Menu.Label>Command Menu</Menu.Label>
+        <Menu.Item href="mailto:hi@juciano.com">
+          <Menu.Label>Contact Support</Menu.Label>
         </Menu.Item>
         <ThemeMenu />
         <Menu.Separator />
-        <Menu.Item href="#contact-s">
-          <Menu.Label>Contact Support</Menu.Label>
-        </Menu.Item>
-        <Menu.Separator />
-        <Menu.Item href="#logout">
+        <Menu.Item onAction={handleLogout}>
           <IconLogout />
           <Menu.Label>Log out</Menu.Label>
         </Menu.Item>
