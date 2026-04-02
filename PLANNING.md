@@ -30,6 +30,11 @@ The following documents break the plan into functional areas:
 - [PLANNING-COLLABORATION.md](/Users/jucianobarbosa/personal/camelion/PLANNING-COLLABORATION.md)
 - [PLANNING-OPERATIONS.md](/Users/jucianobarbosa/personal/camelion/PLANNING-OPERATIONS.md)
 
+Important boundary:
+
+- `operations` owns observability, diagnostics, runtime visibility, release safety, and operational feedback loops
+- it does not own dashboard/home UX maturity, template product depth, auth UX polish, or parser test infrastructure by itself
+
 ## Product Direction
 
 The product needs a tighter primary promise. The most credible direction from the current codebase is:

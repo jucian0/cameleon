@@ -29,10 +29,7 @@ export default function AuthPage() {
     await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo:
-          env.ENV === "development"
-            ? "http://localhost:3000/app/auth/callback?next=/app"
-            : "https://cameleon.juciano.com/app/auth/callback?next=/app",
+        redirectTo: `${window.location.origin}/app/auth/callback?next=/app`,
       },
     });
   }

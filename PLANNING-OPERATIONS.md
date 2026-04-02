@@ -12,6 +12,18 @@ This document covers:
 - workflow action diagnostics
 - parser and YAML error telemetry
 - product usage metrics
+- runtime and environment visibility
+- release checks and post-release monitoring
+
+This document does not cover:
+
+- template product maturity
+- library/discovery UX depth
+- workspace/dashboard product UX
+- auth/account polish as a product surface
+- parser test infrastructure itself
+
+Those are related, but they belong to product, platform UX, or engineering quality rather than operations.
 
 ## Desired Outcomes
 
@@ -21,6 +33,7 @@ The team should be able to:
 - trace parser and serialization failures
 - detect regressions in route loading and saving
 - make roadmap decisions from real usage data
+- explain environment-specific failures without guesswork
 
 ## Area 1: Error Monitoring
 
@@ -140,7 +153,43 @@ Alert when:
 - parser failure for a specific EIP increases
 - metadata fetch failures increase
 
-## Area 5: Release Safety
+## Area 5: Runtime and Environment Visibility
+
+### Problem
+
+Some failures are not purely product bugs. They come from environment drift or runtime mismatch, for example:
+
+- auth redirect issues
+- local vs production callback mismatch
+- Supabase project mismatch
+- environment-specific save or load behavior
+
+Without explicit runtime context, these issues are slow to explain and easy to misdiagnose.
+
+### How It Should Work
+
+Operational tooling should make it easy to answer:
+
+- which environment handled the flow
+- which origin and callback URL were used
+- which workflow id and route context were involved
+- whether the failure happened in the loader, action, client editor, or backend round-trip
+
+### Recommended Signals
+
+- current environment name
+- current origin
+- auth callback URL used
+- workflow id
+- route id
+- save mode (`autosave` vs `manual`)
+- versioning intent (`restore`, `milestone`, etc.)
+
+### Desired Outcome
+
+The team should be able to diagnose “works locally but not remotely” and similar runtime mismatches quickly.
+
+## Area 6: Release Safety
 
 ### Problem
 
@@ -168,7 +217,7 @@ After release:
 - workflow saves
 - workflow reopens correctly
 
-## Area 6: Debuggability for Development
+## Area 7: Debuggability for Development
 
 ### Problem
 
@@ -188,6 +237,16 @@ Development mode should expose lightweight debugging aids:
 - debug tools must not leak into production by default
 - logs should be structured enough for comparison
 
+## Related Next Areas
+
+These follow naturally after operations, but they are not part of this document:
+
+- dashboard and workspace home maturity
+- deeper template product workflows
+- richer library search/filter/discovery UX
+- auth and account UX polish
+- parser and round-trip automated test infrastructure
+
 ## Engineering Deliverables
 
 ### Must Have
@@ -196,12 +255,14 @@ Development mode should expose lightweight debugging aids:
 - route loader/action diagnostics
 - parse and save telemetry
 - baseline operational dashboard definitions
+- runtime/environment visibility
 
 ### Should Have
 
 - alerts for open/save regressions
 - parser error grouping by EIP
 - development debug panel
+- auth callback and redirect diagnostics
 
 ### Nice to Have
 
@@ -212,9 +273,10 @@ Development mode should expose lightweight debugging aids:
 
 1. add error capture around route loading and saving
 2. add parse/save diagnostic events
-3. define dashboards and baseline metrics
-4. add alerts for major regressions
-5. improve development debug tooling
+3. add runtime/environment visibility for auth and callback-sensitive flows
+4. define dashboards and baseline metrics
+5. add alerts for major regressions
+6. improve development debug tooling
 
 ## Definition of Success
 
@@ -223,3 +285,4 @@ This area is successful when:
 - the team can explain production failures quickly
 - regressions are detected early
 - roadmap priorities are informed by real behavior data
+- environment-specific failures can be diagnosed without trial and error
