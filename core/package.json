@@ -5,7 +5,7 @@
   "main": "index.js",
   "exports": {
     ".": "./src/index.ts",
-    "./operations": "./src/lib/topology-operations/index.ts"
+    "./operations": "./src/lib/camel/topology-operations/index.ts"
   },
   "keywords": [],
   "author": "",

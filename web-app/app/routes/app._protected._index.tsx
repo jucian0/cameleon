@@ -10,6 +10,7 @@ import {
 import { Menu } from "app/components/ui/menu";
 import { Link } from "app/components/ui/link";
 import { createServerSupabase } from "app/modules/supabase/supabase-server";
+import { SwaggerIcon } from "app/components/icons/swagger";
 import type { LoaderFunctionArgs } from "react-router";
 import {
   ArrowRight,
@@ -251,6 +252,13 @@ export default function HomePage({
             title="EIPs and Components"
             description="Browse Camel metadata with details before using blocks in the editor."
             href="/app/camel/library/eips"
+          />
+          <EntryCard
+            icon={SwaggerIcon}
+            badge="API"
+            title="API Studio"
+            description="Design REST resources and operations with generated OpenAPI output."
+            href="/app/apis"
           />
           <EntryCard
             icon={History}

@@ -96,6 +96,98 @@ export type Database = {
           updated_at?: string;
         };
       };
+      apis: {
+        Row: {
+          id: string;
+          name: string;
+          owner: string;
+          created_at: string;
+          updated_at: string;
+          description: string | null;
+          content: string | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          owner: string;
+          description?: string | null;
+          content?: string | null;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          owner?: string;
+          description?: string | null;
+          content?: string | null;
+        };
+      };
+      api_versions: {
+        Row: {
+          id: string;
+          api_id: string;
+          version: string;
+          status: string;
+          updated_at: string;
+          description: string;
+          content: string;
+        };
+        Insert: {
+          id?: string;
+          api_id: string;
+          version: string;
+          status: string;
+          updated_at?: string;
+          description: string;
+          content: string;
+        };
+        Update: {
+          id?: string;
+          api_id?: string;
+          version?: string;
+          status?: string;
+          updated_at?: string;
+          description?: string;
+          content?: string;
+        };
+      };
+      api_templates: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          content: string;
+          category: string | null;
+          explanation: string | null;
+          owner: string | null;
+          source_api_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          content: string;
+          category?: string | null;
+          explanation?: string | null;
+          owner?: string | null;
+          source_api_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          content?: string;
+          category?: string | null;
+          explanation?: string | null;
+          owner?: string | null;
+          source_api_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       workflow_latest_versions: {
@@ -120,6 +212,12 @@ export type ConfigVersion =
 
 export type WorkflowTemplate =
   Database["public"]["Tables"]["workflow_templates"]["Row"];
+
+export type ApiRecord = Database["public"]["Tables"]["apis"]["Row"];
+
+export type ApiVersion = Database["public"]["Tables"]["api_versions"]["Row"];
+
+export type ApiTemplate = Database["public"]["Tables"]["api_templates"]["Row"];
 
 export type CamelConfigView = CamelConfig & {
   latest_version: ConfigVersion[];

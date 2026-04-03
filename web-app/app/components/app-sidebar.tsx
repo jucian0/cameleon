@@ -104,14 +104,12 @@ export default function AppSidebar(
         </SidebarSectionGroup>
         <SidebarSection>
           <SidebarItem
-            href="#"
-            tooltip="Contracts"
-            badge="Coming soon"
-            isCurrent={pathname.includes("contracts")}
-            isDisabled
+            href="/app/apis"
+            tooltip="API Studio"
+            isCurrent={pathname.includes("/app/apis")}
           >
             <SwaggerIcon className="size-4" />
-            <SidebarLabel>Open API</SidebarLabel>
+            <SidebarLabel>API Studio</SidebarLabel>
           </SidebarItem>
         </SidebarSection>
       </SidebarContent>
