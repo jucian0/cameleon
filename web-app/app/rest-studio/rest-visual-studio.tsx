@@ -1,6 +1,5 @@
 import {
   Background,
-  Controls,
   Handle,
   Position,
   ReactFlow,
@@ -582,7 +581,6 @@ export function RestVisualStudio({
           }}
         >
           <Background />
-          <Controls showInteractive={false} />
         </ReactFlow>
       </div>
 
