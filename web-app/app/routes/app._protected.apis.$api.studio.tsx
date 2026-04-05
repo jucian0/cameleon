@@ -1,11 +1,11 @@
-import { ApiVisualStudio } from "@/api-studio/api-visual-studio";
+import { RestVisualStudio } from "@/rest-studio/rest-visual-studio";
 import {
   normalizeApiSpec,
   serializeApiSpec,
   validateApiSpec,
   type ApiSpec,
-} from "@/api-studio/api-spec";
-import { updateApi } from "@/api-studio/api-records";
+} from "@/rest-studio/rest-spec";
+import { updateApi } from "@/rest-studio/rest-records";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonStyles } from "app/components/ui/button";
@@ -130,7 +130,7 @@ export default function ApiStudioEditor({
         </div>
       ) : null}
 
-      <ApiVisualStudio
+      <RestVisualStudio
         initialSpec={context.spec}
         initialName={context.name}
         initialDescription={context.description}
@@ -148,10 +148,10 @@ export function ErrorBoundary() {
       ? error.data
       : "message" in (error.data ?? {})
         ? String((error.data as { message?: string }).message)
-        : "The API Studio editor is unavailable."
+        : "The Rest Studio editor is unavailable."
     : error instanceof Error
       ? error.message
-      : "The API Studio editor is unavailable.";
+      : "The Rest Studio editor is unavailable.";
 
   return (
     <div className="rounded-xl border border-border bg-background p-6">

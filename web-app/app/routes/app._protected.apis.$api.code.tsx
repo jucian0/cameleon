@@ -1,4 +1,4 @@
-import { toOpenApiDocument, type ApiSpec } from "@/api-studio/api-spec";
+import { toOpenApiDocument, type ApiSpec } from "@/rest-studio/rest-spec";
 import { buttonStyles } from "app/components/ui/button";
 import { Link } from "app/components/ui/link";
 import { Sheet } from "app/components/ui/sheet";
@@ -31,7 +31,7 @@ export default withModal(({ isOpen, closeModal }: any) => {
         <Sheet.Header className="px-4 py-4 pb-3">
           <Sheet.Title>Generated OpenAPI</Sheet.Title>
           <Sheet.Description>
-            Read-only JSON output generated from the current API Studio model.
+            Read-only JSON output generated from the current Rest Studio model.
           </Sheet.Description>
         </Sheet.Header>
         <Sheet.Body className="px-4 py-2 pb-4">

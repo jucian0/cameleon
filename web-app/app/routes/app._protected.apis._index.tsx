@@ -1,5 +1,5 @@
-import { ApiCard } from "@/api-studio/api-card";
-import { listApis } from "@/api-studio/api-records";
+import { RestCard } from "@/rest-studio/rest-card";
+import { listApis } from "@/rest-studio/rest-records";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import type { ApiRecord } from "@/modules/supabase/supabase-db";
 import { Badge } from "@/components/ui/badge";
@@ -94,7 +94,7 @@ export default function ApiIndex({
       {apis.length ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {apis.map((api) => (
-            <ApiCard key={api.id} api={api} />
+            <RestCard key={api.id} api={api} />
           ))}
         </div>
       ) : (
@@ -102,7 +102,7 @@ export default function ApiIndex({
           <h2 className="text-lg font-semibold text-foreground">No APIs yet</h2>
           <p className="mt-2 text-sm text-muted-fg">
             Start with a blank API and define resources, methods, and response
-            contracts in API Studio.
+            contracts in Rest Studio.
           </p>
           <div className="mt-4">
             <Link

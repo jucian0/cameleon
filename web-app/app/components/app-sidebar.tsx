@@ -105,11 +105,11 @@ export default function AppSidebar(
         <SidebarSection>
           <SidebarItem
             href="/app/apis"
-            tooltip="API Studio"
+            tooltip="Rest Studio"
             isCurrent={pathname.includes("/app/apis")}
           >
             <SwaggerIcon className="size-4" />
-            <SidebarLabel>API Studio</SidebarLabel>
+            <SidebarLabel>Rest Studio</SidebarLabel>
           </SidebarItem>
         </SidebarSection>
       </SidebarContent>

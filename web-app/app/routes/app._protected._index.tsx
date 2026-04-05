@@ -256,7 +256,7 @@ export default function HomePage({
           <EntryCard
             icon={SwaggerIcon}
             badge="API"
-            title="API Studio"
+            title="Rest Studio"
             description="Design REST resources and operations with generated OpenAPI output."
             href="/app/apis"
           />

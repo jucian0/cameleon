@@ -6,9 +6,9 @@ import { Tooltip } from "app/components/ui/tooltip";
 import { ArrowRightFromLine, Code2, Maximize, Minus, Plus } from "lucide-react";
 import React from "react";
 import { useFetcher, useLocation } from "react-router";
-import type { ApiSpec } from "./api-spec";
+import type { ApiSpec } from "./rest-spec";
 
-export function ApiToolbar({
+export function RestToolbar({
   name,
   description,
   spec,

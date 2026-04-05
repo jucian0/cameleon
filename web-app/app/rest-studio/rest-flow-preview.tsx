@@ -128,7 +128,7 @@ function layoutGraph(nodes: Node[], edges: Edge[]) {
   });
 }
 
-export function ApiFlowPreview() {
+export function RestFlowPreview() {
   const nodes = React.useMemo<Node<PreviewNodeData>[]>(
     () => [
       {

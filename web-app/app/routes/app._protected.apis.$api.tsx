@@ -1,5 +1,5 @@
-import { parseApiSpec } from "@/api-studio/api-spec";
-import { getApiById } from "@/api-studio/api-records";
+import { parseApiSpec } from "@/rest-studio/rest-spec";
+import { getApiById } from "@/rest-studio/rest-records";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import { buttonStyles } from "app/components/ui/button";
 import { Link } from "app/components/ui/link";
@@ -11,7 +11,7 @@ import {
   type LoaderFunctionArgs,
   type MetaArgs,
 } from "react-router";
-import { serializeApiSpec } from "@/api-studio/api-spec";
+import { serializeApiSpec } from "@/rest-studio/rest-spec";
 
 export function meta({ loaderData }: MetaArgs<typeof loader>) {
   return [
@@ -22,7 +22,7 @@ export function meta({ loaderData }: MetaArgs<typeof loader>) {
 
 export const handle = {
   breadcrumb: (data?: { name?: string }) =>
-    data?.name ? `API Studio - ${data.name}` : "API Studio",
+    data?.name ? `Rest Studio - ${data.name}` : "Rest Studio",
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {

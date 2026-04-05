@@ -5,7 +5,7 @@ import { Link } from "app/components/ui/link";
 import { Badge } from "@/components/ui/badge";
 import type { ApiRecord } from "@/modules/supabase/supabase-db";
 
-export function ApiCard({ api }: { api: ApiRecord }) {
+export function RestCard({ api }: { api: ApiRecord }) {
   const updatedAt = new Date(api.updated_at).toLocaleDateString();
 
   return (
@@ -22,7 +22,8 @@ export function ApiCard({ api }: { api: ApiRecord }) {
               {api.name}
             </h3>
             <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-              {api.description || "REST API definition for resources, operations, and response contracts."}
+              {api.description ||
+                "REST API definition for resources, operations, and response contracts."}
             </p>
           </div>
         </div>
@@ -32,7 +33,7 @@ export function ApiCard({ api }: { api: ApiRecord }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Badge intent="secondary" className="text-xs">
-              API Studio
+              Rest Studio
             </Badge>
             <span className="text-xs text-muted-foreground">
               {`Updated on ${updatedAt}`}

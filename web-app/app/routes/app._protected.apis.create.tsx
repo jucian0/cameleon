@@ -1,13 +1,26 @@
-import { createDefaultApiSpec, serializeApiSpec } from "@/api-studio/api-spec";
-import { createApi } from "@/api-studio/api-records";
+import {
+  createDefaultApiSpec,
+  serializeApiSpec,
+} from "@/rest-studio/rest-spec";
+import { createApi } from "@/rest-studio/rest-records";
 import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import { Button } from "app/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "app/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "app/components/ui/card";
 import { Link } from "app/components/ui/link";
 import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
 import { ArrowLeft, Save } from "lucide-react";
-import { Form, redirect, useNavigation, type LoaderFunctionArgs } from "react-router";
+import {
+  Form,
+  redirect,
+  useNavigation,
+  type LoaderFunctionArgs,
+} from "react-router";
 
 export const handle = {
   breadcrumb: () => "Create API",
@@ -16,7 +29,7 @@ export const handle = {
 export function meta() {
   return [
     { title: "Create API | Cameleon" },
-    { description: "Create a new REST API definition in API Studio." },
+    { description: "Create a new REST API definition in Rest Studio." },
   ];
 }
 
@@ -82,8 +95,8 @@ export default function CreateApi({
         <CardHeader className="px-4 py-4">
           <CardTitle>Create API</CardTitle>
           <p className="text-sm text-muted-fg">
-            Start a REST API design with a blank resource structure and generated
-            OpenAPI preview.
+            Start a REST API design with a blank resource structure and
+            generated OpenAPI preview.
           </p>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">

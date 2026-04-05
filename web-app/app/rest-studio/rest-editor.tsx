@@ -9,7 +9,7 @@ import {
   type ApiResource,
   type ApiResponse,
   type ApiSpec,
-} from "./api-spec";
+} from "./rest-spec";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "app/components/ui/button";
 import {
@@ -303,7 +303,8 @@ export function ApiEditor({
                     <div>
                       <CardTitle className="text-base">API overview</CardTitle>
                       <p className="mt-1 text-sm text-muted-fg">
-                        Name, version, server, and the high-level description of the API.
+                        Name, version, server, and the high-level description of
+                        the API.
                       </p>
                     </div>
                     <Badge intent="secondary">Design</Badge>
@@ -391,7 +392,9 @@ export function ApiEditor({
                         key={resource.id}
                         onClick={() => {
                           setSelectedResourceId(resource.id);
-                          setSelectedOperationId(resource.operations[0]?.id ?? "");
+                          setSelectedOperationId(
+                            resource.operations[0]?.id ?? "",
+                          );
                         }}
                         className={`w-full rounded-lg border px-3 py-3 text-left transition ${
                           isSelected
@@ -423,9 +426,12 @@ export function ApiEditor({
                   <CardHeader className="px-4 py-4">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <CardTitle className="text-base">Selected resource</CardTitle>
+                        <CardTitle className="text-base">
+                          Selected resource
+                        </CardTitle>
                         <p className="mt-1 text-sm text-muted-fg">
-                          Shape the path and describe what this resource represents.
+                          Shape the path and describe what this resource
+                          represents.
                         </p>
                       </div>
                       <Button
@@ -446,10 +452,14 @@ export function ApiEditor({
                       value={selectedResource.path}
                       onChange={(value) =>
                         setSpec((currentSpec) =>
-                          updateResource(currentSpec, selectedResource.id, (resource) => ({
-                            ...resource,
-                            path: value,
-                          })),
+                          updateResource(
+                            currentSpec,
+                            selectedResource.id,
+                            (resource) => ({
+                              ...resource,
+                              path: value,
+                            }),
+                          ),
                         )
                       }
                       isDisabled={!canEdit}
@@ -459,10 +469,14 @@ export function ApiEditor({
                       value={selectedResource.summary}
                       onChange={(value) =>
                         setSpec((currentSpec) =>
-                          updateResource(currentSpec, selectedResource.id, (resource) => ({
-                            ...resource,
-                            summary: value,
-                          })),
+                          updateResource(
+                            currentSpec,
+                            selectedResource.id,
+                            (resource) => ({
+                              ...resource,
+                              summary: value,
+                            }),
+                          ),
                         )
                       }
                       isDisabled={!canEdit}
@@ -473,10 +487,14 @@ export function ApiEditor({
                       value={selectedResource.description}
                       onChange={(value) =>
                         setSpec((currentSpec) =>
-                          updateResource(currentSpec, selectedResource.id, (resource) => ({
-                            ...resource,
-                            description: value,
-                          })),
+                          updateResource(
+                            currentSpec,
+                            selectedResource.id,
+                            (resource) => ({
+                              ...resource,
+                              description: value,
+                            }),
+                          ),
                         )
                       }
                       isDisabled={!canEdit}
@@ -493,7 +511,8 @@ export function ApiEditor({
                     <div>
                       <CardTitle className="text-base">Operations</CardTitle>
                       <p className="mt-1 text-sm text-muted-fg">
-                        Select any operation across the API and edit it in the inspector.
+                        Select any operation across the API and edit it in the
+                        inspector.
                       </p>
                     </div>
                     {selectedResource ? (
@@ -546,7 +565,8 @@ export function ApiEditor({
                               {resource.path}
                             </p>
                             <p className="mt-2 line-clamp-2 text-sm text-muted-fg">
-                              {operation.description || "No operation description yet."}
+                              {operation.description ||
+                                "No operation description yet."}
                             </p>
                           </div>
                           <Button
@@ -615,7 +635,8 @@ function OperationEditor({
           </div>
           <CardTitle className="mt-3 text-base">Operation inspector</CardTitle>
           <p className="mt-1 text-sm text-muted-fg">
-            Edit request contract, metadata, and response details for the selected operation.
+            Edit request contract, metadata, and response details for the
+            selected operation.
           </p>
         </div>
       </CardHeader>
@@ -627,10 +648,15 @@ function OperationEditor({
             isDisabled={!canEdit}
             onSelectionChange={(key) =>
               setSpec((currentSpec) =>
-                updateOperation(currentSpec, resource.id, operation.id, (currentOperation) => ({
-                  ...currentOperation,
-                  method: String(key) as ApiHttpMethod,
-                })),
+                updateOperation(
+                  currentSpec,
+                  resource.id,
+                  operation.id,
+                  (currentOperation) => ({
+                    ...currentOperation,
+                    method: String(key) as ApiHttpMethod,
+                  }),
+                ),
               )
             }
           >
@@ -648,10 +674,15 @@ function OperationEditor({
             value={operation.operationId}
             onChange={(value) =>
               setSpec((currentSpec) =>
-                updateOperation(currentSpec, resource.id, operation.id, (currentOperation) => ({
-                  ...currentOperation,
-                  operationId: value,
-                })),
+                updateOperation(
+                  currentSpec,
+                  resource.id,
+                  operation.id,
+                  (currentOperation) => ({
+                    ...currentOperation,
+                    operationId: value,
+                  }),
+                ),
               )
             }
             isDisabled={!canEdit}
@@ -661,10 +692,15 @@ function OperationEditor({
             value={operation.summary}
             onChange={(value) =>
               setSpec((currentSpec) =>
-                updateOperation(currentSpec, resource.id, operation.id, (currentOperation) => ({
-                  ...currentOperation,
-                  summary: value,
-                })),
+                updateOperation(
+                  currentSpec,
+                  resource.id,
+                  operation.id,
+                  (currentOperation) => ({
+                    ...currentOperation,
+                    summary: value,
+                  }),
+                ),
               )
             }
             isDisabled={!canEdit}
@@ -675,10 +711,15 @@ function OperationEditor({
             placeholder="Optional workflow id"
             onChange={(value) =>
               setSpec((currentSpec) =>
-                updateOperation(currentSpec, resource.id, operation.id, (currentOperation) => ({
-                  ...currentOperation,
-                  workflowId: value || null,
-                })),
+                updateOperation(
+                  currentSpec,
+                  resource.id,
+                  operation.id,
+                  (currentOperation) => ({
+                    ...currentOperation,
+                    workflowId: value || null,
+                  }),
+                ),
               )
             }
             isDisabled={!canEdit}
@@ -689,10 +730,15 @@ function OperationEditor({
           value={operation.description}
           onChange={(value) =>
             setSpec((currentSpec) =>
-              updateOperation(currentSpec, resource.id, operation.id, (currentOperation) => ({
-                ...currentOperation,
-                description: value,
-              })),
+              updateOperation(
+                currentSpec,
+                resource.id,
+                operation.id,
+                (currentOperation) => ({
+                  ...currentOperation,
+                  description: value,
+                }),
+              ),
             )
           }
           isDisabled={!canEdit}
@@ -712,10 +758,18 @@ function OperationEditor({
               size="sm"
               onPress={() =>
                 setSpec((currentSpec) =>
-                  updateOperation(currentSpec, resource.id, operation.id, (currentOperation) => ({
-                    ...currentOperation,
-                    parameters: [...currentOperation.parameters, createApiParameter()],
-                  })),
+                  updateOperation(
+                    currentSpec,
+                    resource.id,
+                    operation.id,
+                    (currentOperation) => ({
+                      ...currentOperation,
+                      parameters: [
+                        ...currentOperation.parameters,
+                        createApiParameter(),
+                      ],
+                    }),
+                  ),
                 )
               }
               isDisabled={!canEdit}
@@ -820,7 +874,8 @@ function OperationEditor({
                           (currentOperation) => ({
                             ...currentOperation,
                             parameters: currentOperation.parameters.filter(
-                              (currentParameter) => currentParameter.id !== parameter.id,
+                              (currentParameter) =>
+                                currentParameter.id !== parameter.id,
                             ),
                           }),
                         ),
@@ -1065,10 +1120,18 @@ function OperationEditor({
               size="sm"
               onPress={() =>
                 setSpec((currentSpec) =>
-                  updateOperation(currentSpec, resource.id, operation.id, (currentOperation) => ({
-                    ...currentOperation,
-                    responses: [...currentOperation.responses, createApiResponse()],
-                  })),
+                  updateOperation(
+                    currentSpec,
+                    resource.id,
+                    operation.id,
+                    (currentOperation) => ({
+                      ...currentOperation,
+                      responses: [
+                        ...currentOperation.responses,
+                        createApiResponse(),
+                      ],
+                    }),
+                  ),
                 )
               }
               isDisabled={!canEdit}
@@ -1136,7 +1199,8 @@ function OperationEditor({
                           (currentOperation) => ({
                             ...currentOperation,
                             responses: currentOperation.responses.filter(
-                              (currentResponse) => currentResponse.id !== response.id,
+                              (currentResponse) =>
+                                currentResponse.id !== response.id,
                             ),
                           }),
                         ),

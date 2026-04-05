@@ -1,4 +1,4 @@
-import { ApiFlowPreview } from "@/api-studio/api-flow-preview";
+import { RestFlowPreview } from "@/rest-studio/rest-flow-preview";
 
 export const handle = {
   breadcrumb: () => "Preview",
@@ -6,7 +6,7 @@ export const handle = {
 
 export function meta() {
   return [
-    { title: "API Studio Preview | Cameleon" },
+    { title: "Rest Studio Preview | Cameleon" },
     {
       description:
         "Visual concept preview for a structural REST Studio using React Flow.",
@@ -15,5 +15,9 @@ export function meta() {
 }
 
 export default function ApiPreviewRoute() {
-  return <div className="m-6"><ApiFlowPreview /></div>;
+  return (
+    <div className="m-6">
+      <RestFlowPreview />
+    </div>
+  );
 }

@@ -26,7 +26,7 @@ import {
 } from "app/components/ui/select";
 import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
-import { ApiToolbar } from "./api-toolbar";
+import { RestToolbar } from "./rest-toolbar";
 import {
   buildApiCanvas,
   createApiOperation,
@@ -48,7 +48,7 @@ import {
   type ApiResponse,
   type ApiSpec,
   useApiStore,
-} from "./api-spec";
+} from "./rest-spec";
 import {
   Database,
   FolderTree,
@@ -60,7 +60,7 @@ import {
   Workflow,
 } from "lucide-react";
 import React from "react";
-import type { ApiCanvasSelection } from "./api-spec";
+import type { ApiCanvasSelection } from "./rest-spec";
 
 type VisualNodeKind = ApiCanvasNodeData["kind"];
 type SetApiSpec = (value: ApiSpec | ((current: ApiSpec) => ApiSpec)) => void;
@@ -161,7 +161,7 @@ const nodeTypes = {
   studio: ApiStudioNode,
 };
 
-export function ApiVisualStudio({
+export function RestVisualStudio({
   initialSpec,
   initialName,
   initialDescription,
@@ -363,7 +363,7 @@ export function ApiVisualStudio({
 
       <div className="relative h-[calc(100vh-240px)] min-h-[680px] overflow-hidden rounded-xl border border-border/60 bg-background">
         <div className="absolute left-4 right-4 top-4 z-10">
-          <ApiToolbar
+          <RestToolbar
             name={name}
             description={description}
             spec={spec}
