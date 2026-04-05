@@ -20,6 +20,9 @@ importers:
 
   core:
     dependencies:
+      dagre:
+        specifier: 0.8.5
+        version: 0.8.5
       dot-prop-immutable:
         specifier: ^2.1.1
         version: 2.1.1

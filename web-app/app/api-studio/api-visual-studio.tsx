@@ -2,16 +2,12 @@ import {
   Background,
   Controls,
   Handle,
-  MarkerType,
   Position,
   ReactFlow,
   type ReactFlowInstance,
-  type Edge,
-  type Node,
   type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import dagre from "dagre";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "app/components/ui/button";
 import {
@@ -32,16 +28,26 @@ import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
 import { ApiToolbar } from "./api-toolbar";
 import {
+  buildApiCanvas,
   createApiOperation,
   createApiParameter,
   createApiResource,
   createApiResponse,
+  type ApiCanvasDirection,
+  updateApiOperation,
+  updateApiParameter,
+  updateApiResource,
+  updateApiResponse,
+  type ApiCanvasEdge,
+  type ApiCanvasNode,
+  type ApiCanvasNodeData,
   type ApiHttpMethod,
   type ApiOperation,
   type ApiParameter,
   type ApiResource,
   type ApiResponse,
   type ApiSpec,
+  useApiStore,
 } from "./api-spec";
 import {
   Database,
@@ -54,33 +60,10 @@ import {
   Workflow,
 } from "lucide-react";
 import React from "react";
+import type { ApiCanvasSelection } from "./api-spec";
 
-type SelectedTarget =
-  | { kind: "api" }
-  | { kind: "resource"; resourceId: string }
-  | { kind: "operation"; resourceId: string; operationId: string }
-  | { kind: "requestBody"; resourceId: string; operationId: string }
-  | {
-      kind: "response";
-      resourceId: string;
-      operationId: string;
-      responseId?: string;
-    };
-
-type VisualNodeKind =
-  | "api"
-  | "resource"
-  | "operation"
-  | "contract"
-  | "workflow";
-type VisualNodeData = {
-  title: string;
-  subtitle?: string;
-  meta?: string;
-  kind: VisualNodeKind;
-  method?: ApiHttpMethod;
-  isSelected?: boolean;
-};
+type VisualNodeKind = ApiCanvasNodeData["kind"];
+type SetApiSpec = (value: ApiSpec | ((current: ApiSpec) => ApiSpec)) => void;
 
 const HTTP_METHODS: ApiHttpMethod[] = [
   "get",
@@ -110,7 +93,7 @@ const METHOD_DOT_CLASS: Record<ApiHttpMethod, string> = {
   options: "bg-orange-400",
 };
 
-function ApiStudioNode({ data }: NodeProps<Node<VisualNodeData>>) {
+function ApiStudioNode({ data }: NodeProps<ApiCanvasNode>) {
   const config: Record<
     VisualNodeKind,
     {
@@ -178,231 +161,6 @@ const nodeTypes = {
   studio: ApiStudioNode,
 };
 
-function edge(source: string, target: string): Edge {
-  return {
-    id: `${source}->${target}`,
-    source,
-    target,
-    type: "smoothstep",
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      color: "hsl(181, 70%, 48%)",
-    },
-    style: {
-      stroke: "hsl(181, 70%, 48%)",
-      strokeWidth: 1.5,
-    },
-  };
-}
-
-function layoutGraph(nodes: Node[], edges: Edge[], direction: "LR" | "TB") {
-  const graph = new dagre.graphlib.Graph();
-  graph.setGraph({
-    rankdir: direction,
-    nodesep: 48,
-    ranksep: 80,
-    marginx: 24,
-    marginy: 24,
-  });
-  graph.setDefaultEdgeLabel(() => ({}));
-
-  for (const node of nodes) {
-    graph.setNode(node.id, { width: 260, height: 100 });
-  }
-  for (const currentEdge of edges) {
-    graph.setEdge(currentEdge.source, currentEdge.target);
-  }
-  dagre.layout(graph);
-
-  return nodes.map((node) => {
-    const position = graph.node(node.id);
-    return {
-      ...node,
-      position: {
-        x: position.x - 130,
-        y: position.y - 50,
-      },
-    };
-  });
-}
-
-function updateResource(
-  spec: ApiSpec,
-  resourceId: string,
-  updater: (resource: ApiResource) => ApiResource,
-) {
-  return {
-    ...spec,
-    resources: spec.resources.map((resource) =>
-      resource.id === resourceId ? updater(resource) : resource,
-    ),
-  };
-}
-
-function updateOperation(
-  spec: ApiSpec,
-  resourceId: string,
-  operationId: string,
-  updater: (operation: ApiOperation) => ApiOperation,
-) {
-  return updateResource(spec, resourceId, (resource) => ({
-    ...resource,
-    operations: resource.operations.map((operation) =>
-      operation.id === operationId ? updater(operation) : operation,
-    ),
-  }));
-}
-
-function updateParameter(
-  spec: ApiSpec,
-  resourceId: string,
-  operationId: string,
-  parameterId: string,
-  updater: (parameter: ApiParameter) => ApiParameter,
-) {
-  return updateOperation(spec, resourceId, operationId, (operation) => ({
-    ...operation,
-    parameters: operation.parameters.map((parameter) =>
-      parameter.id === parameterId ? updater(parameter) : parameter,
-    ),
-  }));
-}
-
-function updateResponse(
-  spec: ApiSpec,
-  resourceId: string,
-  operationId: string,
-  responseId: string,
-  updater: (response: ApiResponse) => ApiResponse,
-) {
-  return updateOperation(spec, resourceId, operationId, (operation) => ({
-    ...operation,
-    responses: operation.responses.map((response) =>
-      response.id === responseId ? updater(response) : response,
-    ),
-  }));
-}
-
-function buildGraph(
-  spec: ApiSpec,
-  selected: SelectedTarget | null,
-  direction: "LR" | "TB",
-) {
-  const nodes: Node<VisualNodeData>[] = [
-    {
-      id: "api",
-      type: "studio",
-      position: { x: 0, y: 0 },
-      data: {
-        kind: "api",
-        title: spec.info.title || "Untitled API",
-        subtitle: `${spec.info.version || "1.0.0"}${spec.servers[0]?.url ? ` · ${spec.servers[0].url}` : ""}`,
-        meta: "Root",
-        isSelected: selected?.kind === "api",
-      },
-    },
-  ];
-
-  const edges: Edge[] = [];
-
-  spec.resources.forEach((resource) => {
-    const resourceNodeId = `resource:${resource.id}`;
-    nodes.push({
-      id: resourceNodeId,
-      type: "studio",
-      position: { x: 0, y: 0 },
-      data: {
-        kind: "resource",
-        title: resource.path,
-        subtitle: resource.summary || "No resource summary yet.",
-        meta: `${resource.operations.length} ops`,
-        isSelected:
-          selected?.kind === "resource" && selected.resourceId === resource.id,
-      },
-    });
-    edges.push(edge("api", resourceNodeId));
-
-    resource.operations.forEach((operation) => {
-      const operationNodeId = `operation:${resource.id}:${operation.id}`;
-      nodes.push({
-        id: operationNodeId,
-        type: "studio",
-        position: { x: 0, y: 0 },
-        data: {
-          kind: "operation",
-          title:
-            operation.summary ||
-            `${operation.method.toUpperCase()} ${resource.path}`,
-          subtitle:
-            operation.description ||
-            `${operation.parameters.length} params · ${operation.responses.length} responses`,
-          meta: operation.method.toUpperCase(),
-          method: operation.method,
-          isSelected:
-            selected?.kind === "operation" &&
-            selected.resourceId === resource.id &&
-            selected.operationId === operation.id,
-        },
-      });
-      edges.push(edge(resourceNodeId, operationNodeId));
-
-      if (operation.requestBody) {
-        const requestNodeId = `request:${resource.id}:${operation.id}`;
-        nodes.push({
-          id: requestNodeId,
-          type: "studio",
-          position: { x: 0, y: 0 },
-          data: {
-            kind: "contract",
-            title: "Request body",
-            subtitle:
-              operation.requestBody.description ||
-              operation.requestBody.contentType,
-            meta: operation.requestBody.required ? "required" : "optional",
-          },
-        });
-        edges.push(edge(operationNodeId, requestNodeId));
-      }
-
-      const firstResponse = operation.responses[0];
-      if (firstResponse) {
-        const responseNodeId = `response:${resource.id}:${operation.id}`;
-        nodes.push({
-          id: responseNodeId,
-          type: "studio",
-          position: { x: 0, y: 0 },
-          data: {
-            kind: "contract",
-            title: `${firstResponse.statusCode} response`,
-            subtitle: firstResponse.description || "Response contract",
-          },
-        });
-        edges.push(edge(operationNodeId, responseNodeId));
-      }
-
-      if (operation.workflowId) {
-        const workflowNodeId = `workflow:${resource.id}:${operation.id}`;
-        nodes.push({
-          id: workflowNodeId,
-          type: "studio",
-          position: { x: 0, y: 0 },
-          data: {
-            kind: "workflow",
-            title: operation.workflowId,
-            subtitle: "Linked Camel workflow",
-          },
-        });
-        edges.push(edge(operationNodeId, workflowNodeId));
-      }
-    });
-  });
-
-  return {
-    nodes: layoutGraph(nodes, edges, direction),
-    edges,
-  };
-}
-
 export function ApiVisualStudio({
   initialSpec,
   initialName,
@@ -416,20 +174,50 @@ export function ApiVisualStudio({
   canEdit: boolean;
   initialSnapshot: string;
 }) {
+  const apiSpec = useApiStore((state) => state.apiSpec);
+  const setApiSpec = useApiStore((state) => state.setApiSpec);
+  const canvasNodes = useApiStore((state) => state.canvas.nodes);
+  const canvasEdges = useApiStore((state) => state.canvas.edges);
+  const setCanvas = useApiStore((state) => state.canvas.setCanvas);
   const [name, setName] = React.useState(initialName);
   const [description, setDescription] = React.useState(initialDescription);
-  const [spec, setSpec] = React.useState<ApiSpec>(initialSpec);
   const [focusedTarget, setFocusedTarget] =
-    React.useState<SelectedTarget | null>(null);
-  const [sheetTarget, setSheetTarget] = React.useState<SelectedTarget | null>(
-    null,
-  );
-  const [direction, setDirection] = React.useState<"LR" | "TB">("LR");
+    React.useState<ApiCanvasSelection | null>(null);
+  const [sheetTarget, setSheetTarget] =
+    React.useState<ApiCanvasSelection | null>(null);
+  const [direction, setDirection] = React.useState<ApiCanvasDirection>("LR");
   const [zoom, setZoom] = React.useState(1);
-  const flowRef = React.useRef<ReactFlowInstance | null>(null);
+  const flowRef = React.useRef<ReactFlowInstance<
+    ApiCanvasNode,
+    ApiCanvasEdge
+  > | null>(null);
+  const spec = apiSpec;
+  const setSpec = setApiSpec;
 
   React.useEffect(() => {
-    setSpec((current) => ({
+    setName(initialName);
+    setDescription(initialDescription);
+    setApiSpec(initialSpec);
+  }, [initialDescription, initialName, initialSpec, setApiSpec]);
+
+  const graph = React.useMemo(
+    () => buildApiCanvas(spec, focusedTarget, direction),
+    [direction, spec, focusedTarget],
+  );
+
+  React.useEffect(() => {
+    setCanvas(graph.nodes, graph.edges);
+  }, [graph.edges, graph.nodes, setCanvas]);
+
+  React.useEffect(() => {
+    if (!flowRef.current) return;
+    window.requestAnimationFrame(() => {
+      flowRef.current?.fitView({ duration: 300, padding: 0.18 });
+    });
+  }, [direction, canvasNodes, canvasEdges]);
+
+  React.useEffect(() => {
+    setApiSpec((current) => ({
       ...current,
       info: {
         ...current.info,
@@ -437,7 +225,7 @@ export function ApiVisualStudio({
         description,
       },
     }));
-  }, [name, description]);
+  }, [name, description, setApiSpec]);
 
   const selectedResource =
     focusedTarget?.kind === "resource"
@@ -490,23 +278,11 @@ export function ApiVisualStudio({
         )
       : undefined;
 
-  const graph = React.useMemo(
-    () => buildGraph(spec, focusedTarget, direction),
-    [direction, spec, focusedTarget],
-  );
-
-  React.useEffect(() => {
-    if (!flowRef.current) return;
-    window.requestAnimationFrame(() => {
-      flowRef.current?.fitView({ duration: 300, padding: 0.18 });
-    });
-  }, [direction, graph.nodes, graph.edges]);
-
-  function focusTarget(target: SelectedTarget) {
+  function focusTarget(target: ApiCanvasSelection) {
     setFocusedTarget(target);
   }
 
-  function openInspector(target: SelectedTarget) {
+  function openInspector(target: ApiCanvasSelection) {
     setFocusedTarget(target);
     setSheetTarget(target);
   }
@@ -524,7 +300,7 @@ export function ApiVisualStudio({
     const resource = createApiResource({
       path: `/resource-${spec.resources.length + 1}`,
     });
-    setSpec((current) => ({
+    setApiSpec((current) => ({
       ...current,
       resources: [...current.resources, resource],
     }));
@@ -534,8 +310,8 @@ export function ApiVisualStudio({
   function addOperation(method: ApiHttpMethod) {
     if (!selectedResource) return;
     const operation = createApiOperation(method);
-    setSpec((current) =>
-      updateResource(current, selectedResource.id, (resource) => ({
+    setApiSpec((current) =>
+      updateApiResource(current, selectedResource.id, (resource) => ({
         ...resource,
         operations: [...resource.operations, operation],
       })),
@@ -548,7 +324,7 @@ export function ApiVisualStudio({
   }
 
   function removeResource(resourceId: string) {
-    setSpec((current) => {
+    setApiSpec((current) => {
       const resources = current.resources.filter(
         (resource) => resource.id !== resourceId,
       );
@@ -562,8 +338,8 @@ export function ApiVisualStudio({
   }
 
   function removeOperation(resourceId: string, operationId: string) {
-    setSpec((current) =>
-      updateResource(current, resourceId, (resource) => {
+    setApiSpec((current) =>
+      updateApiResource(current, resourceId, (resource) => {
         const operations = resource.operations.filter(
           (operation) => operation.id !== operationId,
         );
@@ -677,8 +453,8 @@ export function ApiVisualStudio({
             flowRef.current = instance;
             setZoom(instance.getZoom());
           }}
-          nodes={graph.nodes}
-          edges={graph.edges}
+          nodes={canvasNodes}
+          edges={canvasEdges}
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.18 }}
@@ -864,7 +640,7 @@ function ApiInspector({
   description: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   spec: ApiSpec;
-  setSpec: React.Dispatch<React.SetStateAction<ApiSpec>>;
+  setSpec: SetApiSpec;
 }) {
   return (
     <div className="space-y-4">
@@ -926,7 +702,7 @@ function ResourceInspector({
   canEdit: boolean;
   resource: ApiResource;
   removeResource: (resourceId: string) => void;
-  setSpec: React.Dispatch<React.SetStateAction<ApiSpec>>;
+  setSpec: SetApiSpec;
 }) {
   return (
     <div className="space-y-4">
@@ -936,7 +712,7 @@ function ResourceInspector({
         value={resource.path}
         onChange={(value) =>
           setSpec((current) =>
-            updateResource(current, resource.id, (currentResource) => ({
+            updateApiResource(current, resource.id, (currentResource) => ({
               ...currentResource,
               path: value,
             })),
@@ -949,7 +725,7 @@ function ResourceInspector({
         value={resource.summary}
         onChange={(value) =>
           setSpec((current) =>
-            updateResource(current, resource.id, (currentResource) => ({
+            updateApiResource(current, resource.id, (currentResource) => ({
               ...currentResource,
               summary: value,
             })),
@@ -962,7 +738,7 @@ function ResourceInspector({
         value={resource.description}
         onChange={(value) =>
           setSpec((current) =>
-            updateResource(current, resource.id, (currentResource) => ({
+            updateApiResource(current, resource.id, (currentResource) => ({
               ...currentResource,
               description: value,
             })),
@@ -999,7 +775,7 @@ function OperationInspector({
   operation: ApiOperation;
   removeOperation: (resourceId: string, operationId: string) => void;
   spec: ApiSpec;
-  setSpec: React.Dispatch<React.SetStateAction<ApiSpec>>;
+  setSpec: SetApiSpec;
 }) {
   return (
     <div className="space-y-4">
@@ -1010,7 +786,7 @@ function OperationInspector({
           isDisabled={!canEdit}
           onSelectionChange={(key) =>
             setSpec((current) =>
-              updateOperation(
+              updateApiOperation(
                 current,
                 resource.id,
                 operation.id,
@@ -1036,7 +812,7 @@ function OperationInspector({
           value={operation.operationId}
           onChange={(value) =>
             setSpec((current) =>
-              updateOperation(
+              updateApiOperation(
                 current,
                 resource.id,
                 operation.id,
@@ -1054,7 +830,7 @@ function OperationInspector({
           value={operation.summary}
           onChange={(value) =>
             setSpec((current) =>
-              updateOperation(
+              updateApiOperation(
                 current,
                 resource.id,
                 operation.id,
@@ -1073,7 +849,7 @@ function OperationInspector({
           placeholder="Optional workflow id"
           onChange={(value) =>
             setSpec((current) =>
-              updateOperation(
+              updateApiOperation(
                 current,
                 resource.id,
                 operation.id,
@@ -1092,7 +868,7 @@ function OperationInspector({
         value={operation.description}
         onChange={(value) =>
           setSpec((current) =>
-            updateOperation(
+            updateApiOperation(
               current,
               resource.id,
               operation.id,
@@ -1135,7 +911,7 @@ function ContractInspector({
   operation: ApiOperation;
   initialFocus: "requestBody" | "responses";
   spec: ApiSpec;
-  setSpec: React.Dispatch<React.SetStateAction<ApiSpec>>;
+  setSpec: SetApiSpec;
 }) {
   return (
     <div className="space-y-4">
@@ -1164,7 +940,7 @@ function ContractInspector({
             size="sm"
             onPress={() =>
               setSpec((current) =>
-                updateOperation(
+                updateApiOperation(
                   current,
                   resource.id,
                   operation.id,
@@ -1196,7 +972,7 @@ function ContractInspector({
                   value={parameter.name}
                   onChange={(value) =>
                     setSpec((current) =>
-                      updateParameter(
+                      updateApiParameter(
                         current,
                         resource.id,
                         operation.id,
@@ -1216,7 +992,7 @@ function ContractInspector({
                   isDisabled={!canEdit}
                   onSelectionChange={(key) =>
                     setSpec((current) =>
-                      updateParameter(
+                      updateApiParameter(
                         current,
                         resource.id,
                         operation.id,
@@ -1244,7 +1020,7 @@ function ContractInspector({
                   isDisabled={!canEdit}
                   onSelectionChange={(key) =>
                     setSpec((current) =>
-                      updateParameter(
+                      updateApiParameter(
                         current,
                         resource.id,
                         operation.id,
@@ -1273,7 +1049,7 @@ function ContractInspector({
                   className="self-end"
                   onPress={() =>
                     setSpec((current) =>
-                      updateOperation(
+                      updateApiOperation(
                         current,
                         resource.id,
                         operation.id,
@@ -1298,7 +1074,7 @@ function ContractInspector({
                   value={parameter.description}
                   onChange={(value) =>
                     setSpec((current) =>
-                      updateParameter(
+                      updateApiParameter(
                         current,
                         resource.id,
                         operation.id,
@@ -1317,7 +1093,7 @@ function ContractInspector({
                   isSelected={parameter.required}
                   onChange={(isSelected) =>
                     setSpec((current) =>
-                      updateParameter(
+                      updateApiParameter(
                         current,
                         resource.id,
                         operation.id,
@@ -1357,7 +1133,7 @@ function ContractInspector({
                 size="sm"
                 onPress={() =>
                   setSpec((current) =>
-                    updateOperation(
+                    updateApiOperation(
                       current,
                       resource.id,
                       operation.id,
@@ -1385,7 +1161,7 @@ function ContractInspector({
                 size="sm"
                 onPress={() =>
                   setSpec((current) =>
-                    updateOperation(
+                    updateApiOperation(
                       current,
                       resource.id,
                       operation.id,
@@ -1412,7 +1188,7 @@ function ContractInspector({
                   value={operation.requestBody.contentType}
                   onChange={(value) =>
                     setSpec((current) =>
-                      updateOperation(
+                      updateApiOperation(
                         current,
                         resource.id,
                         operation.id,
@@ -1435,7 +1211,7 @@ function ContractInspector({
                   value={operation.requestBody.description}
                   onChange={(value) =>
                     setSpec((current) =>
-                      updateOperation(
+                      updateApiOperation(
                         current,
                         resource.id,
                         operation.id,
@@ -1459,7 +1235,7 @@ function ContractInspector({
                 isSelected={operation.requestBody.required}
                 onChange={(isSelected) =>
                   setSpec((current) =>
-                    updateOperation(
+                    updateApiOperation(
                       current,
                       resource.id,
                       operation.id,
@@ -1484,7 +1260,7 @@ function ContractInspector({
                 value={operation.requestBody.example}
                 onChange={(value) =>
                   setSpec((current) =>
-                    updateOperation(
+                    updateApiOperation(
                       current,
                       resource.id,
                       operation.id,
@@ -1521,7 +1297,7 @@ function ContractInspector({
             size="sm"
             onPress={() =>
               setSpec((current) =>
-                updateOperation(
+                updateApiOperation(
                   current,
                   resource.id,
                   operation.id,
@@ -1553,7 +1329,7 @@ function ContractInspector({
                   value={response.statusCode}
                   onChange={(value) =>
                     setSpec((current) =>
-                      updateResponse(
+                      updateApiResponse(
                         current,
                         resource.id,
                         operation.id,
@@ -1572,7 +1348,7 @@ function ContractInspector({
                   value={response.description}
                   onChange={(value) =>
                     setSpec((current) =>
-                      updateResponse(
+                      updateApiResponse(
                         current,
                         resource.id,
                         operation.id,
@@ -1593,7 +1369,7 @@ function ContractInspector({
                   className="self-end"
                   onPress={() =>
                     setSpec((current) =>
-                      updateOperation(
+                      updateApiOperation(
                         current,
                         resource.id,
                         operation.id,
@@ -1618,7 +1394,7 @@ function ContractInspector({
                 value={response.example}
                 onChange={(value) =>
                   setSpec((current) =>
-                    updateResponse(
+                    updateApiResponse(
                       current,
                       resource.id,
                       operation.id,
