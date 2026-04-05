@@ -86,7 +86,11 @@ export default function ApiLayout({
     canEdit: boolean;
   };
 }) {
-  return <Outlet context={loaderData} />;
+  return (
+    <div className="h-full min-h-0">
+      <Outlet context={loaderData} />
+    </div>
+  );
 }
 
 export function ErrorBoundary() {

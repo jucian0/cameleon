@@ -207,6 +207,12 @@ export function RestVisualStudio({
     ApiCanvasEdge
   > | null>(null);
   const location = useLocation();
+  const codeHref = React.useMemo(() => {
+    const pathname = location.pathname.endsWith("/studio")
+      ? `${location.pathname}/code`
+      : `${location.pathname.replace(/\/$/, "")}/code`;
+    return `${pathname}${location.search}`;
+  }, [location.pathname, location.search]);
   const spec = apiSpec;
   const setSpec = setApiSpec;
 
@@ -473,7 +479,7 @@ export function RestVisualStudio({
             </Tooltip>
             <Tooltip>
               <Link
-                href={`${location.pathname}/code${location.search}`}
+                href={codeHref}
                 aria-label="Open code view"
                 className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
               >

@@ -13,6 +13,7 @@ import { Link } from "app/components/ui/link";
 import { Save } from "lucide-react";
 import {
   Form,
+  Outlet,
   isRouteErrorResponse,
   useOutletContext,
   useRouteError,
@@ -135,6 +136,7 @@ export default function ApiStudioEditor({
         canEdit={context.canEdit}
         initialSnapshot={context.initialSnapshot}
       />
+      <Outlet context={context} />
     </Form>
   );
 }

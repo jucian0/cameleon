@@ -1,4 +1,5 @@
 import { decode, encode } from "js-base64";
+import { stringify } from "yaml";
 import type {
   ApiOperation,
   ApiParameter,
@@ -227,6 +228,10 @@ export function toOpenApiDocument(spec: ApiSpec) {
   }
 
   return document;
+}
+
+export function openApiDocumentToYaml(spec: ApiSpec) {
+  return stringify(toOpenApiDocument(spec));
 }
 
 export {

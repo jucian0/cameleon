@@ -5,5 +5,9 @@ export const handle = {
 };
 
 export default function ApiStudioLayout() {
-  return <Outlet />;
+  return (
+    <div className="h-full min-h-0">
+      <Outlet />
+    </div>
+  );
 }

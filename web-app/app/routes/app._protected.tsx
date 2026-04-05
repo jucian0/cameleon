@@ -19,7 +19,9 @@ export default function Layout() {
       <AppSidebar collapsible="dock" />
       <SidebarInset>
         <AppSidebarNav />
-        <Outlet />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <Outlet />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
