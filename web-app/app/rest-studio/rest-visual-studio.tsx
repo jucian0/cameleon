@@ -97,7 +97,11 @@ const METHOD_DOT_CLASS: Record<ApiHttpMethod, string> = {
   options: "bg-orange-400",
 };
 
-function ApiStudioNode({ data }: NodeProps<ApiCanvasNode>) {
+function ApiStudioNode({
+  data,
+  sourcePosition = Position.Right,
+  targetPosition = Position.Left,
+}: NodeProps<ApiCanvasNode>) {
   const config: Record<
     VisualNodeKind,
     {
@@ -125,7 +129,7 @@ function ApiStudioNode({ data }: NodeProps<ApiCanvasNode>) {
     >
       <Handle
         type="target"
-        position={Position.Left}
+        position={targetPosition}
         className="!h-2 !w-2 !border-0 !bg-primary"
       />
       <div className="flex items-start gap-3">
@@ -154,7 +158,7 @@ function ApiStudioNode({ data }: NodeProps<ApiCanvasNode>) {
       </div>
       <Handle
         type="source"
-        position={Position.Right}
+        position={sourcePosition}
         className="!h-2 !w-2 !border-0 !bg-primary"
       />
     </div>

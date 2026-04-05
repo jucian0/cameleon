@@ -1,4 +1,4 @@
-import { MarkerType } from "@xyflow/react";
+import { MarkerType, Position } from "@xyflow/react";
 // @ts-ignore dagre is provided by the workspace and declared in core/package.json for runtime resolution
 import dagre from "dagre";
 import type {
@@ -66,11 +66,16 @@ export function buildApiCanvas(
   selected: ApiCanvasSelection | null,
   direction: ApiCanvasDirection,
 ) {
+  const targetPosition = direction === "TB" ? Position.Top : Position.Left;
+  const sourcePosition = direction === "TB" ? Position.Bottom : Position.Right;
+
   const nodes: ApiCanvasNode[] = [
     {
       id: "api",
       type: "studio",
       position: { x: 0, y: 0 },
+      targetPosition,
+      sourcePosition,
       data: {
         kind: "api",
         title: spec.info.title || "Untitled API",
@@ -89,6 +94,8 @@ export function buildApiCanvas(
       id: resourceNodeId,
       type: "studio",
       position: { x: 0, y: 0 },
+      targetPosition,
+      sourcePosition,
       data: {
         kind: "resource",
         title: resource.path,
@@ -106,6 +113,8 @@ export function buildApiCanvas(
         id: operationNodeId,
         type: "studio",
         position: { x: 0, y: 0 },
+        targetPosition,
+        sourcePosition,
         data: {
           kind: "operation",
           title:
@@ -130,6 +139,8 @@ export function buildApiCanvas(
           id: requestNodeId,
           type: "studio",
           position: { x: 0, y: 0 },
+          targetPosition,
+          sourcePosition,
           data: {
             kind: "contract",
             title: "Request body",
@@ -149,6 +160,8 @@ export function buildApiCanvas(
           id: responseNodeId,
           type: "studio",
           position: { x: 0, y: 0 },
+          targetPosition,
+          sourcePosition,
           data: {
             kind: "contract",
             title: `${firstResponse.statusCode} response`,
@@ -164,6 +177,8 @@ export function buildApiCanvas(
           id: workflowNodeId,
           type: "studio",
           position: { x: 0, y: 0 },
+          targetPosition,
+          sourcePosition,
           data: {
             kind: "workflow",
             title: operation.workflowId,
