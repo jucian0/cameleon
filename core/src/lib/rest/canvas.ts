@@ -190,8 +190,27 @@ export function buildApiCanvas(
     });
   });
 
+  const incomingTargets = new Set(
+    edges.map((currentEdge) => currentEdge.target),
+  );
+  const outgoingSources = new Set(
+    edges.map((currentEdge) => currentEdge.source),
+  );
+
   return {
-    nodes: layoutGraph(nodes, edges, direction),
+    nodes: layoutGraph(
+      nodes.map((node) => ({
+        ...node,
+        targetPosition: incomingTargets.has(node.id)
+          ? targetPosition
+          : undefined,
+        sourcePosition: outgoingSources.has(node.id)
+          ? sourcePosition
+          : undefined,
+      })),
+      edges,
+      direction,
+    ),
     edges,
   };
 }

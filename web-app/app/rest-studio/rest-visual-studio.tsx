@@ -99,8 +99,8 @@ const METHOD_DOT_CLASS: Record<ApiHttpMethod, string> = {
 
 function ApiStudioNode({
   data,
-  sourcePosition = Position.Right,
-  targetPosition = Position.Left,
+  sourcePosition,
+  targetPosition,
 }: NodeProps<ApiCanvasNode>) {
   const config: Record<
     VisualNodeKind,
@@ -127,11 +127,13 @@ function ApiStudioNode({
           : "border-border/60 bg-gradient-card"
       }`}
     >
-      <Handle
-        type="target"
-        position={targetPosition}
-        className="!h-2 !w-2 !border-0 !bg-primary"
-      />
+      {targetPosition ? (
+        <Handle
+          type="target"
+          position={targetPosition}
+          className="!h-2 !w-2 !border-0 !bg-primary"
+        />
+      ) : null}
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/40">
           <Icon className="h-5 w-5 text-primary" />
@@ -156,11 +158,13 @@ function ApiStudioNode({
           ) : null}
         </div>
       </div>
-      <Handle
-        type="source"
-        position={sourcePosition}
-        className="!h-2 !w-2 !border-0 !bg-primary"
-      />
+      {sourcePosition ? (
+        <Handle
+          type="source"
+          position={sourcePosition}
+          className="!h-2 !w-2 !border-0 !bg-primary"
+        />
+      ) : null}
     </div>
   );
 }
@@ -369,12 +373,12 @@ export function RestVisualStudio({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-full min-h-0 flex-col">
       <input type="hidden" name="name" value={name} />
       <input type="hidden" name="description" value={description} />
       <input type="hidden" name="content" value={JSON.stringify(spec)} />
 
-      <div className="relative h-[calc(100vh-240px)] min-h-[680px] overflow-hidden rounded-xl border border-border/60 bg-background">
+      <div className="relative h-full min-h-0 flex-1 overflow-hidden rounded-xl border border-border/60 bg-background">
         <div className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <Badge intent="secondary">

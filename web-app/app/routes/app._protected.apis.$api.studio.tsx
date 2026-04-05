@@ -14,7 +14,6 @@ import { Save } from "lucide-react";
 import {
   Form,
   isRouteErrorResponse,
-  useNavigation,
   useOutletContext,
   useRouteError,
   type LoaderFunctionArgs,
@@ -112,7 +111,6 @@ export default function ApiStudioEditor({
 }: {
   actionData?: { ok?: boolean; error?: string; savedAt?: string };
 }) {
-  const navigation = useNavigation();
   const context = useOutletContext<{
     apiId: string;
     name: string;
@@ -123,9 +121,9 @@ export default function ApiStudioEditor({
   }>();
 
   return (
-    <Form method="post" className="space-y-4">
+    <Form method="post" className="flex h-full min-h-0 flex-col">
       {actionData?.error ? (
-        <div className="mx-6 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
+        <div className="mx-6 mb-4 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
           {actionData.error}
         </div>
       ) : null}
