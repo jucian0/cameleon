@@ -1,11 +1,8 @@
-import { Badge } from "@/components/ui/badge";
-import { Button, buttonStyles } from "app/components/ui/button";
-import { Link } from "app/components/ui/link";
+import { Button } from "app/components/ui/button";
 import { Slider } from "app/components/ui/slider";
-import { Tooltip } from "app/components/ui/tooltip";
-import { ArrowRightFromLine, Code2, Maximize, Minus, Plus } from "lucide-react";
+import { ArrowRightFromLine, Maximize, Minus, Plus } from "lucide-react";
 import React from "react";
-import { useFetcher, useLocation } from "react-router";
+import { useFetcher } from "react-router";
 import type { ApiSpec } from "./rest-spec";
 
 export function RestToolbar({
@@ -23,6 +20,8 @@ export function RestToolbar({
   onZoomTo,
   onFitView,
   onToggleDirection,
+  orientation = "horizontal",
+  onSaveStateChange,
 }: {
   name: string;
   description: string;
@@ -38,8 +37,12 @@ export function RestToolbar({
   onZoomTo: (value: number) => void;
   onFitView: () => void;
   onToggleDirection: () => void;
+  orientation?: "horizontal" | "vertical";
+  onSaveStateChange?: (state: {
+    saveState: "unsaved" | "saving" | "synced" | "failed";
+    saveError: string | null;
+  }) => void;
 }) {
-  const location = useLocation();
   const saveFetcher = useFetcher<{ ok?: boolean; error?: string }>();
   const currentSnapshot = React.useMemo(
     () =>
@@ -71,6 +74,10 @@ export function RestToolbar({
       isHydratedRef.current = true;
     }
   }, [currentSnapshot, initialSnapshot]);
+
+  React.useEffect(() => {
+    onSaveStateChange?.({ saveState, saveError });
+  }, [onSaveStateChange, saveError, saveState]);
 
   React.useEffect(() => {
     if (saveFetcher.state !== "idle" || pendingSnapshotRef.current == null) {
@@ -131,9 +138,23 @@ export function RestToolbar({
     spec,
   ]);
 
+  const isVertical = orientation === "vertical";
+
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-overlay/90 px-3 py-2 shadow-card backdrop-blur-sm">
-      <div className="flex items-center gap-1">
+    <div
+      className={
+        isVertical
+          ? "flex flex-col items-center gap-2 rounded-md bg-primary-foreground p-2 text-foreground"
+          : "flex w-full items-center justify-between gap-1 rounded-md bg-primary-foreground px-4 text-foreground"
+      }
+    >
+      <div
+        className={
+          isVertical
+            ? "flex flex-col items-center gap-2"
+            : "flex items-center gap-1"
+        }
+      >
         <Button
           intent="secondary"
           size="xs"
@@ -143,7 +164,11 @@ export function RestToolbar({
           <Minus className="h-4 w-4" />
         </Button>
         <Slider
-          className="flex w-[120px] items-center sm:w-[140px]"
+          className={
+            isVertical
+              ? "flex h-[140px] items-center"
+              : "flex w-[120px] items-center sm:w-[140px]"
+          }
           value={[zoom]}
           minValue={minZoom}
           maxValue={maxZoom}
@@ -151,6 +176,7 @@ export function RestToolbar({
           onChange={(values) => onZoomTo((values as number[])[0])}
           aria-label="Zoom slider"
           output="none"
+          orientation={isVertical ? "vertical" : "horizontal"}
         />
         <Button
           intent="secondary"
@@ -187,48 +213,6 @@ export function RestToolbar({
             className={`h-4 w-4 ${direction === "LR" ? "rotate-90" : ""}`}
           />
         </Button>
-      </div>
-      <div className="flex items-center gap-2">
-        <Tooltip>
-          <Badge
-            intent={
-              saveState === "failed"
-                ? "danger"
-                : saveState === "saving"
-                  ? "warning"
-                  : saveState === "unsaved"
-                    ? "secondary"
-                    : "success"
-            }
-          >
-            {saveState === "failed"
-              ? "Sync failed"
-              : saveState === "saving"
-                ? "Syncing"
-                : saveState === "unsaved"
-                  ? "Unsaved"
-                  : "Synced"}
-          </Badge>
-          <Tooltip.Content>
-            {saveError
-              ? saveError
-              : saveState === "unsaved"
-                ? "Changes will autosave shortly."
-                : saveState === "saving"
-                  ? "Syncing API changes."
-                  : "All changes synced."}
-          </Tooltip.Content>
-        </Tooltip>
-        <Tooltip>
-          <Link
-            href={`${location.pathname}/code${location.search}`}
-            aria-label="Open code view"
-            className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
-          >
-            <Code2 size={16} />
-          </Link>
-          <Tooltip.Content>Code view</Tooltip.Content>
-        </Tooltip>
       </div>
     </div>
   );

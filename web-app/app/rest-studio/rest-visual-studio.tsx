@@ -9,7 +9,8 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "app/components/ui/button";
+import { Button, buttonStyles } from "app/components/ui/button";
+import { Link } from "app/components/ui/link";
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import {
 } from "app/components/ui/card";
 import { Checkbox } from "app/components/ui/checkbox";
 import { Sheet } from "app/components/ui/sheet";
+import { Tooltip } from "app/components/ui/tooltip";
 import {
   Select,
   SelectList,
@@ -58,8 +60,10 @@ import {
   Settings2,
   Trash2,
   Workflow,
+  Code2,
 } from "lucide-react";
 import React from "react";
+import { useLocation } from "react-router";
 import type { ApiCanvasSelection } from "./rest-spec";
 
 type VisualNodeKind = ApiCanvasNodeData["kind"];
@@ -187,10 +191,15 @@ export function RestVisualStudio({
     React.useState<ApiCanvasSelection | null>(null);
   const [direction, setDirection] = React.useState<ApiCanvasDirection>("LR");
   const [zoom, setZoom] = React.useState(1);
+  const [saveState, setSaveState] = React.useState<
+    "unsaved" | "saving" | "synced" | "failed"
+  >("synced");
+  const [saveError, setSaveError] = React.useState<string | null>(null);
   const flowRef = React.useRef<ReactFlowInstance<
     ApiCanvasNode,
     ApiCanvasEdge
   > | null>(null);
+  const location = useLocation();
   const spec = apiSpec;
   const setSpec = setApiSpec;
 
@@ -362,7 +371,112 @@ export function RestVisualStudio({
       <input type="hidden" name="content" value={JSON.stringify(spec)} />
 
       <div className="relative h-[calc(100vh-240px)] min-h-[680px] overflow-hidden rounded-xl border border-border/60 bg-background">
-        <div className="absolute left-4 right-4 top-4 z-10">
+        <div className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge intent="secondary">
+              {spec.resources.length} resource
+              {spec.resources.length === 1 ? "" : "s"}
+            </Badge>
+            <Button
+              type="button"
+              intent="secondary"
+              size="sm"
+              onPress={() => openInspector({ kind: "api" })}
+            >
+              <Settings2 className="h-4 w-4" />
+              API info
+            </Button>
+            {isApiFocused ? (
+              <Button
+                type="button"
+                intent="secondary"
+                size="sm"
+                onPress={addResource}
+                isDisabled={!canEdit}
+              >
+                <Plus className="h-4 w-4" />
+                Resource
+              </Button>
+            ) : null}
+            {isResourceFocused && selectedResource ? (
+              <>
+                <Button
+                  type="button"
+                  intent="secondary"
+                  size="sm"
+                  onPress={openFocusedInspector}
+                >
+                  <Settings2 className="h-4 w-4" />
+                  Edit resource
+                </Button>
+                <Button
+                  type="button"
+                  intent="secondary"
+                  size="sm"
+                  onPress={() => addOperation("get")}
+                  isDisabled={!canEdit}
+                >
+                  <Plus className="h-4 w-4" />
+                  Add operation
+                </Button>
+              </>
+            ) : null}
+            {isOperationFocused && selectedOperation ? (
+              <Button
+                type="button"
+                intent="secondary"
+                size="sm"
+                onPress={openFocusedInspector}
+              >
+                <Settings2 className="h-4 w-4" />
+                Edit operation
+              </Button>
+            ) : null}
+          </div>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <Badge
+                intent={
+                  saveState === "failed"
+                    ? "danger"
+                    : saveState === "saving"
+                      ? "warning"
+                      : saveState === "unsaved"
+                        ? "secondary"
+                        : "success"
+                }
+              >
+                {saveState === "failed"
+                  ? "Sync failed"
+                  : saveState === "saving"
+                    ? "Syncing"
+                    : saveState === "unsaved"
+                      ? "Unsaved"
+                      : "Synced"}
+              </Badge>
+              <Tooltip.Content>
+                {saveError
+                  ? saveError
+                  : saveState === "unsaved"
+                    ? "Changes will autosave shortly."
+                    : saveState === "saving"
+                      ? "Syncing API changes."
+                      : "All changes synced."}
+              </Tooltip.Content>
+            </Tooltip>
+            <Tooltip>
+              <Link
+                href={`${location.pathname}/code${location.search}`}
+                aria-label="Open code view"
+                className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
+              >
+                <Code2 size={16} />
+              </Link>
+              <Tooltip.Content>Code view</Tooltip.Content>
+            </Tooltip>
+          </div>
+        </div>
+        <div className="absolute bottom-4 left-4 z-10">
           <RestToolbar
             name={name}
             description={description}
@@ -384,68 +498,12 @@ export function RestVisualStudio({
             onToggleDirection={() =>
               setDirection((current) => (current === "LR" ? "TB" : "LR"))
             }
+            orientation="horizontal"
+            onSaveStateChange={({ saveError, saveState }) => {
+              setSaveError(saveError);
+              setSaveState(saveState);
+            }}
           />
-        </div>
-        <div className="absolute left-4 top-20 z-10 flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            intent="secondary"
-            size="sm"
-            onPress={() => openInspector({ kind: "api" })}
-          >
-            <Settings2 className="h-4 w-4" />
-            API info
-          </Button>
-          {isApiFocused ? (
-            <Button
-              type="button"
-              intent="secondary"
-              size="sm"
-              onPress={addResource}
-              isDisabled={!canEdit}
-            >
-              <Plus className="h-4 w-4" />
-              Resource
-            </Button>
-          ) : null}
-          {isResourceFocused && selectedResource ? (
-            <>
-              <Button
-                type="button"
-                intent="secondary"
-                size="sm"
-                onPress={openFocusedInspector}
-              >
-                <Settings2 className="h-4 w-4" />
-                Edit resource
-              </Button>
-              <Button
-                type="button"
-                intent="secondary"
-                size="sm"
-                onPress={() => addOperation("get")}
-                isDisabled={!canEdit}
-              >
-                <Plus className="h-4 w-4" />
-                Add operation
-              </Button>
-            </>
-          ) : null}
-          {isOperationFocused && selectedOperation ? (
-            <Button
-              type="button"
-              intent="secondary"
-              size="sm"
-              onPress={openFocusedInspector}
-            >
-              <Settings2 className="h-4 w-4" />
-              Edit operation
-            </Button>
-          ) : null}
-          <Badge intent="secondary">
-            {spec.resources.length} resource
-            {spec.resources.length === 1 ? "" : "s"}
-          </Badge>
         </div>
 
         <ReactFlow
