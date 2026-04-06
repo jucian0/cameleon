@@ -1,5 +1,5 @@
 import { decode, encode } from "js-base64";
-import { stringify } from "yaml";
+import { parse, stringify } from "yaml";
 import type {
   ApiOperation,
   ApiParameter,
@@ -14,9 +14,294 @@ import {
   createApiResponse,
   createDefaultApiSpec,
 } from "./templates";
+import type {
+  ApiHttpMethod,
+  ApiParameterLocation,
+  ApiScalarType,
+} from "./types";
 
 function createId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
+}
+
+const HTTP_METHODS: ApiHttpMethod[] = [
+  "get",
+  "post",
+  "put",
+  "patch",
+  "delete",
+  "head",
+  "options",
+];
+
+function isRecord(value: unknown): value is Record<string, any> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function normalizeScalarType(type: unknown): ApiScalarType {
+  switch (type) {
+    case "number":
+    case "integer":
+    case "boolean":
+    case "string":
+      return type;
+    default:
+      return "string";
+  }
+}
+
+function extractExample(value: unknown): string {
+  if (!isRecord(value)) return "";
+
+  if ("example" in value && value.example != null) {
+    return typeof value.example === "string"
+      ? value.example
+      : JSON.stringify(value.example, null, 2);
+  }
+
+  if ("examples" in value && isRecord(value.examples)) {
+    const firstExample = Object.values(value.examples)[0];
+    if (
+      isRecord(firstExample) &&
+      "value" in firstExample &&
+      firstExample.value != null
+    ) {
+      return typeof firstExample.value === "string"
+        ? firstExample.value
+        : JSON.stringify(firstExample.value, null, 2);
+    }
+  }
+
+  if (
+    "schema" in value &&
+    isRecord(value.schema) &&
+    "example" in value.schema
+  ) {
+    return typeof value.schema.example === "string"
+      ? value.schema.example
+      : JSON.stringify(value.schema.example, null, 2);
+  }
+
+  return "";
+}
+
+function inferServersFromDocument(input: Record<string, any>) {
+  if (Array.isArray(input.servers)) {
+    return input.servers.map((server) => ({
+      id: server.id ?? createId("server"),
+      url: server.url ?? "",
+      description: server.description ?? "",
+    }));
+  }
+
+  if (typeof input.host === "string" && input.host.trim()) {
+    const schemes =
+      Array.isArray(input.schemes) && input.schemes.length
+        ? input.schemes
+        : ["https"];
+    const basePath = typeof input.basePath === "string" ? input.basePath : "";
+
+    return schemes.map((scheme) => ({
+      id: createId("server"),
+      url: `${scheme}://${input.host}${basePath}`,
+      description: "",
+    }));
+  }
+
+  return [];
+}
+
+function toApiParameter(parameter: Record<string, any>) {
+  const location = parameter.in as ApiParameterLocation | "body" | "formData";
+
+  if (!["path", "query", "header"].includes(String(location))) {
+    return null;
+  }
+
+  return createApiParameter({
+    name: parameter.name ?? "",
+    in: location as ApiParameterLocation,
+    required: location === "path" ? true : Boolean(parameter.required),
+    description: parameter.description ?? "",
+    type: normalizeScalarType(
+      parameter.type ?? parameter.schema?.type ?? parameter.items?.type,
+    ),
+  });
+}
+
+function toApiRequestBodyFromSwagger(
+  operation: Record<string, any>,
+  parameters: Record<string, any>[],
+) {
+  const bodyParameter = parameters.find((parameter) => parameter.in === "body");
+  const formParameters = parameters.filter(
+    (parameter) => parameter.in === "formData",
+  );
+
+  if (bodyParameter) {
+    const contentType =
+      Array.isArray(operation.consumes) && operation.consumes.length
+        ? operation.consumes[0]
+        : "application/json";
+
+    return {
+      contentType,
+      required: Boolean(bodyParameter.required),
+      description: bodyParameter.description ?? "",
+      example: extractExample(bodyParameter),
+    };
+  }
+
+  if (formParameters.length) {
+    const contentType =
+      Array.isArray(operation.consumes) && operation.consumes.length
+        ? operation.consumes[0]
+        : "application/x-www-form-urlencoded";
+
+    return {
+      contentType,
+      required: formParameters.some((parameter) => parameter.required),
+      description:
+        formParameters
+          .map((parameter) => parameter.description)
+          .filter(Boolean)
+          .join("\n") || "Form payload",
+      example: "",
+    };
+  }
+
+  return null;
+}
+
+function toApiRequestBodyFromOpenApi(operation: Record<string, any>) {
+  if (!isRecord(operation.requestBody)) return null;
+
+  const content = isRecord(operation.requestBody.content)
+    ? operation.requestBody.content
+    : {};
+  const firstContentType = Object.keys(content)[0] ?? "application/json";
+  const firstContent = isRecord(content[firstContentType])
+    ? content[firstContentType]
+    : {};
+
+  return {
+    contentType: firstContentType,
+    required: Boolean(operation.requestBody.required),
+    description: operation.requestBody.description ?? "",
+    example: extractExample(firstContent),
+  };
+}
+
+function toApiResponses(responses: unknown) {
+  if (!isRecord(responses)) {
+    return [createApiResponse()];
+  }
+
+  const mapped = Object.entries(responses).map(([statusCode, response]) => {
+    const record = isRecord(response) ? response : {};
+    return createApiResponse({
+      statusCode,
+      description: record.description ?? "Response",
+      example: extractExample(record),
+    });
+  });
+
+  return mapped.length ? mapped : [createApiResponse()];
+}
+
+function importOperation(
+  method: ApiHttpMethod,
+  path: string,
+  operation: Record<string, any>,
+  inheritedParameters: Record<string, any>[],
+  isSwagger2: boolean,
+) {
+  const rawParameters = [
+    ...inheritedParameters,
+    ...(Array.isArray(operation.parameters)
+      ? operation.parameters.filter(isRecord)
+      : []),
+  ];
+
+  const parameters = rawParameters
+    .map(toApiParameter)
+    .filter((parameter): parameter is NonNullable<typeof parameter> =>
+      Boolean(parameter),
+    );
+
+  return createApiOperation(method, {
+    operationId: operation.operationId ?? "",
+    summary: operation.summary ?? `${method.toUpperCase()} ${path}`,
+    description: operation.description ?? "",
+    parameters,
+    requestBody: isSwagger2
+      ? toApiRequestBodyFromSwagger(operation, rawParameters)
+      : toApiRequestBodyFromOpenApi(operation),
+    responses: toApiResponses(operation.responses),
+  });
+}
+
+function importFromApiDocument(input: Record<string, any>) {
+  const isSwagger2 = typeof input.swagger === "string";
+  const info = isRecord(input.info) ? input.info : {};
+  const paths = isRecord(input.paths) ? input.paths : {};
+
+  const resources = Object.entries(paths).map(([path, pathItem]) => {
+    const pathRecord = isRecord(pathItem) ? pathItem : {};
+    const inheritedParameters = Array.isArray(pathRecord.parameters)
+      ? pathRecord.parameters.filter(isRecord)
+      : [];
+
+    const operations = HTTP_METHODS.flatMap((method) => {
+      const candidate = pathRecord[method];
+      if (!isRecord(candidate)) {
+        return [];
+      }
+
+      return [
+        importOperation(
+          method,
+          path,
+          candidate,
+          inheritedParameters,
+          isSwagger2,
+        ),
+      ];
+    });
+
+    return createApiResource({
+      path,
+      summary: pathRecord.summary ?? "",
+      description: pathRecord.description ?? "",
+      operations: operations.length ? operations : [createApiOperation("get")],
+    });
+  });
+
+  return normalizeApiSpec({
+    info: {
+      title: info.title ?? "Imported API",
+      version: info.version ?? "1.0.0",
+      description: info.description ?? "",
+    },
+    servers: inferServersFromDocument(input),
+    resources,
+  });
+}
+
+function coerceToApiSpec(input: unknown) {
+  if (!isRecord(input)) {
+    return createDefaultApiSpec();
+  }
+
+  if (Array.isArray(input.resources)) {
+    return normalizeApiSpec(input as Partial<ApiSpec>);
+  }
+
+  if (isRecord(input.paths)) {
+    return importFromApiDocument(input);
+  }
+
+  return normalizeApiSpec(input as Partial<ApiSpec>);
 }
 
 function normalizeParameter(parameter: Partial<ApiParameter>): ApiParameter {
@@ -89,12 +374,27 @@ export function parseApiSpec(
   }
 
   const decodedContent = decode(encodedContent);
-  const parsed = JSON.parse(decodedContent) as Partial<ApiSpec>;
-  return normalizeApiSpec(parsed);
+  return coerceToApiSpec(JSON.parse(decodedContent));
 }
 
 export function serializeApiSpec(spec: ApiSpec) {
   return encode(JSON.stringify(spec, null, 2));
+}
+
+export function apiSpecToJson(spec: ApiSpec) {
+  return JSON.stringify(spec, null, 2);
+}
+
+export function apiSpecToYaml(spec: ApiSpec) {
+  return stringify(spec);
+}
+
+export function parseApiSpecJson(source: string) {
+  return coerceToApiSpec(JSON.parse(source));
+}
+
+export function parseApiSpecYaml(source: string) {
+  return coerceToApiSpec(parse(source));
 }
 
 export function validateApiSpec(spec: ApiSpec) {
