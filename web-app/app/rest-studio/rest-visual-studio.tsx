@@ -10,6 +10,7 @@ import "@xyflow/react/dist/style.css";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonStyles } from "app/components/ui/button";
 import { Link } from "app/components/ui/link";
+import { Menu } from "app/components/ui/menu";
 import {
   Card,
   CardContent,
@@ -29,6 +30,8 @@ import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
 import { RestToolbar } from "./rest-toolbar";
 import {
+  apiSpecToJson,
+  apiSpecToYaml,
   buildApiCanvas,
   createApiOperation,
   createApiParameter,
@@ -52,11 +55,13 @@ import {
 } from "./rest-spec";
 import {
   Database,
+  Download,
   FolderTree,
   Plus,
   Route,
   Server,
   Settings2,
+  Share2,
   Trash2,
   Workflow,
   Code2,
@@ -377,6 +382,50 @@ export function RestVisualStudio({
     closeInspector();
   }
 
+  function handleDownloadSpec(format: "json" | "yaml") {
+    const exportContent =
+      format === "json" ? apiSpecToJson(spec) : apiSpecToYaml(spec);
+    const blob = new Blob([exportContent], {
+      type: format === "json" ? "application/json" : "application/yaml",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `rest-spec.${format === "json" ? "json" : "yaml"}`;
+    anchor.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  async function handleShareSpec() {
+    const exportContent = apiSpecToYaml(spec);
+    const file = new File([exportContent], "rest-spec.yaml", {
+      type: "application/yaml",
+    });
+
+    try {
+      if (
+        navigator.canShare &&
+        navigator.canShare({ files: [file] }) &&
+        navigator.share
+      ) {
+        await navigator.share({
+          title: "Rest spec",
+          text: "Rest spec in YAML",
+          files: [file],
+        });
+        return;
+      }
+    } catch {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(exportContent);
+    } catch {
+      // noop
+    }
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       <input type="hidden" name="name" value={name} />
@@ -477,6 +526,31 @@ export function RestVisualStudio({
                       : "All changes synced."}
               </Tooltip.Content>
             </Tooltip>
+            <Button
+              type="button"
+              intent="secondary"
+              size="sm"
+              onPress={handleShareSpec}
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+            <Menu>
+              <Menu.Trigger aria-label="Download spec">
+                <Button type="button" intent="secondary" size="sm">
+                  <Download className="h-4 w-4" />
+                  Download
+                </Button>
+              </Menu.Trigger>
+              <Menu.Content placement="bottom end">
+                <Menu.Item onAction={() => handleDownloadSpec("json")}>
+                  <Menu.Label>JSON</Menu.Label>
+                </Menu.Item>
+                <Menu.Item onAction={() => handleDownloadSpec("yaml")}>
+                  <Menu.Label>YAML</Menu.Label>
+                </Menu.Item>
+              </Menu.Content>
+            </Menu>
             <Tooltip>
               <Link
                 href={codeHref}
