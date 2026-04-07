@@ -157,9 +157,6 @@ function ApiStudioNode({
             ) : null}
           </div>
           <p className="mt-2 font-medium text-foreground">{data.title}</p>
-          {data.subtitle ? (
-            <p className="mt-1 text-sm text-muted-fg">{data.subtitle}</p>
-          ) : null}
         </div>
       </div>
       {sourcePosition ? (

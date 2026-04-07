@@ -10,9 +10,10 @@ import {
   type ApiSpec,
 } from "@/rest-studio/rest-spec";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonStyles } from "app/components/ui/button";
+import { buttonStyles } from "app/components/ui/button";
 import { Link } from "app/components/ui/link";
 import { Sheet } from "app/components/ui/sheet";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { withModal } from "app/components/utils/with-modal";
 import { useTheme } from "remix-themes";
 import {
@@ -103,25 +104,22 @@ export default withModal(({ isOpen, closeModal }: any) => {
           >
             <div className="absolute inset-x-3 top-3 z-10 flex items-center gap-2">
               <Badge intent="secondary">ApiSpec</Badge>
-              <Badge intent="outline">{format.toUpperCase()}</Badge>
-              <div className="ml-2 flex items-center gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  intent={format === "json" ? "primary" : "secondary"}
-                  onPress={() => handleFormatChange("json")}
-                >
-                  JSON
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  intent={format === "yaml" ? "primary" : "secondary"}
-                  onPress={() => handleFormatChange("yaml")}
-                >
-                  YAML
-                </Button>
-              </div>
+              <ToggleGroup
+                size="xs"
+                selectionMode="single"
+                selectedKeys={[format]}
+                onSelectionChange={(keys) => {
+                  const next = Array.from(keys)[0];
+                  if (next === "json" || next === "yaml") {
+                    handleFormatChange(next);
+                  }
+                }}
+                aria-label="Source format"
+                className="ml-2 scale-75 origin-left"
+              >
+                <ToggleGroupItem id="json">JSON</ToggleGroupItem>
+                <ToggleGroupItem id="yaml">YAML</ToggleGroupItem>
+              </ToggleGroup>
             </div>
             {parseError ? (
               <div className="absolute inset-x-3 top-14 z-10 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2">
