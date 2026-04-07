@@ -1,4 +1,4 @@
-# API Studio Planning
+# Rest Studio Planning
 
 ## Objective
 
@@ -7,23 +7,37 @@ Add a new product surface to Cameleon for designing REST APIs with the same qual
 ## Status
 
 - Overall: `Defined`
-- Product spec: `Done`
-- Canonical model freeze and phase-1 backlog: `Next`
+- Product spec: `Evolving`
+- Foundation and visual studio: `In Progress`
+- Next major step: deepen authoring and contract fidelity
 
-## Immediate Next Step
+## Current State
 
-Before writing code:
+Already in place:
 
-1. freeze the first version of `ApiSpec`
-2. define the resource and operation layout in more detail
-3. define validation rules
-4. decide whether first code view is read-only generated OpenAPI
+1. API list and create flow
+2. visual Rest Studio canvas
+3. JSON/YAML code editor tied to the internal model
+4. autosave
+5. OpenAPI/Swagger import into the internal `ApiSpec`
+6. code view as a modal route over the studio
+
+## Next
+
+The next implementation priorities are:
+
+1. improve `Add operation` so method choice is explicit instead of implied
+2. deepen `request body` and `response` authoring in the sheet
+3. improve workflow linkage from operations to Camel workflows
+4. add version history for REST APIs
+5. add templates and “save as template” for REST APIs
+6. improve import fidelity for OpenAPI/Swagger details that are still being simplified
 
 ## Product Direction
 
 The intended direction is:
 
-**An API-first design workspace for REST resources and operations, with optional handoff into Camel workflows.**
+**A Rest-first design workspace for resources and operations, with optional handoff into Camel workflows.**
 
 This feature should optimize for:
 
@@ -34,7 +48,7 @@ This feature should optimize for:
 
 ## Boundaries
 
-API Studio should own:
+Rest Studio should own:
 
 - API resources
 - REST operations
@@ -62,7 +76,7 @@ Camel Studio is graph-oriented:
 - branches
 - endpoint chains
 
-API Studio is resource-oriented:
+Rest Studio is resource-oriented:
 
 - paths
 - methods
@@ -91,7 +105,7 @@ Suggested app surfaces:
 - `/app/apis/create`
 - `/app/apis/:api`
 - `/app/apis/:api/studio`
-- `/app/apis/:api/code`
+- `/app/apis/:api/studio/code`
 - `/app/apis/:api/history`
 - `/app/apis/:api/template`
 
@@ -142,15 +156,16 @@ The model should be:
 
 ## Authoring Model
 
-The first UX should not be a graph.
+The current direction is a structural canvas, not a flow canvas.
 
 Recommended layout:
 
-1. resource tree
-2. operation summary panel
-3. authoring sheet or panel
+1. full-size REST canvas
+2. contextual actions on the canvas shell
+3. authoring sheet for API, resource, operation, and contract editing
+4. code modal route for JSON/YAML source editing
 
-This keeps parity with Camel Studio in product quality while using a better editing structure for API design.
+This keeps parity with Camel Studio in product quality while still using the right structural metaphor for REST.
 
 ## Feature Areas
 
@@ -170,6 +185,8 @@ This keeps parity with Camel Studio in product quality while using a better edit
 - request body editing
 - response editing
 - status code editing
+- operation creation with explicit method selection
+- better inline actions from the canvas
 
 ### 3. Schema Authoring
 
@@ -184,11 +201,16 @@ Initial support should focus on:
 
 ### 4. Code View and Round-Trip
 
-Recommended initial strategy:
+Current strategy:
 
-- generated OpenAPI view
-- read-only first
-- editable code later, once safe parsing exists
+- editable internal source view in `JSON` and `YAML`
+- safe parse with last valid state preserved on error
+- download/export from the canvas
+
+Still missing:
+
+- clearer distinction between internal `ApiSpec` source and generated OpenAPI output
+- stronger round-trip fidelity for large imported specs
 
 ### 5. Templates
 
@@ -207,6 +229,11 @@ Suggested defaults:
 - manual `New version` creates `api_versions`
 - restore creates a new version snapshot
 
+Current note:
+
+- autosave foundation exists
+- version history UI and persistence still need to be added for Rest Studio
+
 ### 7. Integration With Camel Workflows
 
 Phase 1:
@@ -223,16 +250,18 @@ Phase 2:
 
 Frontend modules:
 
-- `app/api-studio/*`
+- `app/rest-studio/*`
 - `app/api-components/*`
 - `app/api-templates/*`
 
 Core modules:
 
-- `core/src/lib/api-types.ts`
-- `core/src/lib/api-validation.ts`
-- `core/src/lib/api-openapi.ts`
-- `core/src/lib/api-defaults.ts`
+- `core/src/lib/rest/types.ts`
+- `core/src/lib/rest/templates.ts`
+- `core/src/lib/rest/operations.ts`
+- `core/src/lib/rest/store.ts`
+- `core/src/lib/rest/canvas.ts`
+- `core/src/lib/rest/api-spec.ts`
 
 ## Phased Delivery
 
@@ -241,7 +270,7 @@ Core modules:
 - API list
 - create flow
 - blank API model
-- resource and operation editor
+- visual Rest Studio
 - save and reopen
 
 ### Phase 2
@@ -249,12 +278,14 @@ Core modules:
 - templates
 - save as template
 - version history
+- better request and response editing
 
 ### Phase 3
 
 - reusable schemas
-- stronger request and response editing
 - examples
+- richer import fidelity
+- workflow linkage improvements
 
 ### Phase 4
 

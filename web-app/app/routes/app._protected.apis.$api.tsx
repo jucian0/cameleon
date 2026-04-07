@@ -47,6 +47,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     );
   }
 
+  const workflowsResult = await supabase
+    .from("workflows")
+    .select("id, name, description, owner, visibility")
+    .or(`owner.eq.${user.id},visibility.eq.public`)
+    .order("updated_at", { ascending: false });
+
+  if (workflowsResult.error) {
+    throw routerData(
+      { message: workflowsResult.error.message },
+      { status: 500 },
+    );
+  }
+
   try {
     const spec = parseApiSpec(result.data.content);
     return {
@@ -59,6 +72,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         description: result.data.description ?? "",
         spec,
       }),
+      workflows: workflowsResult.data ?? [],
       canEdit: true,
     };
   } catch (error) {
@@ -83,6 +97,13 @@ export default function ApiLayout({
     description: string;
     spec: ReturnType<typeof parseApiSpec>;
     initialSnapshot: string;
+    workflows: {
+      id: string;
+      name: string;
+      description: string | null;
+      owner: string;
+      visibility: "public" | "private";
+    }[];
     canEdit: boolean;
   };
 }) {

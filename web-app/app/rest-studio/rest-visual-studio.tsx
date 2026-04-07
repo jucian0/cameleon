@@ -57,6 +57,7 @@ import {
   Database,
   Download,
   FolderTree,
+  History,
   Plus,
   Route,
   Server,
@@ -90,6 +91,27 @@ const PARAMETER_TYPES: ApiParameter["type"][] = [
   "integer",
   "boolean",
 ];
+const RESPONSE_PRESETS = [
+  { statusCode: "200", description: "Successful response" },
+  { statusCode: "201", description: "Created" },
+  { statusCode: "400", description: "Bad request" },
+  { statusCode: "404", description: "Not found" },
+  { statusCode: "500", description: "Internal server error" },
+] as const;
+const REQUEST_BODY_PRESETS = [
+  {
+    contentType: "application/json",
+    description: "JSON request payload",
+  },
+  {
+    contentType: "multipart/form-data",
+    description: "Multipart form payload",
+  },
+  {
+    contentType: "application/x-www-form-urlencoded",
+    description: "URL-encoded form payload",
+  },
+] as const;
 
 const METHOD_DOT_CLASS: Record<ApiHttpMethod, string> = {
   get: "bg-emerald-400",
@@ -178,12 +200,20 @@ export function RestVisualStudio({
   initialSpec,
   initialName,
   initialDescription,
+  workflows,
   canEdit,
   initialSnapshot,
 }: {
   initialSpec: ApiSpec;
   initialName: string;
   initialDescription: string;
+  workflows: {
+    id: string;
+    name: string;
+    description: string | null;
+    owner: string;
+    visibility: "public" | "private";
+  }[];
   canEdit: boolean;
   initialSnapshot: string;
 }) {
@@ -213,6 +243,12 @@ export function RestVisualStudio({
     const pathname = location.pathname.endsWith("/studio")
       ? `${location.pathname}/code`
       : `${location.pathname.replace(/\/$/, "")}/code`;
+    return `${pathname}${location.search}`;
+  }, [location.pathname, location.search]);
+  const historyHref = React.useMemo(() => {
+    const pathname = location.pathname.endsWith("/studio")
+      ? `${location.pathname}/history`
+      : `${location.pathname.replace(/\/$/, "")}/history`;
     return `${pathname}${location.search}`;
   }, [location.pathname, location.search]);
   const spec = apiSpec;
@@ -272,6 +308,13 @@ export function RestVisualStudio({
           (operation) => operation.id === focusedTarget.operationId,
         )
       : undefined;
+  const selectedResourceMethods = React.useMemo(
+    () =>
+      new Set(
+        selectedResource?.operations.map((operation) => operation.method) ?? [],
+      ),
+    [selectedResource],
+  );
 
   const isApiFocused = focusedTarget?.kind === "api";
   const isResourceFocused = focusedTarget?.kind === "resource";
@@ -468,16 +511,35 @@ export function RestVisualStudio({
                   <Settings2 className="h-4 w-4" />
                   Edit resource
                 </Button>
-                <Button
-                  type="button"
-                  intent="secondary"
-                  size="sm"
-                  onPress={() => addOperation("get")}
-                  isDisabled={!canEdit}
-                >
-                  <Plus className="h-4 w-4" />
-                  Add operation
-                </Button>
+                <Menu>
+                  <Menu.Trigger aria-label="Add operation">
+                    <Button
+                      type="button"
+                      intent="secondary"
+                      size="sm"
+                      isDisabled={!canEdit}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add operation
+                    </Button>
+                  </Menu.Trigger>
+                  <Menu.Content placement="bottom end">
+                    {HTTP_METHODS.map((method) => (
+                      <Menu.Item
+                        key={method}
+                        isDisabled={selectedResourceMethods.has(method)}
+                        onAction={() => addOperation(method)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`h-2.5 w-2.5 rounded-full ${METHOD_DOT_CLASS[method]}`}
+                          />
+                          <Menu.Label>{method.toUpperCase()}</Menu.Label>
+                        </div>
+                      </Menu.Item>
+                    ))}
+                  </Menu.Content>
+                </Menu>
               </>
             ) : null}
             {isOperationFocused && selectedOperation ? (
@@ -548,6 +610,16 @@ export function RestVisualStudio({
                 </Menu.Item>
               </Menu.Content>
             </Menu>
+            <Tooltip>
+              <Link
+                href={historyHref}
+                aria-label="Open history"
+                className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
+              >
+                <History size={16} />
+              </Link>
+              <Tooltip.Content>History</Tooltip.Content>
+            </Tooltip>
             <Tooltip>
               <Link
                 href={codeHref}
@@ -738,6 +810,7 @@ export function RestVisualStudio({
                 resource={inspectedResource}
                 operation={inspectedOperation}
                 removeOperation={removeOperation}
+                workflows={workflows}
                 spec={spec}
                 setSpec={setSpec}
               />
@@ -908,6 +981,7 @@ function OperationInspector({
   resource,
   operation,
   removeOperation,
+  workflows,
   spec,
   setSpec,
 }: {
@@ -915,9 +989,20 @@ function OperationInspector({
   resource: ApiResource;
   operation: ApiOperation;
   removeOperation: (resourceId: string, operationId: string) => void;
+  workflows: {
+    id: string;
+    name: string;
+    description: string | null;
+    owner: string;
+    visibility: "public" | "private";
+  }[];
   spec: ApiSpec;
   setSpec: SetApiSpec;
 }) {
+  const linkedWorkflow = workflows.find(
+    (workflow) => workflow.id === operation.workflowId,
+  );
+
   return (
     <div className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-2">
@@ -984,11 +1069,12 @@ function OperationInspector({
           }
           isDisabled={!canEdit}
         />
-        <TextField
+        <Select
           label="Linked workflow"
-          value={operation.workflowId ?? ""}
-          placeholder="Optional workflow id"
-          onChange={(value) =>
+          placeholder="No workflow linked"
+          selectedKey={operation.workflowId ?? null}
+          isDisabled={!canEdit}
+          onSelectionChange={(key) =>
             setSpec((current) =>
               updateApiOperation(
                 current,
@@ -996,13 +1082,22 @@ function OperationInspector({
                 operation.id,
                 (currentOperation) => ({
                   ...currentOperation,
-                  workflowId: value || null,
+                  workflowId: key ? String(key) : null,
                 }),
               ),
             )
           }
-          isDisabled={!canEdit}
-        />
+        >
+          <SelectTrigger />
+          <SelectList>
+            <SelectOption id="">No workflow linked</SelectOption>
+            {workflows.map((workflow) => (
+              <SelectOption key={workflow.id} id={workflow.id}>
+                {workflow.name}
+              </SelectOption>
+            ))}
+          </SelectList>
+        </Select>
       </div>
       <Textarea
         label="Description"
@@ -1022,6 +1117,41 @@ function OperationInspector({
         }
         isDisabled={!canEdit}
       />
+
+      {linkedWorkflow ? (
+        <Card className="gap-0 py-0">
+          <CardHeader className="px-4 py-4 pb-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="space-y-1">
+                <CardTitle className="text-sm font-medium">
+                  Linked workflow
+                </CardTitle>
+                <p className="text-sm text-muted-fg">{linkedWorkflow.name}</p>
+              </div>
+              <Badge
+                intent={
+                  linkedWorkflow.visibility === "public"
+                    ? "warning"
+                    : "secondary"
+                }
+              >
+                {linkedWorkflow.visibility === "public" ? "Starter" : "Private"}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="flex items-center justify-between gap-3 px-4 pb-4 pt-0">
+            <p className="line-clamp-2 text-sm text-muted-fg">
+              {linkedWorkflow.description || "No workflow description."}
+            </p>
+            <Link
+              href={`/app/camel/workflows/${linkedWorkflow.id}/studio`}
+              className={buttonStyles({ intent: "secondary", size: "sm" })}
+            >
+              Open
+            </Link>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="flex justify-end">
         <Button
@@ -1054,141 +1184,281 @@ function ContractInspector({
   spec: ApiSpec;
   setSpec: SetApiSpec;
 }) {
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge
-          intent={initialFocus === "requestBody" ? "secondary" : "outline"}
-        >
-          Request body
-        </Badge>
-        <Badge intent={initialFocus === "responses" ? "secondary" : "outline"}>
-          Responses
-        </Badge>
-      </div>
+  const sectionOrder =
+    initialFocus === "requestBody"
+      ? (["parameters", "requestBody", "responses"] as const)
+      : (["parameters", "responses", "requestBody"] as const);
 
+  function updateRequestBody(
+    updater: (
+      requestBody: NonNullable<ApiOperation["requestBody"]>,
+    ) => NonNullable<ApiOperation["requestBody"]>,
+  ) {
+    setSpec((current) =>
+      updateApiOperation(
+        current,
+        resource.id,
+        operation.id,
+        (currentOperation) => ({
+          ...currentOperation,
+          requestBody: currentOperation.requestBody
+            ? updater(currentOperation.requestBody)
+            : null,
+        }),
+      ),
+    );
+  }
+
+  const parameterSection = (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h3 className="font-medium text-foreground">Parameters</h3>
+          <p className="text-sm text-muted-fg">
+            Path, query, and header inputs for this operation.
+          </p>
+        </div>
+        <Button
+          type="button"
+          intent="secondary"
+          size="sm"
+          onPress={() =>
+            setSpec((current) =>
+              updateApiOperation(
+                current,
+                resource.id,
+                operation.id,
+                (currentOperation) => ({
+                  ...currentOperation,
+                  parameters: [
+                    ...currentOperation.parameters,
+                    createApiParameter(),
+                  ],
+                }),
+              ),
+            )
+          }
+          isDisabled={!canEdit}
+        >
+          <Plus />
+          Add parameter
+        </Button>
+      </div>
+      <div className="space-y-3">
+        {operation.parameters.map((parameter) => (
+          <div
+            key={parameter.id}
+            className="rounded-lg border border-border/60 p-3"
+          >
+            <div className="grid gap-3 lg:grid-cols-[1.2fr_0.9fr_0.9fr_auto]">
+              <TextField
+                label="Name"
+                value={parameter.name}
+                onChange={(value) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        name: value,
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+              />
+              <Select
+                label="In"
+                selectedKey={parameter.in}
+                isDisabled={!canEdit}
+                onSelectionChange={(key) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        in: String(key) as ApiParameter["in"],
+                      }),
+                    ),
+                  )
+                }
+              >
+                <SelectTrigger />
+                <SelectList>
+                  {PARAMETER_LOCATIONS.map((location) => (
+                    <SelectOption key={location} id={location}>
+                      {location}
+                    </SelectOption>
+                  ))}
+                </SelectList>
+              </Select>
+              <Select
+                label="Type"
+                selectedKey={parameter.type}
+                isDisabled={!canEdit}
+                onSelectionChange={(key) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        type: String(key) as ApiParameter["type"],
+                      }),
+                    ),
+                  )
+                }
+              >
+                <SelectTrigger />
+                <SelectList>
+                  {PARAMETER_TYPES.map((type) => (
+                    <SelectOption key={type} id={type}>
+                      {type}
+                    </SelectOption>
+                  ))}
+                </SelectList>
+              </Select>
+              <Button
+                type="button"
+                intent="plain"
+                size="sq-sm"
+                className="self-end"
+                onPress={() =>
+                  setSpec((current) =>
+                    updateApiOperation(
+                      current,
+                      resource.id,
+                      operation.id,
+                      (currentOperation) => ({
+                        ...currentOperation,
+                        parameters: currentOperation.parameters.filter(
+                          (currentParameter) =>
+                            currentParameter.id !== parameter.id,
+                        ),
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto]">
+              <TextField
+                label="Description"
+                value={parameter.description}
+                onChange={(value) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        description: value,
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+              />
+              <Checkbox
+                className="self-end pb-2"
+                isSelected={parameter.required}
+                onChange={(isSelected) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        required: isSelected,
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+                label="Required"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
+  const requestBodySection =
+    operation.method === "post" ||
+    operation.method === "put" ||
+    operation.method === "patch" ||
+    operation.requestBody ? (
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h3 className="font-medium text-foreground">Parameters</h3>
+            <h3 className="font-medium text-foreground">Request body</h3>
             <p className="text-sm text-muted-fg">
-              Path, query, and header inputs for this operation.
+              Describe payload expectations for body-based requests.
             </p>
           </div>
-          <Button
-            type="button"
-            intent="secondary"
-            size="sm"
-            onPress={() =>
-              setSpec((current) =>
-                updateApiOperation(
-                  current,
-                  resource.id,
-                  operation.id,
-                  (currentOperation) => ({
-                    ...currentOperation,
-                    parameters: [
-                      ...currentOperation.parameters,
-                      createApiParameter(),
-                    ],
-                  }),
-                ),
-              )
-            }
-            isDisabled={!canEdit}
-          >
-            <Plus />
-            Add parameter
-          </Button>
-        </div>
-        <div className="space-y-3">
-          {operation.parameters.map((parameter) => (
-            <div
-              key={parameter.id}
-              className="rounded-lg border border-border/60 p-3"
-            >
-              <div className="grid gap-3 lg:grid-cols-[1.2fr_0.9fr_0.9fr_auto]">
-                <TextField
-                  label="Name"
-                  value={parameter.name}
-                  onChange={(value) =>
-                    setSpec((current) =>
-                      updateApiParameter(
-                        current,
-                        resource.id,
-                        operation.id,
-                        parameter.id,
-                        (currentParameter) => ({
-                          ...currentParameter,
-                          name: value,
-                        }),
-                      ),
-                    )
-                  }
-                  isDisabled={!canEdit}
-                />
-                <Select
-                  label="In"
-                  selectedKey={parameter.in}
-                  isDisabled={!canEdit}
-                  onSelectionChange={(key) =>
-                    setSpec((current) =>
-                      updateApiParameter(
-                        current,
-                        resource.id,
-                        operation.id,
-                        parameter.id,
-                        (currentParameter) => ({
-                          ...currentParameter,
-                          in: String(key) as ApiParameter["in"],
-                        }),
-                      ),
-                    )
-                  }
-                >
-                  <SelectTrigger />
-                  <SelectList>
-                    {PARAMETER_LOCATIONS.map((location) => (
-                      <SelectOption key={location} id={location}>
-                        {location}
-                      </SelectOption>
-                    ))}
-                  </SelectList>
-                </Select>
-                <Select
-                  label="Type"
-                  selectedKey={parameter.type}
-                  isDisabled={!canEdit}
-                  onSelectionChange={(key) =>
-                    setSpec((current) =>
-                      updateApiParameter(
-                        current,
-                        resource.id,
-                        operation.id,
-                        parameter.id,
-                        (currentParameter) => ({
-                          ...currentParameter,
-                          type: String(key) as ApiParameter["type"],
-                        }),
-                      ),
-                    )
-                  }
-                >
-                  <SelectTrigger />
-                  <SelectList>
-                    {PARAMETER_TYPES.map((type) => (
-                      <SelectOption key={type} id={type}>
-                        {type}
-                      </SelectOption>
-                    ))}
-                  </SelectList>
-                </Select>
+          {!operation.requestBody ? (
+            <Menu>
+              <Menu.Trigger aria-label="Add request body">
                 <Button
                   type="button"
-                  intent="plain"
-                  size="sq-sm"
-                  className="self-end"
-                  onPress={() =>
+                  intent="secondary"
+                  size="sm"
+                  isDisabled={!canEdit}
+                >
+                  <Plus />
+                  Add body
+                </Button>
+              </Menu.Trigger>
+              <Menu.Content placement="bottom end">
+                {REQUEST_BODY_PRESETS.map((preset) => (
+                  <Menu.Item
+                    key={preset.contentType}
+                    onAction={() =>
+                      setSpec((current) =>
+                        updateApiOperation(
+                          current,
+                          resource.id,
+                          operation.id,
+                          (currentOperation) => ({
+                            ...currentOperation,
+                            requestBody: {
+                              contentType: preset.contentType,
+                              required: true,
+                              description: preset.description,
+                              example: "",
+                            },
+                          }),
+                        ),
+                      )
+                    }
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <Menu.Label>{preset.contentType}</Menu.Label>
+                      <span className="text-xs text-muted-fg">
+                        {preset.description}
+                      </span>
+                    </div>
+                  </Menu.Item>
+                ))}
+                <Menu.Separator />
+                <Menu.Item
+                  onAction={() =>
                     setSpec((current) =>
                       updateApiOperation(
                         current,
@@ -1196,318 +1466,232 @@ function ContractInspector({
                         operation.id,
                         (currentOperation) => ({
                           ...currentOperation,
-                          parameters: currentOperation.parameters.filter(
-                            (currentParameter) =>
-                              currentParameter.id !== parameter.id,
-                          ),
+                          requestBody: {
+                            contentType: "",
+                            required: true,
+                            description: "",
+                            example: "",
+                          },
                         }),
                       ),
                     )
                   }
-                  isDisabled={!canEdit}
                 >
-                  <Trash2 />
-                </Button>
+                  <Menu.Label>Custom</Menu.Label>
+                </Menu.Item>
+              </Menu.Content>
+            </Menu>
+          ) : (
+            <Button
+              type="button"
+              intent="plain"
+              size="sm"
+              onPress={() =>
+                setSpec((current) =>
+                  updateApiOperation(
+                    current,
+                    resource.id,
+                    operation.id,
+                    (currentOperation) => ({
+                      ...currentOperation,
+                      requestBody: null,
+                    }),
+                  ),
+                )
+              }
+              isDisabled={!canEdit}
+            >
+              <Trash2 className="h-4 w-4" />
+              Remove
+            </Button>
+          )}
+        </div>
+
+        {operation.requestBody ? (
+          <Card className="gap-0 py-0">
+            <CardHeader className="px-4 py-4 pb-3">
+              <div className="flex items-center gap-2">
+                <Badge intent="secondary">Payload</Badge>
+                <Badge
+                  intent={
+                    operation.requestBody.required ? "warning" : "outline"
+                  }
+                >
+                  {operation.requestBody.required ? "Required" : "Optional"}
+                </Badge>
               </div>
-              <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto]">
+            </CardHeader>
+            <CardContent className="space-y-3 px-4 pb-4 pt-0">
+              <div className="grid gap-3 lg:grid-cols-[220px_auto]">
                 <TextField
-                  label="Description"
-                  value={parameter.description}
+                  label="Content type"
+                  value={operation.requestBody.contentType}
                   onChange={(value) =>
-                    setSpec((current) =>
-                      updateApiParameter(
-                        current,
-                        resource.id,
-                        operation.id,
-                        parameter.id,
-                        (currentParameter) => ({
-                          ...currentParameter,
-                          description: value,
-                        }),
-                      ),
-                    )
+                    updateRequestBody((currentRequestBody) => ({
+                      ...currentRequestBody,
+                      contentType: value,
+                    }))
                   }
                   isDisabled={!canEdit}
                 />
                 <Checkbox
                   className="self-end pb-2"
-                  isSelected={parameter.required}
+                  isSelected={operation.requestBody.required}
                   onChange={(isSelected) =>
-                    setSpec((current) =>
-                      updateApiParameter(
-                        current,
-                        resource.id,
-                        operation.id,
-                        parameter.id,
-                        (currentParameter) => ({
-                          ...currentParameter,
-                          required: isSelected,
-                        }),
-                      ),
-                    )
+                    updateRequestBody((currentRequestBody) => ({
+                      ...currentRequestBody,
+                      required: isSelected,
+                    }))
                   }
                   isDisabled={!canEdit}
-                  label="Required"
+                  label="Required body"
                 />
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {(operation.method === "post" ||
-        operation.method === "put" ||
-        operation.method === "patch" ||
-        operation.requestBody) && (
-        <section className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="font-medium text-foreground">Request body</h3>
-              <p className="text-sm text-muted-fg">
-                Describe payload expectations for body-based requests.
-              </p>
-            </div>
-            {!operation.requestBody ? (
-              <Button
-                type="button"
-                intent="secondary"
-                size="sm"
-                onPress={() =>
-                  setSpec((current) =>
-                    updateApiOperation(
-                      current,
-                      resource.id,
-                      operation.id,
-                      (currentOperation) => ({
-                        ...currentOperation,
-                        requestBody: {
-                          contentType: "application/json",
-                          required: true,
-                          description: "",
-                          example: "",
-                        },
-                      }),
-                    ),
-                  )
+              <TextField
+                label="Description"
+                value={operation.requestBody.description}
+                onChange={(value) =>
+                  updateRequestBody((currentRequestBody) => ({
+                    ...currentRequestBody,
+                    description: value,
+                  }))
                 }
                 isDisabled={!canEdit}
-              >
-                <Plus />
-                Add body
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                intent="plain"
-                size="sm"
-                onPress={() =>
-                  setSpec((current) =>
-                    updateApiOperation(
-                      current,
-                      resource.id,
-                      operation.id,
-                      (currentOperation) => ({
-                        ...currentOperation,
-                        requestBody: null,
-                      }),
-                    ),
-                  )
-                }
-                isDisabled={!canEdit}
-              >
-                <Trash2 />
-                Remove
-              </Button>
-            )}
-          </div>
-
-          {operation.requestBody ? (
-            <div className="rounded-lg border border-border/60 p-3">
-              <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
-                <TextField
-                  label="Content type"
-                  value={operation.requestBody.contentType}
-                  onChange={(value) =>
-                    setSpec((current) =>
-                      updateApiOperation(
-                        current,
-                        resource.id,
-                        operation.id,
-                        (currentOperation) => ({
-                          ...currentOperation,
-                          requestBody: currentOperation.requestBody
-                            ? {
-                                ...currentOperation.requestBody,
-                                contentType: value,
-                              }
-                            : null,
-                        }),
-                      ),
-                    )
-                  }
-                  isDisabled={!canEdit}
-                />
-                <TextField
-                  label="Description"
-                  value={operation.requestBody.description}
-                  onChange={(value) =>
-                    setSpec((current) =>
-                      updateApiOperation(
-                        current,
-                        resource.id,
-                        operation.id,
-                        (currentOperation) => ({
-                          ...currentOperation,
-                          requestBody: currentOperation.requestBody
-                            ? {
-                                ...currentOperation.requestBody,
-                                description: value,
-                              }
-                            : null,
-                        }),
-                      ),
-                    )
-                  }
-                  isDisabled={!canEdit}
-                />
-              </div>
-              <Checkbox
-                className="mt-3"
-                isSelected={operation.requestBody.required}
-                onChange={(isSelected) =>
-                  setSpec((current) =>
-                    updateApiOperation(
-                      current,
-                      resource.id,
-                      operation.id,
-                      (currentOperation) => ({
-                        ...currentOperation,
-                        requestBody: currentOperation.requestBody
-                          ? {
-                              ...currentOperation.requestBody,
-                              required: isSelected,
-                            }
-                          : null,
-                      }),
-                    ),
-                  )
-                }
-                isDisabled={!canEdit}
-                label="Required body"
               />
               <Textarea
                 label="Example"
-                className="mt-3"
                 value={operation.requestBody.example}
                 onChange={(value) =>
-                  setSpec((current) =>
-                    updateApiOperation(
-                      current,
-                      resource.id,
-                      operation.id,
-                      (currentOperation) => ({
-                        ...currentOperation,
-                        requestBody: currentOperation.requestBody
-                          ? {
-                              ...currentOperation.requestBody,
-                              example: value,
-                            }
-                          : null,
-                      }),
-                    ),
-                  )
+                  updateRequestBody((currentRequestBody) => ({
+                    ...currentRequestBody,
+                    example: value,
+                  }))
                 }
                 isDisabled={!canEdit}
               />
-            </div>
-          ) : null}
-        </section>
-      )}
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="gap-0 py-0">
+            <CardContent className="px-4 py-4 text-sm text-muted-fg">
+              This operation does not currently define a request body.
+            </CardContent>
+          </Card>
+        )}
+      </section>
+    ) : null;
 
-      <section className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h3 className="font-medium text-foreground">Responses</h3>
-            <p className="text-sm text-muted-fg">
-              Status codes and payload examples returned by this operation.
-            </p>
-          </div>
-          <Button
-            type="button"
-            intent="secondary"
-            size="sm"
-            onPress={() =>
-              setSpec((current) =>
-                updateApiOperation(
-                  current,
-                  resource.id,
-                  operation.id,
-                  (currentOperation) => ({
-                    ...currentOperation,
-                    responses: [
-                      ...currentOperation.responses,
-                      createApiResponse(),
-                    ],
-                  }),
-                ),
-              )
-            }
-            isDisabled={!canEdit}
-          >
-            <Plus />
-            Add response
-          </Button>
+  const responseSection = (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h3 className="font-medium text-foreground">Responses</h3>
+          <p className="text-sm text-muted-fg">
+            Status codes and payload examples returned by this operation.
+          </p>
         </div>
+        <Menu>
+          <Menu.Trigger aria-label="Add response">
+            <Button
+              type="button"
+              intent="secondary"
+              size="sm"
+              isDisabled={!canEdit}
+            >
+              <Plus />
+              Add response
+            </Button>
+          </Menu.Trigger>
+          <Menu.Content placement="bottom end">
+            {RESPONSE_PRESETS.map((preset) => {
+              const isUsed = operation.responses.some(
+                (response) => response.statusCode === preset.statusCode,
+              );
+              return (
+                <Menu.Item
+                  key={preset.statusCode}
+                  isDisabled={isUsed}
+                  onAction={() =>
+                    setSpec((current) =>
+                      updateApiOperation(
+                        current,
+                        resource.id,
+                        operation.id,
+                        (currentOperation) => ({
+                          ...currentOperation,
+                          responses: [
+                            ...currentOperation.responses,
+                            createApiResponse({
+                              statusCode: preset.statusCode,
+                              description: preset.description,
+                            }),
+                          ],
+                        }),
+                      ),
+                    )
+                  }
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <Menu.Label>{preset.statusCode}</Menu.Label>
+                    <span className="text-xs text-muted-fg">
+                      {preset.description}
+                    </span>
+                  </div>
+                </Menu.Item>
+              );
+            })}
+            <Menu.Separator />
+            <Menu.Item
+              onAction={() =>
+                setSpec((current) =>
+                  updateApiOperation(
+                    current,
+                    resource.id,
+                    operation.id,
+                    (currentOperation) => ({
+                      ...currentOperation,
+                      responses: [
+                        ...currentOperation.responses,
+                        createApiResponse({
+                          statusCode: "",
+                          description: "",
+                        }),
+                      ],
+                    }),
+                  ),
+                )
+              }
+            >
+              <Menu.Label>Custom</Menu.Label>
+            </Menu.Item>
+          </Menu.Content>
+        </Menu>
+      </div>
+      {operation.responses.length === 0 ? (
+        <Card className="gap-0 py-0">
+          <CardContent className="px-4 py-4 text-sm text-muted-fg">
+            No responses defined yet. Add at least one response contract.
+          </CardContent>
+        </Card>
+      ) : (
         <div className="space-y-3">
           {operation.responses.map((response) => (
-            <div
-              key={response.id}
-              className="rounded-lg border border-border/60 p-3"
-            >
-              <div className="grid gap-3 lg:grid-cols-[140px_1fr_auto]">
-                <TextField
-                  label="Status"
-                  value={response.statusCode}
-                  onChange={(value) =>
-                    setSpec((current) =>
-                      updateApiResponse(
-                        current,
-                        resource.id,
-                        operation.id,
-                        response.id,
-                        (currentResponse) => ({
-                          ...currentResponse,
-                          statusCode: value,
-                        }),
-                      ),
-                    )
-                  }
-                  isDisabled={!canEdit}
-                />
-                <TextField
-                  label="Description"
-                  value={response.description}
-                  onChange={(value) =>
-                    setSpec((current) =>
-                      updateApiResponse(
-                        current,
-                        resource.id,
-                        operation.id,
-                        response.id,
-                        (currentResponse) => ({
-                          ...currentResponse,
-                          description: value,
-                        }),
-                      ),
-                    )
-                  }
-                  isDisabled={!canEdit}
-                />
+            <Card key={response.id} className="gap-0 py-0">
+              <CardHeader className="flex flex-row items-start justify-between gap-3 px-4 py-4 pb-3">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Badge intent="secondary">
+                      {response.statusCode || "Response"}
+                    </Badge>
+                    <span className="text-sm text-muted-fg">
+                      {response.description || "No response description yet."}
+                    </span>
+                  </div>
+                </div>
                 <Button
                   type="button"
                   intent="plain"
                   size="sq-sm"
-                  className="self-end"
                   onPress={() =>
                     setSpec((current) =>
                       updateApiOperation(
@@ -1526,33 +1710,105 @@ function ContractInspector({
                   }
                   isDisabled={!canEdit}
                 >
-                  <Trash2 />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              </div>
-              <Textarea
-                label="Example"
-                className="mt-3"
-                value={response.example}
-                onChange={(value) =>
-                  setSpec((current) =>
-                    updateApiResponse(
-                      current,
-                      resource.id,
-                      operation.id,
-                      response.id,
-                      (currentResponse) => ({
-                        ...currentResponse,
-                        example: value,
-                      }),
-                    ),
-                  )
-                }
-                isDisabled={!canEdit}
-              />
-            </div>
+              </CardHeader>
+              <CardContent className="space-y-3 px-4 pb-4 pt-0">
+                <div className="grid gap-3 lg:grid-cols-[140px_1fr]">
+                  <TextField
+                    label="Status"
+                    value={response.statusCode}
+                    onChange={(value) =>
+                      setSpec((current) =>
+                        updateApiResponse(
+                          current,
+                          resource.id,
+                          operation.id,
+                          response.id,
+                          (currentResponse) => ({
+                            ...currentResponse,
+                            statusCode: value,
+                          }),
+                        ),
+                      )
+                    }
+                    isDisabled={!canEdit}
+                  />
+                  <TextField
+                    label="Description"
+                    value={response.description}
+                    onChange={(value) =>
+                      setSpec((current) =>
+                        updateApiResponse(
+                          current,
+                          resource.id,
+                          operation.id,
+                          response.id,
+                          (currentResponse) => ({
+                            ...currentResponse,
+                            description: value,
+                          }),
+                        ),
+                      )
+                    }
+                    isDisabled={!canEdit}
+                  />
+                </div>
+                <Textarea
+                  label="Example"
+                  value={response.example}
+                  onChange={(value) =>
+                    setSpec((current) =>
+                      updateApiResponse(
+                        current,
+                        resource.id,
+                        operation.id,
+                        response.id,
+                        (currentResponse) => ({
+                          ...currentResponse,
+                          example: value,
+                        }),
+                      ),
+                    )
+                  }
+                  isDisabled={!canEdit}
+                />
+              </CardContent>
+            </Card>
           ))}
         </div>
-      </section>
+      )}
+    </section>
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge
+          intent={initialFocus === "requestBody" ? "secondary" : "outline"}
+        >
+          Request body
+        </Badge>
+        <Badge intent={initialFocus === "responses" ? "secondary" : "outline"}>
+          Responses
+        </Badge>
+      </div>
+      {sectionOrder.map((section) => {
+        if (section === "parameters")
+          return (
+            <React.Fragment key={section}>{parameterSection}</React.Fragment>
+          );
+        if (section === "requestBody" && requestBodySection) {
+          return (
+            <React.Fragment key={section}>{requestBodySection}</React.Fragment>
+          );
+        }
+        if (section === "responses")
+          return (
+            <React.Fragment key={section}>{responseSection}</React.Fragment>
+          );
+        return null;
+      })}
     </div>
   );
 }

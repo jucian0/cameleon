@@ -117,6 +117,13 @@ export default function ApiStudioEditor({
     name: string;
     description: string;
     spec: ApiSpec;
+    workflows: {
+      id: string;
+      name: string;
+      description: string | null;
+      owner: string;
+      visibility: "public" | "private";
+    }[];
     canEdit: boolean;
     initialSnapshot: string;
   }>();
@@ -133,6 +140,7 @@ export default function ApiStudioEditor({
         initialSpec={context.spec}
         initialName={context.name}
         initialDescription={context.description}
+        workflows={context.workflows}
         canEdit={context.canEdit}
         initialSnapshot={context.initialSnapshot}
       />
