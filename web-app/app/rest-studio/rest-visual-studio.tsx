@@ -58,6 +58,7 @@ import {
   Download,
   FolderTree,
   History,
+  LayoutTemplate,
   Plus,
   Route,
   Server,
@@ -249,6 +250,12 @@ export function RestVisualStudio({
     const pathname = location.pathname.endsWith("/studio")
       ? `${location.pathname}/history`
       : `${location.pathname.replace(/\/$/, "")}/history`;
+    return `${pathname}${location.search}`;
+  }, [location.pathname, location.search]);
+  const templateHref = React.useMemo(() => {
+    const pathname = location.pathname.endsWith("/studio")
+      ? `${location.pathname}/template`
+      : `${location.pathname.replace(/\/$/, "")}/template`;
     return `${pathname}${location.search}`;
   }, [location.pathname, location.search]);
   const spec = apiSpec;
@@ -610,6 +617,16 @@ export function RestVisualStudio({
                 </Menu.Item>
               </Menu.Content>
             </Menu>
+            <Tooltip>
+              <Link
+                href={templateHref}
+                aria-label="Save as template"
+                className={buttonStyles({ size: "sq-sm", intent: "secondary" })}
+              >
+                <LayoutTemplate size={16} />
+              </Link>
+              <Tooltip.Content>Save as template</Tooltip.Content>
+            </Tooltip>
             <Tooltip>
               <Link
                 href={historyHref}

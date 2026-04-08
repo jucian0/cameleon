@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonStyles } from "app/components/ui/button";
 import { Link } from "app/components/ui/link";
 import { SearchField } from "app/components/ui/search-field";
-import { Eye, Plus } from "lucide-react";
+import { Eye, LayoutTemplate, Plus } from "lucide-react";
 import { useSearchParams, type LoaderFunctionArgs } from "react-router";
 
 const metaData = {
@@ -70,6 +70,13 @@ export default function ApiIndex({
         >
           <Plus className="h-4 w-4" />
           New API
+        </Link>
+        <Link
+          href="/app/apis/templates"
+          className={buttonStyles({ intent: "secondary" })}
+        >
+          <LayoutTemplate className="h-4 w-4" />
+          Templates
         </Link>
         <Link
           href="/app/apis/preview"

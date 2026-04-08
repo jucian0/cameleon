@@ -154,3 +154,17 @@ export async function createApiTemplate(
     .select("id")
     .maybeSingle();
 }
+
+export async function deleteApiTemplate(
+  supabase: SupabaseClient,
+  templateId: string,
+  ownerId: string,
+) {
+  return supabase
+    .from("api_templates")
+    .delete()
+    .eq("id", templateId)
+    .eq("owner", ownerId)
+    .select("id")
+    .maybeSingle();
+}
