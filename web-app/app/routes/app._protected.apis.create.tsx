@@ -8,23 +8,22 @@ import { createServerSupabase } from "@/modules/supabase/supabase-server";
 import type { ApiTemplate } from "@/modules/supabase/supabase-db";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "app/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "app/components/ui/card";
-import { Link } from "app/components/ui/link";
+import { Card, CardContent, CardHeader } from "app/components/ui/card";
+import { Modal } from "app/components/ui/modal";
+import { SearchField } from "app/components/ui/search-field";
 import { TextField } from "app/components/ui/text-field";
 import { Textarea } from "app/components/ui/textarea";
-import { ArrowLeft, LayoutTemplate, Save } from "lucide-react";
+import { withModal } from "app/components/utils/with-modal";
+import { LayoutTemplate, Save } from "lucide-react";
+import { redirect, useNavigation, type LoaderFunctionArgs } from "react-router";
 import {
-  Form,
-  redirect,
-  useLoaderData,
-  useNavigation,
-  type LoaderFunctionArgs,
-} from "react-router";
+  Autocomplete,
+  ListBox,
+  ListBoxItem,
+  useFilter,
+  type Key,
+  type Selection,
+} from "react-aria-components";
 import React from "react";
 
 export const handle = {
@@ -133,45 +132,89 @@ export async function action({ request }: LoaderFunctionArgs) {
   return redirect(`/app/apis/${result.data.id}/studio`);
 }
 
-export default function CreateApi({
+export default withModal(function CreateApi({
+  isOpen,
+  closeModal,
+  loaderData,
   actionData,
 }: {
+  isOpen: boolean;
+  closeModal: (callbackUrl: string) => void;
+  loaderData: Awaited<ReturnType<typeof loader>>;
   actionData?: { error?: string };
 }) {
-  const loaderData = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isPending = navigation.state === "submitting";
   const [selectedTemplateId, setSelectedTemplateId] =
     React.useState<string>("");
+  const [templateFilter, setTemplateFilter] = React.useState("");
+  const { contains } = useFilter({ sensitivity: "base" });
+
+  const filteredTemplates = React.useMemo(
+    () =>
+      loaderData.templates.filter((template: ApiTemplate) => {
+        if (!templateFilter.trim()) return true;
+
+        return [
+          template.name,
+          template.description ?? "",
+          template.explanation ?? "",
+          template.category ?? "",
+        ].some((value) => contains(value, templateFilter));
+      }),
+    [contains, loaderData.templates, templateFilter],
+  );
+
+  function handleTemplateSelectionChange(selectedKeys: Selection) {
+    if (selectedKeys === "all") return;
+
+    const [selectedItem] = Array.from(selectedKeys as Set<Key>)
+      .map((key) => filteredTemplates.find((template) => template.id === key))
+      .filter(Boolean);
+
+    if (!selectedItem) return;
+    setSelectedTemplateId(selectedItem.id);
+  }
+
+  function handleClose() {
+    closeModal("/app/apis");
+  }
 
   return (
-    <div className="m-6 max-w-3xl space-y-4">
-      <div className="flex items-center gap-3">
-        <Link href="/app/apis">
-          <Button intent="secondary" size="sm">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </Link>
-      </div>
-
-      <Card className="gap-0 py-0">
-        <CardHeader className="px-4 py-4">
-          <CardTitle>Create API</CardTitle>
-          <p className="text-sm text-muted-fg">
-            Start from a blank API or choose a reusable template as the initial
-            structure.
-          </p>
-        </CardHeader>
-        <CardContent className="px-4 pb-4 pt-0">
-          <Form method="post" className="space-y-4">
+    <Modal isOpen={isOpen} onOpenChange={handleClose}>
+      <Modal.Content isBlurred size="2xl" className="sm:max-w-2xl">
+        <form
+          method="post"
+          className="flex max-h-[inherit] flex-col overflow-hidden"
+        >
+          <Modal.Header>
+            <Modal.Title>Create API</Modal.Title>
+            <Modal.Description>
+              Start from a blank REST API or choose a reusable template as the
+              initial structure.
+            </Modal.Description>
+          </Modal.Header>
+          <Modal.Body>
             <input type="hidden" name="templateId" value={selectedTemplateId} />
-            <TextField name="name" label="API name" isRequired />
-            <Textarea name="description" label="Description" />
+            <TextField
+              autoFocus
+              aria-label="API name"
+              placeholder="Enter a name"
+              name="name"
+              isRequired
+            />
+            <Textarea
+              className="mt-4"
+              aria-label="Description"
+              placeholder="Enter a description"
+              name="description"
+            />
             {loaderData.templatesError ? (
-              <p className="text-sm text-danger">{loaderData.templatesError}</p>
+              <p className="mt-4 text-sm text-danger">
+                {loaderData.templatesError}
+              </p>
             ) : loaderData.templates.length ? (
-              <section className="space-y-3">
+              <section className="mt-4 space-y-4 rounded-lg border border-border p-4">
                 <div>
                   <p className="text-sm font-medium text-foreground">
                     Template
@@ -181,77 +224,105 @@ export default function CreateApi({
                     start from scratch.
                   </p>
                 </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {loaderData.templates.map((template: ApiTemplate) => {
-                    const isSelected = selectedTemplateId === template.id;
-                    const isOwned = template.owner === loaderData.currentUserId;
+                <Autocomplete
+                  aria-label="API template library"
+                  inputValue={templateFilter}
+                  onInputChange={setTemplateFilter}
+                  filter={contains}
+                >
+                  <SearchField
+                    aria-label="Search API templates"
+                    placeholder="Filter templates"
+                  />
+                  <ListBox
+                    aria-label="API templates"
+                    selectionMode="single"
+                    layout="grid"
+                    selectionBehavior="replace"
+                    shouldFocusWrap
+                    onSelectionChange={handleTemplateSelectionChange}
+                    className="grid gap-3 md:grid-cols-2"
+                    items={filteredTemplates}
+                    renderEmptyState={() => (
+                      <p className="text-sm text-muted-fg">
+                        No templates match your filter.
+                      </p>
+                    )}
+                  >
+                    {(template: ApiTemplate) => {
+                      const isOwned =
+                        template.owner === loaderData.currentUserId;
 
-                    return (
-                      <button
-                        key={template.id}
-                        type="button"
-                        onClick={() =>
-                          setSelectedTemplateId((current) =>
-                            current === template.id ? "" : template.id,
-                          )
-                        }
-                        className="text-left"
-                      >
-                        <Card
-                          className={`h-full gap-0 py-0 transition ${
-                            isSelected
-                              ? "border-primary bg-primary/10"
-                              : "border-border/60 bg-gradient-card"
-                          }`}
+                      return (
+                        <ListBoxItem
+                          id={template.id}
+                          textValue={template.name}
+                          className="outline-none"
                         >
-                          <CardHeader className="px-4 py-4">
-                            <div className="flex items-start gap-3">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/40">
-                                <LayoutTemplate className="h-5 w-5 text-primary" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
-                                  <h3 className="truncate text-base font-semibold text-foreground">
-                                    {template.name}
-                                  </h3>
-                                  <Badge
-                                    intent={isOwned ? "secondary" : "warning"}
-                                  >
-                                    {isOwned ? "Custom" : "System"}
-                                  </Badge>
+                          {({ isSelected }) => (
+                            <Card
+                              className={`h-full gap-0 py-0 transition ${
+                                isSelected
+                                  ? "border-primary bg-primary/10"
+                                  : "border-border/60 bg-gradient-card"
+                              }`}
+                            >
+                              <CardHeader className="px-4 py-4">
+                                <div className="flex items-start gap-3">
+                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/40">
+                                    <LayoutTemplate className="h-5 w-5 text-primary" />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <h3 className="truncate text-base font-semibold text-foreground">
+                                        {template.name}
+                                      </h3>
+                                      <Badge
+                                        intent={
+                                          isOwned ? "secondary" : "warning"
+                                        }
+                                      >
+                                        {isOwned ? "Custom" : "System"}
+                                      </Badge>
+                                    </div>
+                                    <p className="mt-1 line-clamp-2 text-sm text-muted-fg">
+                                      {template.description ||
+                                        "Reusable REST API template."}
+                                    </p>
+                                  </div>
                                 </div>
-                                <p className="mt-1 line-clamp-2 text-sm text-muted-fg">
-                                  {template.description ||
-                                    "Reusable REST API template."}
+                              </CardHeader>
+                              <CardContent className="px-4 pb-4 pt-0">
+                                <p className="line-clamp-3 text-sm text-foreground">
+                                  {template.explanation ||
+                                    "Use this template as the starting structure for a new API."}
                                 </p>
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="px-4 pb-4 pt-0">
-                            <p className="line-clamp-3 text-sm text-foreground">
-                              {template.explanation ||
-                                "Use this template as the starting structure for a new API."}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </button>
-                    );
-                  })}
-                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </ListBoxItem>
+                      );
+                    }}
+                  </ListBox>
+                </Autocomplete>
               </section>
             ) : null}
             {actionData?.error ? (
-              <p className="text-sm text-danger">{actionData.error}</p>
+              <p className="mt-4 text-sm text-danger">{actionData.error}</p>
             ) : null}
-            <div className="flex justify-end">
-              <Button type="submit" isPending={isPending}>
-                <Save className="h-4 w-4" />
-                Create API
-              </Button>
-            </div>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button intent="secondary" type="button" onPress={handleClose}>
+              Cancel
+            </Button>
+            <div className="flex-1" />
+            <Button type="submit" isPending={isPending}>
+              <Save className="h-4 w-4" />
+              Create API
+            </Button>
+          </Modal.Footer>
+        </form>
+      </Modal.Content>
+    </Modal>
   );
-}
+});
