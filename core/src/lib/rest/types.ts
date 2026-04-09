@@ -27,6 +27,7 @@ export type ApiRequestBody = {
   required: boolean;
   description: string;
   example: string;
+  schemaId: string | null;
 };
 
 export type ApiResponse = {
@@ -34,6 +35,14 @@ export type ApiResponse = {
   statusCode: string;
   description: string;
   example: string;
+  schemaId: string | null;
+};
+
+export type ApiSchema = {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
 };
 
 export type ApiOperation = {
@@ -69,6 +78,7 @@ export type ApiSpec = {
     description: string;
   };
   servers: ApiServer[];
+  schemas: ApiSchema[];
   resources: ApiResource[];
 };
 
@@ -77,6 +87,7 @@ export type ApiCanvasNodeKind =
   | "resource"
   | "operation"
   | "contract"
+  | "schema"
   | "workflow";
 
 export type ApiCanvasNodeData = {
@@ -95,6 +106,7 @@ export type ApiCanvasDirection = "LR" | "TB";
 
 export type ApiCanvasSelection =
   | { kind: "api" }
+  | { kind: "schema"; schemaId: string }
   | { kind: "resource"; resourceId: string }
   | { kind: "operation"; resourceId: string; operationId: string }
   | { kind: "requestBody"; resourceId: string; operationId: string }

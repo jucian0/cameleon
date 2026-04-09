@@ -967,6 +967,7 @@ function OperationEditor({
                             required: true,
                             description: "",
                             example: "",
+                            schemaId: null,
                           },
                         }),
                       ),

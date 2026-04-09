@@ -34,15 +34,21 @@ function layoutGraph(
   const graph = new dagre.graphlib.Graph();
   graph.setGraph({
     rankdir: direction,
-    nodesep: 48,
-    ranksep: 80,
-    marginx: 24,
-    marginy: 24,
+    nodesep: 72,
+    ranksep: 112,
+    marginx: 32,
+    marginy: 32,
   });
   graph.setDefaultEdgeLabel(() => ({}));
 
   for (const node of nodes) {
-    graph.setNode(node.id, { width: 260, height: 100 });
+    const dimensions =
+      node.data.kind === "contract" || node.data.kind === "workflow"
+        ? { width: 210, height: 88 }
+        : node.data.kind === "api"
+          ? { width: 280, height: 96 }
+          : { width: 250, height: 96 };
+    graph.setNode(node.id, dimensions);
   }
   for (const currentEdge of edges) {
     graph.setEdge(currentEdge.source, currentEdge.target);
@@ -87,6 +93,36 @@ export function buildApiCanvas(
   ];
 
   const edges: ApiCanvasEdge[] = [];
+  const schemaNodeIds = new Set<string>();
+
+  function ensureSchemaNode(schemaId: string) {
+    const schema = spec.schemas.find(
+      (currentSchema) => currentSchema.id === schemaId,
+    );
+    if (!schema) return null;
+
+    const schemaNodeId = `schema:${schema.id}`;
+    if (!schemaNodeIds.has(schemaNodeId)) {
+      schemaNodeIds.add(schemaNodeId);
+      nodes.push({
+        id: schemaNodeId,
+        type: "studio",
+        position: { x: 0, y: 0 },
+        targetPosition,
+        sourcePosition,
+        data: {
+          kind: "schema",
+          title: schema.name,
+          subtitle: schema.description || "Reusable schema",
+          meta: "Schema",
+          isSelected:
+            selected?.kind === "schema" && selected.schemaId === schema.id,
+        },
+      });
+    }
+
+    return schemaNodeId;
+  }
 
   spec.resources.forEach((resource) => {
     const resourceNodeId = `resource:${resource.id}`;
@@ -151,6 +187,13 @@ export function buildApiCanvas(
           },
         });
         edges.push(edge(operationNodeId, requestNodeId));
+
+        if (operation.requestBody.schemaId) {
+          const schemaNodeId = ensureSchemaNode(operation.requestBody.schemaId);
+          if (schemaNodeId) {
+            edges.push(edge(requestNodeId, schemaNodeId));
+          }
+        }
       }
 
       const firstResponse = operation.responses[0];
@@ -169,6 +212,13 @@ export function buildApiCanvas(
           },
         });
         edges.push(edge(operationNodeId, responseNodeId));
+
+        if (firstResponse.schemaId) {
+          const schemaNodeId = ensureSchemaNode(firstResponse.schemaId);
+          if (schemaNodeId) {
+            edges.push(edge(responseNodeId, schemaNodeId));
+          }
+        }
       }
 
       if (operation.workflowId) {

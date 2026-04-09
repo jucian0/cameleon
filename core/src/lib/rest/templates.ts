@@ -4,6 +4,7 @@ import type {
   ApiParameter,
   ApiResource,
   ApiResponse,
+  ApiSchema,
   ApiSpec,
 } from "./types";
 
@@ -33,6 +34,17 @@ export function createApiResponse(
     statusCode: "200",
     description: "Successful response",
     example: "",
+    schemaId: null,
+    ...overrides,
+  };
+}
+
+export function createApiSchema(overrides: Partial<ApiSchema> = {}): ApiSchema {
+  return {
+    id: createId("schema"),
+    name: "Schema",
+    description: "",
+    content: '{\n  "type": "object"\n}',
     ...overrides,
   };
 }
@@ -42,7 +54,9 @@ export function createApiOperation(
   overrides: Partial<ApiOperation> = {},
 ): ApiOperation {
   const defaultSummary =
-    method === "get" ? "List resources" : `Handle ${method.toUpperCase()} request`;
+    method === "get"
+      ? "List resources"
+      : `Handle ${method.toUpperCase()} request`;
 
   return {
     id: createId("operation"),
@@ -58,6 +72,7 @@ export function createApiOperation(
             required: true,
             description: "",
             example: "",
+            schemaId: null,
           }
         : null,
     responses: [createApiResponse()],
@@ -93,6 +108,7 @@ export function createDefaultApiSpec(title = "Untitled API"): ApiSpec {
         description: "Production",
       },
     ],
+    schemas: [],
     resources: [createApiResource()],
   };
 }

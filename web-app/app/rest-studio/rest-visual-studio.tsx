@@ -37,6 +37,7 @@ import {
   createApiParameter,
   createApiResource,
   createApiResponse,
+  createApiSchema,
   type ApiCanvasDirection,
   updateApiOperation,
   updateApiParameter,
@@ -50,6 +51,7 @@ import {
   type ApiParameter,
   type ApiResource,
   type ApiResponse,
+  type ApiSchema,
   type ApiSpec,
   useApiStore,
 } from "./rest-spec";
@@ -141,17 +143,26 @@ function ApiStudioNode({
     resource: { icon: FolderTree, badge: "Resource", intent: "info" },
     operation: { icon: Route, badge: "Operation", intent: "secondary" },
     contract: { icon: Database, badge: "Contract", intent: "outline" },
+    schema: { icon: Code2, badge: "Schema", intent: "outline" },
     workflow: { icon: Workflow, badge: "Workflow", intent: "warning" },
   };
   const current = config[data.kind];
   const Icon = current.icon;
+  const sizeClass =
+    data.kind === "contract" ||
+    data.kind === "workflow" ||
+    data.kind === "schema"
+      ? "min-w-[180px] max-w-[210px]"
+      : data.kind === "api"
+        ? "min-w-[240px] max-w-[280px]"
+        : "min-w-[220px] max-w-[250px]";
 
   return (
     <div
-      className={`min-w-[220px] max-w-[260px] rounded-xl border p-3 shadow-card transition ${
+      className={`${sizeClass} rounded-xl border p-3 shadow-card transition ${
         data.isSelected
-          ? "border-primary/70 bg-primary/10"
-          : "border-border/60 bg-gradient-card"
+          ? "border-primary/70 bg-primary/10 ring-1 ring-primary/30"
+          : "border-border/60 bg-gradient-card hover:border-primary/30"
       }`}
     >
       {targetPosition ? (
@@ -162,11 +173,11 @@ function ApiStudioNode({
         />
       ) : null}
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/40">
-          <Icon className="h-5 w-5 text-primary" />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/35 shadow-sm">
+          <Icon className="h-4.5 w-4.5 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <Badge intent={current.intent}>{current.badge}</Badge>
             {data.meta ? (
               <span className="truncate text-xs text-muted-fg">
@@ -179,7 +190,9 @@ function ApiStudioNode({
               />
             ) : null}
           </div>
-          <p className="mt-2 font-medium text-foreground">{data.title}</p>
+          <p className="mt-2 line-clamp-2 text-[13px] font-medium text-foreground">
+            {data.title}
+          </p>
         </div>
       </div>
       {sourcePosition ? (
@@ -331,17 +344,19 @@ export function RestVisualStudio({
     focusedTarget?.kind === "response";
 
   const inspectedResource =
-    sheetTarget?.kind === "resource"
-      ? spec.resources.find(
-          (resource) => resource.id === sheetTarget.resourceId,
-        )
-      : sheetTarget?.kind === "operation" ||
-          sheetTarget?.kind === "requestBody" ||
-          sheetTarget?.kind === "response"
+    sheetTarget?.kind === "schema"
+      ? undefined
+      : sheetTarget?.kind === "resource"
         ? spec.resources.find(
             (resource) => resource.id === sheetTarget.resourceId,
           )
-        : undefined;
+        : sheetTarget?.kind === "operation" ||
+            sheetTarget?.kind === "requestBody" ||
+            sheetTarget?.kind === "response"
+          ? spec.resources.find(
+              (resource) => resource.id === sheetTarget.resourceId,
+            )
+          : undefined;
 
   const inspectedOperation =
     sheetTarget?.kind === "operation" ||
@@ -351,6 +366,10 @@ export function RestVisualStudio({
           (operation) => operation.id === sheetTarget.operationId,
         )
       : undefined;
+  const inspectedSchema =
+    sheetTarget?.kind === "schema"
+      ? spec.schemas.find((schema) => schema.id === sheetTarget.schemaId)
+      : null;
 
   function focusTarget(target: ApiCanvasSelection) {
     setFocusedTarget(target);
@@ -480,8 +499,9 @@ export function RestVisualStudio({
       <input type="hidden" name="content" value={JSON.stringify(spec)} />
 
       <div className="relative h-full min-h-0 flex-1 overflow-hidden rounded-xl border border-border/60 bg-background">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_oklab,var(--color-primary)_10%,transparent),transparent_35%),radial-gradient(circle_at_bottom_right,color-mix(in_oklab,var(--color-primary)_8%,transparent),transparent_30%)]" />
         <div className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border/60 bg-background/85 px-3 py-2 shadow-sm backdrop-blur">
             <Badge intent="secondary">
               {spec.resources.length} resource
               {spec.resources.length === 1 ? "" : "s"}
@@ -561,7 +581,7 @@ export function RestVisualStudio({
               </Button>
             ) : null}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/85 px-3 py-2 shadow-sm backdrop-blur">
             <Tooltip>
               <Badge
                 intent={
@@ -705,6 +725,13 @@ export function RestVisualStudio({
               focusTarget({ kind: "api" });
               return;
             }
+            if (node.id.startsWith("schema:")) {
+              openInspector({
+                kind: "schema",
+                schemaId: node.id.replace("schema:", ""),
+              });
+              return;
+            }
             if (node.id.startsWith("resource:")) {
               focusTarget({
                 kind: "resource",
@@ -765,6 +792,9 @@ export function RestVisualStudio({
               {sheetTarget?.kind === "api" ? (
                 <Badge intent="outline">API</Badge>
               ) : null}
+              {sheetTarget?.kind === "schema" ? (
+                <Badge intent="outline">Schema</Badge>
+              ) : null}
               {sheetTarget?.kind === "resource" ? (
                 <Badge intent="info">Resource</Badge>
               ) : null}
@@ -777,26 +807,30 @@ export function RestVisualStudio({
             <Sheet.Title>
               {sheetTarget?.kind === "api"
                 ? "API info"
-                : sheetTarget?.kind === "resource"
-                  ? inspectedResource?.path || "Resource"
-                  : sheetTarget?.kind === "requestBody"
-                    ? "Request body"
-                    : sheetTarget?.kind === "response"
-                      ? "Response contract"
-                      : inspectedOperation?.summary ||
-                        inspectedOperation?.method.toUpperCase() ||
-                        "Operation"}
+                : sheetTarget?.kind === "schema"
+                  ? inspectedSchema?.name || "Schema"
+                  : sheetTarget?.kind === "resource"
+                    ? inspectedResource?.path || "Resource"
+                    : sheetTarget?.kind === "requestBody"
+                      ? "Request body"
+                      : sheetTarget?.kind === "response"
+                        ? "Response contract"
+                        : inspectedOperation?.summary ||
+                          inspectedOperation?.method.toUpperCase() ||
+                          "Operation"}
             </Sheet.Title>
             <Sheet.Description>
               {sheetTarget?.kind === "api"
                 ? "Edit the top-level REST API metadata."
-                : sheetTarget?.kind === "resource"
-                  ? "Shape the path and semantics of this resource."
-                  : sheetTarget?.kind === "requestBody"
-                    ? "Edit the request payload contract for this operation."
-                    : sheetTarget?.kind === "response"
-                      ? "Edit the response contract for this operation."
-                      : "Edit request contract, metadata, and response details for this operation."}
+                : sheetTarget?.kind === "schema"
+                  ? "Edit a reusable schema referenced by request or response contracts."
+                  : sheetTarget?.kind === "resource"
+                    ? "Shape the path and semantics of this resource."
+                    : sheetTarget?.kind === "requestBody"
+                      ? "Edit the request payload contract for this operation."
+                      : sheetTarget?.kind === "response"
+                        ? "Edit the response contract for this operation."
+                        : "Edit request contract, metadata, and response details for this operation."}
             </Sheet.Description>
           </Sheet.Header>
           <Sheet.Body className="space-y-4 px-4 py-2 pb-4">
@@ -808,6 +842,13 @@ export function RestVisualStudio({
                 description={description}
                 setDescription={setDescription}
                 spec={spec}
+                setSpec={setSpec}
+              />
+            ) : null}
+            {sheetTarget?.kind === "schema" && inspectedSchema ? (
+              <SchemaInspector
+                canEdit={canEdit}
+                schema={inspectedSchema}
                 setSpec={setSpec}
               />
             ) : null}
@@ -920,6 +961,135 @@ function ApiInspector({
         onChange={setDescription}
         isDisabled={!canEdit}
       />
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-medium text-foreground">Schemas</h3>
+            <p className="text-sm text-muted-fg">
+              Reusable request and response models imported from OpenAPI or
+              created here.
+            </p>
+          </div>
+          <Button
+            type="button"
+            intent="secondary"
+            size="sm"
+            onPress={() =>
+              setSpec((current) => ({
+                ...current,
+                schemas: [...current.schemas, createApiSchema()],
+              }))
+            }
+            isDisabled={!canEdit}
+          >
+            <Plus />
+            Add schema
+          </Button>
+        </div>
+        {spec.schemas.length === 0 ? (
+          <Card className="gap-0 py-0">
+            <CardContent className="px-4 py-4 text-sm text-muted-fg">
+              No reusable schemas yet.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {spec.schemas.map((schema) => (
+              <Card key={schema.id} className="gap-0 py-0">
+                <CardHeader className="flex flex-row items-start justify-between gap-3 px-4 py-4 pb-3">
+                  <div className="min-w-0 flex-1">
+                    <TextField
+                      label="Name"
+                      value={schema.name}
+                      onChange={(value) =>
+                        setSpec((current) => ({
+                          ...current,
+                          schemas: current.schemas.map((currentSchema) =>
+                            currentSchema.id === schema.id
+                              ? { ...currentSchema, name: value }
+                              : currentSchema,
+                          ),
+                        }))
+                      }
+                      isDisabled={!canEdit}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    intent="plain"
+                    size="sq-sm"
+                    onPress={() =>
+                      setSpec((current) => ({
+                        ...current,
+                        schemas: current.schemas.filter(
+                          (currentSchema) => currentSchema.id !== schema.id,
+                        ),
+                        resources: current.resources.map((resource) => ({
+                          ...resource,
+                          operations: resource.operations.map((operation) => ({
+                            ...operation,
+                            requestBody: operation.requestBody
+                              ? {
+                                  ...operation.requestBody,
+                                  schemaId:
+                                    operation.requestBody.schemaId === schema.id
+                                      ? null
+                                      : operation.requestBody.schemaId,
+                                }
+                              : null,
+                            responses: operation.responses.map((response) => ({
+                              ...response,
+                              schemaId:
+                                response.schemaId === schema.id
+                                  ? null
+                                  : response.schemaId,
+                            })),
+                          })),
+                        })),
+                      }))
+                    }
+                    isDisabled={!canEdit}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-3 px-4 pb-4 pt-0">
+                  <TextField
+                    label="Description"
+                    value={schema.description}
+                    onChange={(value) =>
+                      setSpec((current) => ({
+                        ...current,
+                        schemas: current.schemas.map((currentSchema) =>
+                          currentSchema.id === schema.id
+                            ? { ...currentSchema, description: value }
+                            : currentSchema,
+                        ),
+                      }))
+                    }
+                    isDisabled={!canEdit}
+                  />
+                  <Textarea
+                    label="Schema JSON"
+                    value={schema.content}
+                    onChange={(value) =>
+                      setSpec((current) => ({
+                        ...current,
+                        schemas: current.schemas.map((currentSchema) =>
+                          currentSchema.id === schema.id
+                            ? { ...currentSchema, content: value }
+                            : currentSchema,
+                        ),
+                      }))
+                    }
+                    isDisabled={!canEdit}
+                  />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -989,6 +1159,66 @@ function ResourceInspector({
           Delete resource
         </Button>
       </div>
+    </div>
+  );
+}
+
+function SchemaInspector({
+  canEdit,
+  schema,
+  setSpec,
+}: {
+  canEdit: boolean;
+  schema: ApiSchema;
+  setSpec: SetApiSpec;
+}) {
+  return (
+    <div className="space-y-4">
+      <TextField
+        label="Name"
+        value={schema.name}
+        onChange={(value) =>
+          setSpec((current) => ({
+            ...current,
+            schemas: current.schemas.map((currentSchema) =>
+              currentSchema.id === schema.id
+                ? { ...currentSchema, name: value }
+                : currentSchema,
+            ),
+          }))
+        }
+        isDisabled={!canEdit}
+      />
+      <TextField
+        label="Description"
+        value={schema.description}
+        onChange={(value) =>
+          setSpec((current) => ({
+            ...current,
+            schemas: current.schemas.map((currentSchema) =>
+              currentSchema.id === schema.id
+                ? { ...currentSchema, description: value }
+                : currentSchema,
+            ),
+          }))
+        }
+        isDisabled={!canEdit}
+      />
+      <Textarea
+        label="Schema JSON"
+        value={schema.content}
+        onChange={(value) =>
+          setSpec((current) => ({
+            ...current,
+            schemas: current.schemas.map((currentSchema) =>
+              currentSchema.id === schema.id
+                ? { ...currentSchema, content: value }
+                : currentSchema,
+            ),
+          }))
+        }
+        isDisabled={!canEdit}
+      />
     </div>
   );
 }
@@ -1201,6 +1431,12 @@ function ContractInspector({
   spec: ApiSpec;
   setSpec: SetApiSpec;
 }) {
+  const schemaOptions = spec.schemas;
+  const selectedRequestSchema = operation.requestBody?.schemaId
+    ? schemaOptions.find(
+        (schema) => schema.id === operation.requestBody?.schemaId,
+      )
+    : null;
   const sectionOrder =
     initialFocus === "requestBody"
       ? (["parameters", "requestBody", "responses"] as const)
@@ -1459,6 +1695,7 @@ function ContractInspector({
                               required: true,
                               description: preset.description,
                               example: "",
+                              schemaId: null,
                             },
                           }),
                         ),
@@ -1488,6 +1725,7 @@ function ContractInspector({
                             required: true,
                             description: "",
                             example: "",
+                            schemaId: null,
                           },
                         }),
                       ),
@@ -1564,6 +1802,49 @@ function ContractInspector({
                   label="Required body"
                 />
               </div>
+              <Select
+                label="Schema"
+                selectedKey={operation.requestBody.schemaId ?? "none"}
+                isDisabled={!canEdit}
+                onSelectionChange={(key) =>
+                  updateRequestBody((currentRequestBody) => ({
+                    ...currentRequestBody,
+                    schemaId: String(key) === "none" ? null : String(key),
+                  }))
+                }
+              >
+                <SelectTrigger />
+                <SelectList>
+                  <SelectOption id="none">No schema</SelectOption>
+                  {schemaOptions.map((schema) => (
+                    <SelectOption key={schema.id} id={schema.id}>
+                      {schema.name}
+                    </SelectOption>
+                  ))}
+                </SelectList>
+              </Select>
+              {selectedRequestSchema ? (
+                <Card className="gap-0 py-0">
+                  <CardHeader className="px-4 py-4 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Badge intent="secondary">Schema</Badge>
+                      <span className="text-sm font-medium text-foreground">
+                        {selectedRequestSchema.name}
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2 px-4 pb-4 pt-0">
+                    {selectedRequestSchema.description ? (
+                      <p className="text-sm text-muted-fg">
+                        {selectedRequestSchema.description}
+                      </p>
+                    ) : null}
+                    <pre className="overflow-x-auto rounded-md border border-border/60 bg-secondary/20 p-3 text-xs text-muted-fg">
+                      <code>{selectedRequestSchema.content}</code>
+                    </pre>
+                  </CardContent>
+                </Card>
+              ) : null}
               <TextField
                 label="Description"
                 value={operation.requestBody.description}
@@ -1731,6 +2012,35 @@ function ContractInspector({
                 </Button>
               </CardHeader>
               <CardContent className="space-y-3 px-4 pb-4 pt-0">
+                {response.schemaId
+                  ? (() => {
+                      const linkedSchema = schemaOptions.find(
+                        (schema) => schema.id === response.schemaId,
+                      );
+                      return linkedSchema ? (
+                        <Card className="gap-0 py-0">
+                          <CardHeader className="px-4 py-4 pb-3">
+                            <div className="flex items-center gap-2">
+                              <Badge intent="secondary">Schema</Badge>
+                              <span className="text-sm font-medium text-foreground">
+                                {linkedSchema.name}
+                              </span>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-2 px-4 pb-4 pt-0">
+                            {linkedSchema.description ? (
+                              <p className="text-sm text-muted-fg">
+                                {linkedSchema.description}
+                              </p>
+                            ) : null}
+                            <pre className="overflow-x-auto rounded-md border border-border/60 bg-secondary/20 p-3 text-xs text-muted-fg">
+                              <code>{linkedSchema.content}</code>
+                            </pre>
+                          </CardContent>
+                        </Card>
+                      ) : null;
+                    })()
+                  : null}
                 <div className="grid gap-3 lg:grid-cols-[140px_1fr]">
                   <TextField
                     label="Status"
@@ -1770,6 +2080,36 @@ function ContractInspector({
                     }
                     isDisabled={!canEdit}
                   />
+                  <Select
+                    label="Schema"
+                    selectedKey={response.schemaId ?? "none"}
+                    isDisabled={!canEdit}
+                    onSelectionChange={(key) =>
+                      setSpec((current) =>
+                        updateApiResponse(
+                          current,
+                          resource.id,
+                          operation.id,
+                          response.id,
+                          (currentResponse) => ({
+                            ...currentResponse,
+                            schemaId:
+                              String(key) === "none" ? null : String(key),
+                          }),
+                        ),
+                      )
+                    }
+                  >
+                    <SelectTrigger />
+                    <SelectList>
+                      <SelectOption id="none">No schema</SelectOption>
+                      {schemaOptions.map((schema) => (
+                        <SelectOption key={schema.id} id={schema.id}>
+                          {schema.name}
+                        </SelectOption>
+                      ))}
+                    </SelectList>
+                  </Select>
                 </div>
                 <Textarea
                   label="Example"

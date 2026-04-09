@@ -5,6 +5,7 @@ import type {
   ApiParameter,
   ApiResource,
   ApiResponse,
+  ApiSchema,
   ApiSpec,
 } from "./types";
 import {
@@ -12,6 +13,7 @@ import {
   createApiParameter,
   createApiResource,
   createApiResponse,
+  createApiSchema,
   createDefaultApiSpec,
 } from "./templates";
 import type {
@@ -85,6 +87,30 @@ function extractExample(value: unknown): string {
   return "";
 }
 
+function extractRefName(value: unknown): string | null {
+  if (!isRecord(value)) return null;
+
+  const directRef = typeof value.$ref === "string" ? value.$ref : null;
+  const schemaRef =
+    isRecord(value.schema) && typeof value.schema.$ref === "string"
+      ? value.schema.$ref
+      : null;
+  const ref = directRef ?? schemaRef;
+
+  if (!ref) return null;
+
+  const match = ref.match(/\/([^/]+)$/);
+  return match?.[1] ?? null;
+}
+
+function stringifySchemaContent(value: unknown): string {
+  if (!isRecord(value)) {
+    return '{\n  "type": "object"\n}';
+  }
+
+  return JSON.stringify(value, null, 2);
+}
+
 function inferServersFromDocument(input: Record<string, any>) {
   if (Array.isArray(input.servers)) {
     return input.servers.map((server) => ({
@@ -149,6 +175,7 @@ function toApiRequestBodyFromSwagger(
       required: Boolean(bodyParameter.required),
       description: bodyParameter.description ?? "",
       example: extractExample(bodyParameter),
+      schemaId: extractRefName(bodyParameter),
     };
   }
 
@@ -167,6 +194,7 @@ function toApiRequestBodyFromSwagger(
           .filter(Boolean)
           .join("\n") || "Form payload",
       example: "",
+      schemaId: null,
     };
   }
 
@@ -189,6 +217,7 @@ function toApiRequestBodyFromOpenApi(operation: Record<string, any>) {
     required: Boolean(operation.requestBody.required),
     description: operation.requestBody.description ?? "",
     example: extractExample(firstContent),
+    schemaId: extractRefName(firstContent),
   };
 }
 
@@ -203,6 +232,7 @@ function toApiResponses(responses: unknown) {
       statusCode,
       description: record.description ?? "Response",
       example: extractExample(record),
+      schemaId: extractRefName(record),
     });
   });
 
@@ -245,6 +275,21 @@ function importFromApiDocument(input: Record<string, any>) {
   const isSwagger2 = typeof input.swagger === "string";
   const info = isRecord(input.info) ? input.info : {};
   const paths = isRecord(input.paths) ? input.paths : {};
+  const rawSchemas = isSwagger2
+    ? isRecord(input.definitions)
+      ? input.definitions
+      : {}
+    : isRecord(input.components) && isRecord(input.components.schemas)
+      ? input.components.schemas
+      : {};
+
+  const schemas = Object.entries(rawSchemas).map(([name, schema]) =>
+    createApiSchema({
+      name,
+      description: isRecord(schema) ? (schema.description ?? "") : "",
+      content: stringifySchemaContent(schema),
+    }),
+  );
 
   const resources = Object.entries(paths).map(([path, pathItem]) => {
     const pathRecord = isRecord(pathItem) ? pathItem : {};
@@ -284,6 +329,7 @@ function importFromApiDocument(input: Record<string, any>) {
       description: info.description ?? "",
     },
     servers: inferServersFromDocument(input),
+    schemas,
     resources,
   });
 }
@@ -312,6 +358,10 @@ function normalizeResponse(response: Partial<ApiResponse>): ApiResponse {
   return createApiResponse(response);
 }
 
+function normalizeSchema(schema: Partial<ApiSchema>): ApiSchema {
+  return createApiSchema(schema);
+}
+
 function normalizeOperation(operation: Partial<ApiOperation>): ApiOperation {
   const base = createApiOperation(operation.method ?? "get", operation);
   return {
@@ -325,6 +375,7 @@ function normalizeOperation(operation: Partial<ApiOperation>): ApiOperation {
           required: Boolean(operation.requestBody.required),
           description: operation.requestBody.description ?? "",
           example: operation.requestBody.example ?? "",
+          schemaId: operation.requestBody.schemaId ?? null,
         }
       : null,
     responses: Array.isArray(operation.responses)
@@ -359,6 +410,9 @@ export function normalizeApiSpec(input: Partial<ApiSpec>): ApiSpec {
           url: server.url ?? "",
           description: server.description ?? "",
         }))
+      : [],
+    schemas: Array.isArray(input.schemas)
+      ? input.schemas.map(normalizeSchema)
       : [],
     resources: Array.isArray(input.resources)
       ? input.resources.map(normalizeResource)
