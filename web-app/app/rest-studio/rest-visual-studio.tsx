@@ -120,6 +120,43 @@ const REQUEST_BODY_PRESETS = [
   },
 ] as const;
 
+function summarizeSchemaContent(content: string) {
+  try {
+    const parsed = JSON.parse(content);
+    const type =
+      typeof parsed?.type === "string"
+        ? parsed.type
+        : parsed?.properties
+          ? "object"
+          : "unknown";
+    const properties = parsed?.properties
+      ? Object.keys(parsed.properties).length
+      : 0;
+    const required = Array.isArray(parsed?.required) ? parsed.required.length : 0;
+    const enumCount = Array.isArray(parsed?.enum) ? parsed.enum.length : 0;
+    const itemsType =
+      parsed?.items && typeof parsed.items.type === "string"
+        ? parsed.items.type
+        : null;
+
+    return {
+      type,
+      properties,
+      required,
+      enumCount,
+      itemsType,
+    };
+  } catch {
+    return {
+      type: null,
+      properties: null,
+      required: 0,
+      enumCount: 0,
+      itemsType: null,
+    };
+  }
+}
+
 const METHOD_DOT_CLASS: Record<ApiHttpMethod, string> = {
   get: "bg-emerald-400",
   post: "bg-sky-400",
@@ -2195,6 +2232,120 @@ function ContractInspector({
                 label="Required"
               />
             </div>
+            <div className="mt-3 grid gap-3 lg:grid-cols-3">
+              <TextField
+                label="Format"
+                value={parameter.format}
+                onChange={(value) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        format: value,
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+              />
+              <TextField
+                label="Default"
+                value={parameter.defaultValue}
+                onChange={(value) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        defaultValue: value,
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+              />
+              <TextField
+                label="Enum values"
+                description="Comma-separated"
+                value={parameter.enum.join(", ")}
+                onChange={(value) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        enum: value
+                          .split(",")
+                          .map((item) => item.trim())
+                          .filter(Boolean),
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+              />
+            </div>
+            <div className="mt-3 grid gap-3 lg:grid-cols-[auto_220px]">
+              <Checkbox
+                isSelected={parameter.isArray}
+                onChange={(isSelected) =>
+                  setSpec((current) =>
+                    updateApiParameter(
+                      current,
+                      resource.id,
+                      operation.id,
+                      parameter.id,
+                      (currentParameter) => ({
+                        ...currentParameter,
+                        isArray: isSelected,
+                      }),
+                    ),
+                  )
+                }
+                isDisabled={!canEdit}
+                label="Array parameter"
+              />
+              {parameter.isArray ? (
+                <Select
+                  label="Item type"
+                  selectedKey={parameter.itemType}
+                  isDisabled={!canEdit}
+                  onSelectionChange={(key) =>
+                    setSpec((current) =>
+                      updateApiParameter(
+                        current,
+                        resource.id,
+                        operation.id,
+                        parameter.id,
+                        (currentParameter) => ({
+                          ...currentParameter,
+                          itemType: String(key) as ApiParameter["type"],
+                        }),
+                      ),
+                    )
+                  }
+                >
+                  <SelectTrigger />
+                  <SelectList>
+                    {PARAMETER_TYPES.map((type) => (
+                      <SelectOption key={type} id={type}>
+                        {type}
+                      </SelectOption>
+                    ))}
+                  </SelectList>
+                </Select>
+              ) : null}
+            </div>
           </div>
         ))}
       </div>
@@ -2372,28 +2523,60 @@ function ContractInspector({
                   ))}
                 </SelectList>
               </Select>
-              {selectedRequestSchema ? (
-                <Card className="gap-0 py-0">
-                  <CardHeader className="px-4 py-4 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Badge intent="secondary">Schema</Badge>
-                      <span className="text-sm font-medium text-foreground">
-                        {selectedRequestSchema.name}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-2 px-4 pb-4 pt-0">
-                    {selectedRequestSchema.description ? (
-                      <p className="text-sm text-muted-fg">
-                        {selectedRequestSchema.description}
-                      </p>
-                    ) : null}
-                    <pre className="overflow-x-auto rounded-md border border-border/60 bg-secondary/20 p-3 text-xs text-muted-fg">
-                      <code>{selectedRequestSchema.content}</code>
-                    </pre>
-                  </CardContent>
-                </Card>
-              ) : null}
+              {selectedRequestSchema
+                ? (() => {
+                    const summary = summarizeSchemaContent(
+                      selectedRequestSchema.content,
+                    );
+                    return (
+                      <Card className="gap-0 py-0">
+                        <CardHeader className="px-4 py-4 pb-3">
+                          <div className="flex items-center gap-2">
+                            <Badge intent="secondary">Schema</Badge>
+                            <span className="text-sm font-medium text-foreground">
+                              {selectedRequestSchema.name}
+                            </span>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-2 px-4 pb-4 pt-0">
+                          {selectedRequestSchema.description ? (
+                            <p className="text-sm text-muted-fg">
+                              {selectedRequestSchema.description}
+                            </p>
+                          ) : null}
+                          <div className="flex flex-wrap gap-2">
+                            {summary.type ? (
+                              <Badge intent="outline">Type: {summary.type}</Badge>
+                            ) : null}
+                            {summary.properties !== null ? (
+                              <Badge intent="outline">
+                                {summary.properties} props
+                              </Badge>
+                            ) : null}
+                            {summary.required > 0 ? (
+                              <Badge intent="outline">
+                                {summary.required} required
+                              </Badge>
+                            ) : null}
+                            {summary.enumCount > 0 ? (
+                              <Badge intent="outline">
+                                {summary.enumCount} enum values
+                              </Badge>
+                            ) : null}
+                            {summary.itemsType ? (
+                              <Badge intent="outline">
+                                Items: {summary.itemsType}
+                              </Badge>
+                            ) : null}
+                          </div>
+                          <pre className="overflow-x-auto rounded-md border border-border/60 bg-secondary/20 p-3 text-xs text-muted-fg">
+                            <code>{selectedRequestSchema.content}</code>
+                          </pre>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()
+                : null}
               <TextField
                 label="Description"
                 value={operation.requestBody.description}
@@ -2566,7 +2749,11 @@ function ContractInspector({
                       const linkedSchema = schemaOptions.find(
                         (schema) => schema.id === response.schemaId,
                       );
-                      return linkedSchema ? (
+                      if (!linkedSchema) return null;
+                      const summary = summarizeSchemaContent(
+                        linkedSchema.content,
+                      );
+                      return (
                         <Card className="gap-0 py-0">
                           <CardHeader className="px-4 py-4 pb-3">
                             <div className="flex items-center gap-2">
@@ -2582,12 +2769,37 @@ function ContractInspector({
                                 {linkedSchema.description}
                               </p>
                             ) : null}
+                            <div className="flex flex-wrap gap-2">
+                              {summary.type ? (
+                                <Badge intent="outline">Type: {summary.type}</Badge>
+                              ) : null}
+                              {summary.properties !== null ? (
+                                <Badge intent="outline">
+                                  {summary.properties} props
+                                </Badge>
+                              ) : null}
+                              {summary.required > 0 ? (
+                                <Badge intent="outline">
+                                  {summary.required} required
+                                </Badge>
+                              ) : null}
+                              {summary.enumCount > 0 ? (
+                                <Badge intent="outline">
+                                  {summary.enumCount} enum values
+                                </Badge>
+                              ) : null}
+                              {summary.itemsType ? (
+                                <Badge intent="outline">
+                                  Items: {summary.itemsType}
+                                </Badge>
+                              ) : null}
+                            </div>
                             <pre className="overflow-x-auto rounded-md border border-border/60 bg-secondary/20 p-3 text-xs text-muted-fg">
                               <code>{linkedSchema.content}</code>
                             </pre>
                           </CardContent>
                         </Card>
-                      ) : null;
+                      );
                     })()
                   : null}
                 <div className="grid gap-3 lg:grid-cols-[140px_1fr]">

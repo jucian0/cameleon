@@ -246,6 +246,26 @@ function toApiParameter(parameter: Record<string, any>) {
     type: normalizeScalarType(
       parameter.type ?? parameter.schema?.type ?? parameter.items?.type,
     ),
+    format:
+      typeof parameter.format === "string"
+        ? parameter.format
+        : typeof parameter.schema?.format === "string"
+          ? parameter.schema.format
+          : "",
+    enum: Array.isArray(parameter.enum)
+      ? parameter.enum.map(String)
+      : Array.isArray(parameter.items?.enum)
+        ? parameter.items.enum.map(String)
+        : [],
+    defaultValue:
+      parameter.default != null
+        ? String(parameter.default)
+        : parameter.schema?.default != null
+          ? String(parameter.schema.default)
+          : "",
+    isArray:
+      parameter.type === "array" || parameter.schema?.type === "array",
+    itemType: normalizeScalarType(parameter.items?.type),
   });
 }
 

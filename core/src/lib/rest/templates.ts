@@ -26,6 +26,11 @@ export function createApiParameter(
     required: false,
     description: "",
     type: "string",
+    format: "",
+    enum: [],
+    defaultValue: "",
+    isArray: false,
+    itemType: "string",
     ...overrides,
   };
 }

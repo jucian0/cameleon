@@ -21,6 +21,11 @@ export type ApiParameter = {
   required: boolean;
   description: string;
   type: ApiScalarType;
+  format: string;
+  enum: string[];
+  defaultValue: string;
+  isArray: boolean;
+  itemType: ApiScalarType;
 };
 
 export type ApiResponseHeader = {

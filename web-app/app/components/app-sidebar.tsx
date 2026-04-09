@@ -29,7 +29,7 @@ import { useState } from "react";
 import { createClient } from "@/modules/supabase/supabase-client";
 import type { Loader } from "@/root";
 import { ThemeMenu } from "./theme-menu";
-import { Workflow } from "lucide-react";
+import { LayoutTemplate, Workflow } from "lucide-react";
 
 export default function AppSidebar(
   props: Readonly<React.ComponentProps<typeof Sidebar>>,
@@ -102,16 +102,37 @@ export default function AppSidebar(
             </SidebarDisclosure>
           </SidebarDisclosureGroup>
         </SidebarSectionGroup>
-        <SidebarSection>
-          <SidebarItem
-            href="/app/apis"
-            tooltip="Rest Studio"
-            isCurrent={pathname.includes("/app/apis")}
-          >
-            <SwaggerIcon className="size-4" />
-            <SidebarLabel>Rest Studio</SidebarLabel>
-          </SidebarItem>
-        </SidebarSection>
+        <SidebarSectionGroup>
+          <SidebarDisclosureGroup defaultExpandedKeys={[2]}>
+            <SidebarDisclosure id={2}>
+              <SidebarDisclosureTrigger>
+                <SwaggerIcon className="size-4" />
+                <SidebarLabel>Rest Studio</SidebarLabel>
+              </SidebarDisclosureTrigger>
+              <SidebarDisclosurePanel>
+                <SidebarItem
+                  href="/app/apis"
+                  tooltip="APIs"
+                  isCurrent={
+                    pathname === "/app/apis" ||
+                    /^\/app\/apis\/[^/]+/.test(pathname)
+                  }
+                >
+                  <SwaggerIcon className="size-4" />
+                  <SidebarLabel>APIs</SidebarLabel>
+                </SidebarItem>
+                <SidebarItem
+                  href="/app/apis/templates"
+                  tooltip="Templates"
+                  isCurrent={pathname.includes("/app/apis/templates")}
+                >
+                  <LayoutTemplate className="size-4" />
+                  <SidebarLabel>Templates</SidebarLabel>
+                </SidebarItem>
+              </SidebarDisclosurePanel>
+            </SidebarDisclosure>
+          </SidebarDisclosureGroup>
+        </SidebarSectionGroup>
       </SidebarContent>
 
       <SidebarFooter>
