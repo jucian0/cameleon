@@ -157,6 +157,27 @@ function summarizeSchemaContent(content: string) {
   }
 }
 
+function parseSchemaObject(content: string) {
+  try {
+    const parsed = JSON.parse(content);
+    return typeof parsed === "object" && parsed !== null ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function stringifySchemaObject(schemaObject: Record<string, any>) {
+  return JSON.stringify(schemaObject, null, 2);
+}
+
+function updateStructuredSchemaContent(
+  content: string,
+  updater: (schemaObject: Record<string, any>) => Record<string, any>,
+) {
+  const current = parseSchemaObject(content);
+  return stringifySchemaObject(updater(current));
+}
+
 const METHOD_DOT_CLASS: Record<ApiHttpMethod, string> = {
   get: "bg-emerald-400",
   post: "bg-sky-400",
@@ -1443,6 +1464,51 @@ function SchemaInspector({
   schema: ApiSchema;
   setSpec: SetApiSpec;
 }) {
+  const schemaObject = parseSchemaObject(schema.content);
+  const schemaType =
+    typeof schemaObject.type === "string" ? schemaObject.type : "object";
+  const schemaEnum = Array.isArray(schemaObject.enum)
+    ? schemaObject.enum.map(String).join(", ")
+    : "";
+  const schemaItemsType =
+    typeof schemaObject.items?.type === "string"
+      ? schemaObject.items.type
+      : "string";
+  const schemaProperties = Object.entries(schemaObject.properties ?? {}).map(
+    ([name, value]) => {
+      const property: Record<string, any> =
+        typeof value === "object" && value !== null ? (value as Record<string, any>) : {};
+      return {
+        name,
+        type: typeof property.type === "string" ? property.type : "string",
+        description:
+          typeof property.description === "string" ? property.description : "",
+        required:
+          Array.isArray(schemaObject.required) &&
+          schemaObject.required.includes(name),
+      };
+    },
+  );
+
+  function updateSchema(
+    updater: (schemaObject: Record<string, any>) => Record<string, any>,
+  ) {
+    setSpec((current) => ({
+      ...current,
+      schemas: current.schemas.map((currentSchema) =>
+        currentSchema.id === schema.id
+          ? {
+              ...currentSchema,
+              content: updateStructuredSchemaContent(
+                currentSchema.content,
+                updater,
+              ),
+            }
+          : currentSchema,
+      ),
+    }));
+  }
+
   return (
     <div className="space-y-4">
       <TextField
@@ -1475,6 +1541,342 @@ function SchemaInspector({
         }
         isDisabled={!canEdit}
       />
+      <Card className="gap-0 py-0">
+        <CardHeader className="px-4 py-4 pb-3">
+          <CardTitle>Structured schema</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 px-4 pb-4 pt-0">
+          <div className="grid gap-3 lg:grid-cols-2">
+            <Select
+              label="Type"
+              selectedKey={schemaType}
+              isDisabled={!canEdit}
+              onSelectionChange={(key) =>
+                updateSchema((currentSchemaObject) => {
+                  const nextType = String(key);
+                  const nextSchemaObject: Record<string, any> = {
+                    ...currentSchemaObject,
+                    type: nextType,
+                  };
+
+                  if (nextType === "object") {
+                    nextSchemaObject.properties ??= {};
+                    nextSchemaObject.required ??= [];
+                    delete nextSchemaObject.items;
+                  } else if (nextType === "array") {
+                    nextSchemaObject.items ??= { type: "string" };
+                    delete nextSchemaObject.properties;
+                    delete nextSchemaObject.required;
+                  } else {
+                    delete nextSchemaObject.properties;
+                    delete nextSchemaObject.required;
+                    delete nextSchemaObject.items;
+                  }
+
+                  return nextSchemaObject;
+                })
+              }
+            >
+              <SelectTrigger />
+              <SelectList>
+                <SelectOption id="object">object</SelectOption>
+                <SelectOption id="array">array</SelectOption>
+                {PARAMETER_TYPES.map((type) => (
+                  <SelectOption key={type} id={type}>
+                    {type}
+                  </SelectOption>
+                ))}
+              </SelectList>
+            </Select>
+            <TextField
+              label="Enum values"
+              description="Comma-separated"
+              value={schemaEnum}
+              onChange={(value) =>
+                updateSchema((currentSchemaObject) => {
+                  const nextEnum = value
+                    .split(",")
+                    .map((item) => item.trim())
+                    .filter(Boolean);
+                  if (!nextEnum.length) {
+                    const { enum: _enum, ...rest } = currentSchemaObject;
+                    return rest;
+                  }
+                  return {
+                    ...currentSchemaObject,
+                    enum: nextEnum,
+                  };
+                })
+              }
+              isDisabled={!canEdit}
+            />
+          </div>
+          {schemaType === "array" ? (
+            <Select
+              label="Items type"
+              selectedKey={schemaItemsType}
+              isDisabled={!canEdit}
+              onSelectionChange={(key) =>
+                updateSchema((currentSchemaObject) => ({
+                  ...currentSchemaObject,
+                  items: {
+                    ...(typeof currentSchemaObject.items === "object" &&
+                    currentSchemaObject.items !== null
+                      ? currentSchemaObject.items
+                      : {}),
+                    type: String(key),
+                  },
+                }))
+              }
+            >
+              <SelectTrigger />
+              <SelectList>
+                {PARAMETER_TYPES.map((type) => (
+                  <SelectOption key={type} id={type}>
+                    {type}
+                  </SelectOption>
+                ))}
+              </SelectList>
+            </Select>
+          ) : null}
+          {schemaType === "object" ? (
+            <section className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h4 className="font-medium text-foreground">Properties</h4>
+                  <p className="text-sm text-muted-fg">
+                    Define the fields of this object schema.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  intent="secondary"
+                  size="sm"
+                  onPress={() =>
+                    updateSchema((currentSchemaObject) => {
+                      const currentProperties =
+                        typeof currentSchemaObject.properties === "object" &&
+                        currentSchemaObject.properties !== null
+                          ? currentSchemaObject.properties
+                          : {};
+                      let index = Object.keys(currentProperties).length + 1;
+                      let nextName = `property${index}`;
+                      while (nextName in currentProperties) {
+                        index += 1;
+                        nextName = `property${index}`;
+                      }
+                      return {
+                        ...currentSchemaObject,
+                        properties: {
+                          ...currentProperties,
+                          [nextName]: { type: "string" },
+                        },
+                      };
+                    })
+                  }
+                  isDisabled={!canEdit}
+                >
+                  <Plus />
+                  Add property
+                </Button>
+              </div>
+              {schemaProperties.length ? (
+                <div className="space-y-3">
+                  {schemaProperties.map((property) => (
+                    <div
+                      key={property.name}
+                      className="rounded-lg border border-border/60 p-3"
+                    >
+                      <div className="grid gap-3 lg:grid-cols-[1fr_180px_auto]">
+                        <TextField
+                          label="Name"
+                          value={property.name}
+                          onChange={(value) =>
+                            updateSchema((currentSchemaObject) => {
+                              const currentProperties =
+                                typeof currentSchemaObject.properties ===
+                                  "object" &&
+                                currentSchemaObject.properties !== null
+                                  ? currentSchemaObject.properties
+                                  : {};
+                              const currentProperty =
+                                currentProperties[property.name] ?? {
+                                  type: "string",
+                                };
+                              const nextProperties = {
+                                ...currentProperties,
+                              };
+                              delete nextProperties[property.name];
+                              nextProperties[value || property.name] =
+                                currentProperty;
+
+                              const currentRequired = Array.isArray(
+                                currentSchemaObject.required,
+                              )
+                                ? currentSchemaObject.required
+                                : [];
+                              return {
+                                ...currentSchemaObject,
+                                properties: nextProperties,
+                                required: currentRequired.map((item) =>
+                                  item === property.name
+                                    ? value || property.name
+                                    : item,
+                                ),
+                              };
+                            })
+                          }
+                          isDisabled={!canEdit}
+                        />
+                        <Select
+                          label="Type"
+                          selectedKey={property.type}
+                          isDisabled={!canEdit}
+                          onSelectionChange={(key) =>
+                            updateSchema((currentSchemaObject) => {
+                              const currentProperties =
+                                typeof currentSchemaObject.properties ===
+                                  "object" &&
+                                currentSchemaObject.properties !== null
+                                  ? currentSchemaObject.properties
+                                  : {};
+                              return {
+                                ...currentSchemaObject,
+                                properties: {
+                                  ...currentProperties,
+                                  [property.name]: {
+                                    ...(typeof currentProperties[
+                                      property.name
+                                    ] === "object" &&
+                                    currentProperties[property.name] !== null
+                                      ? currentProperties[property.name]
+                                      : {}),
+                                    type: String(key),
+                                  },
+                                },
+                              };
+                            })
+                          }
+                        >
+                          <SelectTrigger />
+                          <SelectList>
+                            {PARAMETER_TYPES.map((type) => (
+                              <SelectOption key={type} id={type}>
+                                {type}
+                              </SelectOption>
+                            ))}
+                          </SelectList>
+                        </Select>
+                        <Button
+                          type="button"
+                          intent="plain"
+                          size="sq-sm"
+                          className="self-end"
+                          onPress={() =>
+                            updateSchema((currentSchemaObject) => {
+                              const currentProperties =
+                                typeof currentSchemaObject.properties ===
+                                  "object" &&
+                                currentSchemaObject.properties !== null
+                                  ? currentSchemaObject.properties
+                                  : {};
+                              const nextProperties = {
+                                ...currentProperties,
+                              };
+                              delete nextProperties[property.name];
+                              const currentRequired = Array.isArray(
+                                currentSchemaObject.required,
+                              )
+                                ? currentSchemaObject.required
+                                : [];
+                              return {
+                                ...currentSchemaObject,
+                                properties: nextProperties,
+                                required: currentRequired.filter(
+                                  (item) => item !== property.name,
+                                ),
+                              };
+                            })
+                          }
+                          isDisabled={!canEdit}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto]">
+                        <TextField
+                          label="Description"
+                          value={property.description}
+                          onChange={(value) =>
+                            updateSchema((currentSchemaObject) => {
+                              const currentProperties =
+                                typeof currentSchemaObject.properties ===
+                                  "object" &&
+                                currentSchemaObject.properties !== null
+                                  ? currentSchemaObject.properties
+                                  : {};
+                              return {
+                                ...currentSchemaObject,
+                                properties: {
+                                  ...currentProperties,
+                                  [property.name]: {
+                                    ...(typeof currentProperties[
+                                      property.name
+                                    ] === "object" &&
+                                    currentProperties[property.name] !== null
+                                      ? currentProperties[property.name]
+                                      : {}),
+                                    description: value,
+                                  },
+                                },
+                              };
+                            })
+                          }
+                          isDisabled={!canEdit}
+                        />
+                        <Checkbox
+                          className="self-end pb-2"
+                          isSelected={property.required}
+                          onChange={(isSelected) =>
+                            updateSchema((currentSchemaObject) => {
+                              const currentRequired = Array.isArray(
+                                currentSchemaObject.required,
+                              )
+                                ? currentSchemaObject.required
+                                : [];
+                              return {
+                                ...currentSchemaObject,
+                                required: isSelected
+                                  ? Array.from(
+                                      new Set([
+                                        ...currentRequired,
+                                        property.name,
+                                      ]),
+                                    )
+                                  : currentRequired.filter(
+                                      (item) => item !== property.name,
+                                    ),
+                              };
+                            })
+                          }
+                          isDisabled={!canEdit}
+                          label="Required"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Card className="gap-0 py-0">
+                  <CardContent className="px-4 py-4 text-sm text-muted-fg">
+                    No properties defined yet.
+                  </CardContent>
+                </Card>
+              )}
+            </section>
+          ) : null}
+        </CardContent>
+      </Card>
       <Textarea
         label="Schema JSON"
         value={schema.content}
