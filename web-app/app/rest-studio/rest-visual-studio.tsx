@@ -37,7 +37,10 @@ import {
   createApiParameter,
   createApiResource,
   createApiResponse,
+  createApiResponseHeader,
   createApiSchema,
+  createApiSecurityScheme,
+  createApiTag,
   type ApiCanvasDirection,
   updateApiOperation,
   updateApiParameter,
@@ -51,6 +54,7 @@ import {
   type ApiParameter,
   type ApiResource,
   type ApiResponse,
+  type ApiSecurityScheme,
   type ApiSchema,
   type ApiSpec,
   useApiStore,
@@ -144,6 +148,7 @@ function ApiStudioNode({
     operation: { icon: Route, badge: "Operation", intent: "secondary" },
     contract: { icon: Database, badge: "Contract", intent: "outline" },
     schema: { icon: Code2, badge: "Schema", intent: "outline" },
+    security: { icon: Settings2, badge: "Security", intent: "warning" },
     workflow: { icon: Workflow, badge: "Workflow", intent: "warning" },
   };
   const current = config[data.kind];
@@ -151,7 +156,8 @@ function ApiStudioNode({
   const sizeClass =
     data.kind === "contract" ||
     data.kind === "workflow" ||
-    data.kind === "schema"
+    data.kind === "schema" ||
+    data.kind === "security"
       ? "min-w-[180px] max-w-[210px]"
       : data.kind === "api"
         ? "min-w-[240px] max-w-[280px]"
@@ -193,6 +199,15 @@ function ApiStudioNode({
           <p className="mt-2 line-clamp-2 text-[13px] font-medium text-foreground">
             {data.title}
           </p>
+          {data.flags?.length ? (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {data.flags.map((flag) => (
+                <Badge key={flag} intent="outline">
+                  {flag}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
       {sourcePosition ? (
@@ -732,6 +747,15 @@ export function RestVisualStudio({
               });
               return;
             }
+            if (node.id.startsWith("security:")) {
+              const [, resourceId, operationId] = node.id.split(":");
+              openInspector({
+                kind: "operation",
+                resourceId,
+                operationId,
+              });
+              return;
+            }
             if (node.id.startsWith("resource:")) {
               focusTarget({
                 kind: "resource",
@@ -955,12 +979,222 @@ function ApiInspector({
         }
         isDisabled={!canEdit}
       />
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-medium text-foreground">Servers</h3>
+            <p className="text-sm text-muted-fg">
+              Multiple server entries imported from OpenAPI or defined here.
+            </p>
+          </div>
+          <Button
+            type="button"
+            intent="secondary"
+            size="sm"
+            onPress={() =>
+              setSpec((current) => ({
+                ...current,
+                servers: [
+                  ...current.servers,
+                  {
+                    id: `server-${crypto.randomUUID()}`,
+                    url: "",
+                    description: "",
+                  },
+                ],
+              }))
+            }
+            isDisabled={!canEdit}
+          >
+            <Plus />
+            Add server
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {spec.servers.map((server) => (
+            <Card key={server.id} className="gap-0 py-0">
+              <CardContent className="grid gap-3 px-4 py-4 lg:grid-cols-[1fr_1fr_auto]">
+                <TextField
+                  label="URL"
+                  value={server.url}
+                  onChange={(value) =>
+                    setSpec((current) => ({
+                      ...current,
+                      servers: current.servers.map((currentServer) =>
+                        currentServer.id === server.id
+                          ? { ...currentServer, url: value }
+                          : currentServer,
+                      ),
+                    }))
+                  }
+                  isDisabled={!canEdit}
+                />
+                <TextField
+                  label="Description"
+                  value={server.description}
+                  onChange={(value) =>
+                    setSpec((current) => ({
+                      ...current,
+                      servers: current.servers.map((currentServer) =>
+                        currentServer.id === server.id
+                          ? { ...currentServer, description: value }
+                          : currentServer,
+                      ),
+                    }))
+                  }
+                  isDisabled={!canEdit}
+                />
+                <Button
+                  type="button"
+                  intent="plain"
+                  size="sq-sm"
+                  className="self-end"
+                  onPress={() =>
+                    setSpec((current) => ({
+                      ...current,
+                      servers: current.servers.filter(
+                        (currentServer) => currentServer.id !== server.id,
+                      ),
+                    }))
+                  }
+                  isDisabled={!canEdit || spec.servers.length === 1}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
       <Textarea
         label="Description"
         value={description}
         onChange={setDescription}
         isDisabled={!canEdit}
       />
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-medium text-foreground">Tags</h3>
+            <p className="text-sm text-muted-fg">
+              Shared tags imported from the spec and reusable across operations.
+            </p>
+          </div>
+          <Button
+            type="button"
+            intent="secondary"
+            size="sm"
+            onPress={() =>
+              setSpec((current) => ({
+                ...current,
+                tags: [...current.tags, createApiTag()],
+              }))
+            }
+            isDisabled={!canEdit}
+          >
+            <Plus />
+            Add tag
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {spec.tags.map((tag) => (
+            <Card key={tag.id} className="gap-0 py-0">
+              <CardContent className="grid gap-3 px-4 py-4 lg:grid-cols-[180px_1fr_auto]">
+                <TextField
+                  label="Name"
+                  value={tag.name}
+                  onChange={(value) =>
+                    setSpec((current) => ({
+                      ...current,
+                      tags: current.tags.map((currentTag) =>
+                        currentTag.id === tag.id
+                          ? { ...currentTag, name: value }
+                          : currentTag,
+                      ),
+                    }))
+                  }
+                  isDisabled={!canEdit}
+                />
+                <TextField
+                  label="Description"
+                  value={tag.description}
+                  onChange={(value) =>
+                    setSpec((current) => ({
+                      ...current,
+                      tags: current.tags.map((currentTag) =>
+                        currentTag.id === tag.id
+                          ? { ...currentTag, description: value }
+                          : currentTag,
+                      ),
+                    }))
+                  }
+                  isDisabled={!canEdit}
+                />
+                <Button
+                  type="button"
+                  intent="plain"
+                  size="sq-sm"
+                  className="self-end"
+                  onPress={() =>
+                    setSpec((current) => ({
+                      ...current,
+                      tags: current.tags.filter((currentTag) => currentTag.id !== tag.id),
+                      resources: current.resources.map((resource) => ({
+                        ...resource,
+                        operations: resource.operations.map((operation) => ({
+                          ...operation,
+                          tags: operation.tags.filter((currentTag) => currentTag !== tag.name),
+                        })),
+                      })),
+                    }))
+                  }
+                  isDisabled={!canEdit}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-medium text-foreground">Security schemes</h3>
+            <p className="text-sm text-muted-fg">
+              Authentication definitions imported from Swagger or OpenAPI.
+            </p>
+          </div>
+          <Button
+            type="button"
+            intent="secondary"
+            size="sm"
+            onPress={() =>
+              setSpec((current) => ({
+                ...current,
+                securitySchemes: [
+                  ...current.securitySchemes,
+                  createApiSecurityScheme(),
+                ],
+              }))
+            }
+            isDisabled={!canEdit}
+          >
+            <Plus />
+            Add scheme
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {spec.securitySchemes.map((scheme) => (
+            <SecuritySchemeCard
+              key={scheme.id}
+              canEdit={canEdit}
+              scheme={scheme}
+              setSpec={setSpec}
+            />
+          ))}
+        </div>
+      </section>
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -1223,6 +1457,102 @@ function SchemaInspector({
   );
 }
 
+function SecuritySchemeCard({
+  canEdit,
+  scheme,
+  setSpec,
+}: {
+  canEdit: boolean;
+  scheme: ApiSecurityScheme;
+  setSpec: SetApiSpec;
+}) {
+  return (
+    <Card className="gap-0 py-0">
+      <CardContent className="grid gap-3 px-4 py-4 lg:grid-cols-[180px_160px_1fr_auto]">
+        <TextField
+          label="Name"
+          value={scheme.name}
+          onChange={(value) =>
+            setSpec((current) => ({
+              ...current,
+              securitySchemes: current.securitySchemes.map((currentScheme) =>
+                currentScheme.id === scheme.id
+                  ? { ...currentScheme, name: value }
+                  : currentScheme,
+              ),
+            }))
+          }
+          isDisabled={!canEdit}
+        />
+        <Select
+          label="Type"
+          selectedKey={scheme.type}
+          isDisabled={!canEdit}
+          onSelectionChange={(key) =>
+            setSpec((current) => ({
+              ...current,
+              securitySchemes: current.securitySchemes.map((currentScheme) =>
+                currentScheme.id === scheme.id
+                  ? { ...currentScheme, type: String(key) as ApiSecurityScheme["type"] }
+                  : currentScheme,
+              ),
+            }))
+          }
+        >
+          <SelectTrigger />
+          <SelectList>
+            <SelectOption id="apiKey">apiKey</SelectOption>
+            <SelectOption id="http">http</SelectOption>
+            <SelectOption id="oauth2">oauth2</SelectOption>
+            <SelectOption id="openIdConnect">openIdConnect</SelectOption>
+          </SelectList>
+        </Select>
+        <TextField
+          label="Description"
+          value={scheme.description}
+          onChange={(value) =>
+            setSpec((current) => ({
+              ...current,
+              securitySchemes: current.securitySchemes.map((currentScheme) =>
+                currentScheme.id === scheme.id
+                  ? { ...currentScheme, description: value }
+                  : currentScheme,
+              ),
+            }))
+          }
+          isDisabled={!canEdit}
+        />
+        <Button
+          type="button"
+          intent="plain"
+          size="sq-sm"
+          className="self-end"
+          onPress={() =>
+            setSpec((current) => ({
+              ...current,
+              securitySchemes: current.securitySchemes.filter(
+                (currentScheme) => currentScheme.id !== scheme.id,
+              ),
+              resources: current.resources.map((resource) => ({
+                ...resource,
+                operations: resource.operations.map((operation) => ({
+                  ...operation,
+                  security: operation.security.filter(
+                    (currentSecurity) => currentSecurity.schemeName !== scheme.name,
+                  ),
+                })),
+              })),
+            }))
+          }
+          isDisabled={!canEdit}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function OperationInspector({
   canEdit,
   resource,
@@ -1249,6 +1579,8 @@ function OperationInspector({
   const linkedWorkflow = workflows.find(
     (workflow) => workflow.id === operation.workflowId,
   );
+  const availableTags = spec.tags;
+  const availableSecuritySchemes = spec.securitySchemes;
 
   return (
     <div className="space-y-4">
@@ -1364,6 +1696,223 @@ function OperationInspector({
         }
         isDisabled={!canEdit}
       />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <TextField
+          label="Tags"
+          description="Comma-separated tags for this operation."
+          value={operation.tags.join(", ")}
+          onChange={(value) =>
+            setSpec((current) =>
+              updateApiOperation(
+                current,
+                resource.id,
+                operation.id,
+                (currentOperation) => ({
+                  ...currentOperation,
+                  tags: value
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter(Boolean),
+                }),
+              ),
+            )
+          }
+          isDisabled={!canEdit}
+        />
+        <Checkbox
+          className="self-end pb-2"
+          isSelected={operation.deprecated}
+          onChange={(isSelected) =>
+            setSpec((current) =>
+              updateApiOperation(
+                current,
+                resource.id,
+                operation.id,
+                (currentOperation) => ({
+                  ...currentOperation,
+                  deprecated: isSelected,
+                }),
+              ),
+            )
+          }
+          isDisabled={!canEdit}
+          label="Deprecated"
+        />
+      </div>
+      {availableTags.length ? (
+        <div className="flex flex-wrap gap-2">
+          {availableTags.map((tag) => (
+            <Badge
+              key={tag.id}
+              intent={operation.tags.includes(tag.name) ? "secondary" : "outline"}
+            >
+              {tag.name}
+            </Badge>
+          ))}
+        </div>
+      ) : null}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-medium text-foreground">Security</h3>
+            <p className="text-sm text-muted-fg">
+              Security requirements applied to this operation.
+            </p>
+          </div>
+          <Menu>
+            <Menu.Trigger aria-label="Add security requirement">
+              <Button
+                type="button"
+                intent="secondary"
+                size="sm"
+                isDisabled={!canEdit || availableSecuritySchemes.length === 0}
+              >
+                <Plus />
+                Add security
+              </Button>
+            </Menu.Trigger>
+            <Menu.Content placement="bottom end">
+              {availableSecuritySchemes.map((scheme) => {
+                const isUsed = operation.security.some(
+                  (currentSecurity) => currentSecurity.schemeName === scheme.name,
+                );
+                return (
+                  <Menu.Item
+                    key={scheme.id}
+                    isDisabled={isUsed}
+                    onAction={() =>
+                      setSpec((current) =>
+                        updateApiOperation(
+                          current,
+                          resource.id,
+                          operation.id,
+                          (currentOperation) => ({
+                            ...currentOperation,
+                            security: [
+                              ...currentOperation.security,
+                              {
+                                id: `security-requirement-${crypto.randomUUID()}`,
+                                schemeName: scheme.name,
+                                scopes: [],
+                              },
+                            ],
+                          }),
+                        ),
+                      )
+                    }
+                  >
+                    <Menu.Label>{scheme.name}</Menu.Label>
+                  </Menu.Item>
+                );
+              })}
+            </Menu.Content>
+          </Menu>
+        </div>
+        {operation.security.length ? (
+          <div className="space-y-3">
+            {operation.security.map((security) => (
+              <Card key={security.id} className="gap-0 py-0">
+                <CardContent className="grid gap-3 px-4 py-4 lg:grid-cols-[180px_1fr_auto]">
+                  <Select
+                    label="Scheme"
+                    selectedKey={security.schemeName}
+                    isDisabled={!canEdit}
+                    onSelectionChange={(key) =>
+                      setSpec((current) =>
+                        updateApiOperation(
+                          current,
+                          resource.id,
+                          operation.id,
+                          (currentOperation) => ({
+                            ...currentOperation,
+                            security: currentOperation.security.map(
+                              (currentSecurity) =>
+                                currentSecurity.id === security.id
+                                  ? {
+                                      ...currentSecurity,
+                                      schemeName: String(key),
+                                    }
+                                  : currentSecurity,
+                            ),
+                          }),
+                        ),
+                      )
+                    }
+                  >
+                    <SelectTrigger />
+                    <SelectList>
+                      {availableSecuritySchemes.map((scheme) => (
+                        <SelectOption key={scheme.id} id={scheme.name}>
+                          {scheme.name}
+                        </SelectOption>
+                      ))}
+                    </SelectList>
+                  </Select>
+                  <TextField
+                    label="Scopes"
+                    value={security.scopes.join(", ")}
+                    onChange={(value) =>
+                      setSpec((current) =>
+                        updateApiOperation(
+                          current,
+                          resource.id,
+                          operation.id,
+                          (currentOperation) => ({
+                            ...currentOperation,
+                            security: currentOperation.security.map(
+                              (currentSecurity) =>
+                                currentSecurity.id === security.id
+                                  ? {
+                                      ...currentSecurity,
+                                      scopes: value
+                                        .split(",")
+                                        .map((scope) => scope.trim())
+                                        .filter(Boolean),
+                                    }
+                                  : currentSecurity,
+                            ),
+                          }),
+                        ),
+                      )
+                    }
+                    isDisabled={!canEdit}
+                  />
+                  <Button
+                    type="button"
+                    intent="plain"
+                    size="sq-sm"
+                    className="self-end"
+                    onPress={() =>
+                      setSpec((current) =>
+                        updateApiOperation(
+                          current,
+                          resource.id,
+                          operation.id,
+                          (currentOperation) => ({
+                            ...currentOperation,
+                            security: currentOperation.security.filter(
+                              (currentSecurity) => currentSecurity.id !== security.id,
+                            ),
+                          }),
+                        ),
+                      )
+                    }
+                    isDisabled={!canEdit}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="gap-0 py-0">
+            <CardContent className="px-4 py-4 text-sm text-muted-fg">
+              No security requirements applied to this operation.
+            </CardContent>
+          </Card>
+        )}
+      </section>
 
       {linkedWorkflow ? (
         <Card className="gap-0 py-0">
@@ -2130,6 +2679,172 @@ function ContractInspector({
                   }
                   isDisabled={!canEdit}
                 />
+                <section className="space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <h4 className="font-medium text-foreground">Headers</h4>
+                      <p className="text-sm text-muted-fg">
+                        Response headers returned with this status.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      intent="secondary"
+                      size="sm"
+                      onPress={() =>
+                        setSpec((current) =>
+                          updateApiResponse(
+                            current,
+                            resource.id,
+                            operation.id,
+                            response.id,
+                            (currentResponse) => ({
+                              ...currentResponse,
+                              headers: [
+                                ...currentResponse.headers,
+                                createApiResponseHeader(),
+                              ],
+                            }),
+                          ),
+                        )
+                      }
+                      isDisabled={!canEdit}
+                    >
+                      <Plus />
+                      Add header
+                    </Button>
+                  </div>
+                  {response.headers.length ? (
+                    <div className="space-y-3">
+                      {response.headers.map((header) => (
+                        <div
+                          key={header.id}
+                          className="grid gap-3 rounded-lg border border-border/60 p-3 lg:grid-cols-[1fr_160px_1fr_auto]"
+                        >
+                          <TextField
+                            label="Name"
+                            value={header.name}
+                            onChange={(value) =>
+                              setSpec((current) =>
+                                updateApiResponse(
+                                  current,
+                                  resource.id,
+                                  operation.id,
+                                  response.id,
+                                  (currentResponse) => ({
+                                    ...currentResponse,
+                                    headers: currentResponse.headers.map(
+                                      (currentHeader) =>
+                                        currentHeader.id === header.id
+                                          ? { ...currentHeader, name: value }
+                                          : currentHeader,
+                                    ),
+                                  }),
+                                ),
+                              )
+                            }
+                            isDisabled={!canEdit}
+                          />
+                          <Select
+                            label="Type"
+                            selectedKey={header.type}
+                            isDisabled={!canEdit}
+                            onSelectionChange={(key) =>
+                              setSpec((current) =>
+                                updateApiResponse(
+                                  current,
+                                  resource.id,
+                                  operation.id,
+                                  response.id,
+                                  (currentResponse) => ({
+                                    ...currentResponse,
+                                    headers: currentResponse.headers.map(
+                                      (currentHeader) =>
+                                        currentHeader.id === header.id
+                                          ? {
+                                              ...currentHeader,
+                                              type: String(key) as ApiParameter["type"],
+                                            }
+                                          : currentHeader,
+                                    ),
+                                  }),
+                                ),
+                              )
+                            }
+                          >
+                            <SelectTrigger />
+                            <SelectList>
+                              {PARAMETER_TYPES.map((type) => (
+                                <SelectOption key={type} id={type}>
+                                  {type}
+                                </SelectOption>
+                              ))}
+                            </SelectList>
+                          </Select>
+                          <TextField
+                            label="Description"
+                            value={header.description}
+                            onChange={(value) =>
+                              setSpec((current) =>
+                                updateApiResponse(
+                                  current,
+                                  resource.id,
+                                  operation.id,
+                                  response.id,
+                                  (currentResponse) => ({
+                                    ...currentResponse,
+                                    headers: currentResponse.headers.map(
+                                      (currentHeader) =>
+                                        currentHeader.id === header.id
+                                          ? {
+                                              ...currentHeader,
+                                              description: value,
+                                            }
+                                          : currentHeader,
+                                    ),
+                                  }),
+                                ),
+                              )
+                            }
+                            isDisabled={!canEdit}
+                          />
+                          <Button
+                            type="button"
+                            intent="plain"
+                            size="sq-sm"
+                            className="self-end"
+                            onPress={() =>
+                              setSpec((current) =>
+                                updateApiResponse(
+                                  current,
+                                  resource.id,
+                                  operation.id,
+                                  response.id,
+                                  (currentResponse) => ({
+                                    ...currentResponse,
+                                    headers: currentResponse.headers.filter(
+                                      (currentHeader) =>
+                                        currentHeader.id !== header.id,
+                                    ),
+                                  }),
+                                ),
+                              )
+                            }
+                            isDisabled={!canEdit}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="gap-0 py-0">
+                      <CardContent className="px-4 py-4 text-sm text-muted-fg">
+                        No headers defined for this response.
+                      </CardContent>
+                    </Card>
+                  )}
+                </section>
               </CardContent>
             </Card>
           ))}

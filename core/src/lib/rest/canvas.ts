@@ -43,7 +43,9 @@ function layoutGraph(
 
   for (const node of nodes) {
     const dimensions =
-      node.data.kind === "contract" || node.data.kind === "workflow"
+      node.data.kind === "contract" ||
+      node.data.kind === "workflow" ||
+      node.data.kind === "security"
         ? { width: 210, height: 88 }
         : node.data.kind === "api"
           ? { width: 280, height: 96 }
@@ -86,7 +88,16 @@ export function buildApiCanvas(
         kind: "api",
         title: spec.info.title || "Untitled API",
         subtitle: `${spec.info.version || "1.0.0"}${spec.servers[0]?.url ? ` · ${spec.servers[0].url}` : ""}`,
-        meta: "Root",
+        meta:
+          spec.servers.length > 1
+            ? `${spec.servers.length} servers`
+            : spec.tags.length
+              ? `${spec.tags.length} tags`
+              : "Root",
+        flags: [
+          ...(spec.servers.length > 1 ? [`${spec.servers.length} servers`] : []),
+          ...spec.tags.slice(0, 2).map((tag) => tag.name),
+        ],
         isSelected: selected?.kind === "api",
       },
     },
@@ -156,11 +167,13 @@ export function buildApiCanvas(
           title:
             operation.summary ||
             `${operation.method.toUpperCase()} ${resource.path}`,
-          subtitle:
-            operation.description ||
-            `${operation.parameters.length} params · ${operation.responses.length} responses`,
+          subtitle: `${operation.parameters.length} params · ${operation.responses.length} responses`,
           meta: operation.method.toUpperCase(),
           method: operation.method,
+          flags: [
+            ...(operation.deprecated ? ["Deprecated"] : []),
+            ...operation.tags.slice(0, 2),
+          ],
           isSelected:
             selected?.kind === "operation" &&
             selected.resourceId === resource.id &&
@@ -236,6 +249,31 @@ export function buildApiCanvas(
           },
         });
         edges.push(edge(operationNodeId, workflowNodeId));
+      }
+
+      if (operation.security.length) {
+        const securityNodeId = `security:${resource.id}:${operation.id}`;
+        nodes.push({
+          id: securityNodeId,
+          type: "studio",
+          position: { x: 0, y: 0 },
+          targetPosition,
+          sourcePosition,
+          data: {
+            kind: "security",
+            title:
+              operation.security.length === 1
+                ? operation.security[0].schemeName
+                : `${operation.security.length} security rules`,
+            subtitle:
+              operation.security.length === 1 &&
+              operation.security[0].scopes.length
+                ? operation.security[0].scopes.join(", ")
+                : "Operation security",
+            meta: "Security",
+          },
+        });
+        edges.push(edge(operationNodeId, securityNodeId));
       }
     });
   });

@@ -12,6 +12,7 @@ export type ApiHttpMethod =
 export type ApiParameterLocation = "path" | "query" | "header";
 
 export type ApiScalarType = "string" | "number" | "integer" | "boolean";
+export type ApiSecuritySchemeType = "apiKey" | "http" | "oauth2" | "openIdConnect";
 
 export type ApiParameter = {
   id: string;
@@ -20,6 +21,37 @@ export type ApiParameter = {
   required: boolean;
   description: string;
   type: ApiScalarType;
+};
+
+export type ApiResponseHeader = {
+  id: string;
+  name: string;
+  description: string;
+  type: ApiScalarType;
+};
+
+export type ApiTag = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+export type ApiSecurityRequirement = {
+  id: string;
+  schemeName: string;
+  scopes: string[];
+};
+
+export type ApiSecurityScheme = {
+  id: string;
+  name: string;
+  type: ApiSecuritySchemeType;
+  description: string;
+  in?: "query" | "header" | "cookie";
+  scheme?: string;
+  bearerFormat?: string;
+  flows?: string[];
+  openIdConnectUrl?: string;
 };
 
 export type ApiRequestBody = {
@@ -36,6 +68,7 @@ export type ApiResponse = {
   description: string;
   example: string;
   schemaId: string | null;
+  headers: ApiResponseHeader[];
 };
 
 export type ApiSchema = {
@@ -51,6 +84,9 @@ export type ApiOperation = {
   operationId: string;
   summary: string;
   description: string;
+  tags: string[];
+  deprecated: boolean;
+  security: ApiSecurityRequirement[];
   parameters: ApiParameter[];
   requestBody: ApiRequestBody | null;
   responses: ApiResponse[];
@@ -78,6 +114,8 @@ export type ApiSpec = {
     description: string;
   };
   servers: ApiServer[];
+  tags: ApiTag[];
+  securitySchemes: ApiSecurityScheme[];
   schemas: ApiSchema[];
   resources: ApiResource[];
 };
@@ -88,6 +126,7 @@ export type ApiCanvasNodeKind =
   | "operation"
   | "contract"
   | "schema"
+  | "security"
   | "workflow";
 
 export type ApiCanvasNodeData = {
@@ -96,6 +135,7 @@ export type ApiCanvasNodeData = {
   meta?: string;
   kind: ApiCanvasNodeKind;
   method?: ApiHttpMethod;
+  flags?: string[];
   isSelected?: boolean;
 };
 

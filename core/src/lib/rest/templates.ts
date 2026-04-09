@@ -4,8 +4,12 @@ import type {
   ApiParameter,
   ApiResource,
   ApiResponse,
+  ApiResponseHeader,
   ApiSchema,
+  ApiSecurityRequirement,
+  ApiSecurityScheme,
   ApiSpec,
+  ApiTag,
 } from "./types";
 
 function createId(prefix: string) {
@@ -26,6 +30,52 @@ export function createApiParameter(
   };
 }
 
+export function createApiResponseHeader(
+  overrides: Partial<ApiResponseHeader> = {},
+): ApiResponseHeader {
+  return {
+    id: createId("response-header"),
+    name: "",
+    description: "",
+    type: "string",
+    ...overrides,
+  };
+}
+
+export function createApiTag(overrides: Partial<ApiTag> = {}): ApiTag {
+  return {
+    id: createId("tag"),
+    name: "tag",
+    description: "",
+    ...overrides,
+  };
+}
+
+export function createApiSecurityRequirement(
+  overrides: Partial<ApiSecurityRequirement> = {},
+): ApiSecurityRequirement {
+  return {
+    id: createId("security-requirement"),
+    schemeName: "",
+    scopes: [],
+    ...overrides,
+  };
+}
+
+export function createApiSecurityScheme(
+  overrides: Partial<ApiSecurityScheme> = {},
+): ApiSecurityScheme {
+  return {
+    id: createId("security-scheme"),
+    name: "auth",
+    type: "http",
+    description: "",
+    scheme: "bearer",
+    bearerFormat: "JWT",
+    ...overrides,
+  };
+}
+
 export function createApiResponse(
   overrides: Partial<ApiResponse> = {},
 ): ApiResponse {
@@ -35,6 +85,7 @@ export function createApiResponse(
     description: "Successful response",
     example: "",
     schemaId: null,
+    headers: [],
     ...overrides,
   };
 }
@@ -64,6 +115,9 @@ export function createApiOperation(
     operationId: "",
     summary: defaultSummary,
     description: "",
+    tags: [],
+    deprecated: false,
+    security: [],
     parameters: [],
     requestBody:
       method === "post" || method === "put" || method === "patch"
@@ -108,6 +162,8 @@ export function createDefaultApiSpec(title = "Untitled API"): ApiSpec {
         description: "Production",
       },
     ],
+    tags: [],
+    securitySchemes: [],
     schemas: [],
     resources: [createApiResource()],
   };

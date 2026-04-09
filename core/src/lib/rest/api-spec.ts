@@ -5,15 +5,23 @@ import type {
   ApiParameter,
   ApiResource,
   ApiResponse,
+  ApiResponseHeader,
   ApiSchema,
+  ApiSecurityRequirement,
+  ApiSecurityScheme,
   ApiSpec,
+  ApiTag,
 } from "./types";
 import {
   createApiOperation,
   createApiParameter,
   createApiResource,
   createApiResponse,
+  createApiResponseHeader,
   createApiSchema,
+  createApiSecurityRequirement,
+  createApiSecurityScheme,
+  createApiTag,
   createDefaultApiSpec,
 } from "./templates";
 import type {
@@ -49,6 +57,18 @@ function normalizeScalarType(type: unknown): ApiScalarType {
       return type;
     default:
       return "string";
+  }
+}
+
+function normalizeSecuritySchemeType(type: unknown): ApiSecurityScheme["type"] {
+  switch (type) {
+    case "apiKey":
+    case "http":
+    case "oauth2":
+    case "openIdConnect":
+      return type;
+    default:
+      return "http";
   }
 }
 
@@ -109,6 +129,80 @@ function stringifySchemaContent(value: unknown): string {
   }
 
   return JSON.stringify(value, null, 2);
+}
+
+function toApiResponseHeaders(headers: unknown) {
+  if (!isRecord(headers)) return [];
+
+  return Object.entries(headers).map(([name, header]) => {
+    const record = isRecord(header) ? header : {};
+    return createApiResponseHeader({
+      name,
+      description: record.description ?? "",
+      type: normalizeScalarType(record.type ?? record.schema?.type),
+    });
+  });
+}
+
+function toApiSecurityRequirements(security: unknown) {
+  if (!Array.isArray(security)) return [];
+
+  return security.flatMap((entry) => {
+    if (!isRecord(entry)) return [];
+    return Object.entries(entry).map(([schemeName, scopes]) =>
+      createApiSecurityRequirement({
+        schemeName,
+        scopes: Array.isArray(scopes)
+          ? scopes.filter((scope): scope is string => typeof scope === "string")
+          : [],
+      }),
+    );
+  });
+}
+
+function inferTagsFromDocument(input: Record<string, any>) {
+  if (!Array.isArray(input.tags)) return [];
+
+  return input.tags
+    .filter(isRecord)
+    .map((tag) =>
+      createApiTag({
+        name: tag.name ?? "tag",
+        description: tag.description ?? "",
+      }),
+    );
+}
+
+function inferSecuritySchemesFromDocument(input: Record<string, any>) {
+  const rawSchemes =
+    isRecord(input.components) && isRecord(input.components.securitySchemes)
+      ? input.components.securitySchemes
+      : isRecord(input.securityDefinitions)
+        ? input.securityDefinitions
+        : {};
+
+  return Object.entries(rawSchemes).map(([name, scheme]) => {
+    const record = isRecord(scheme) ? scheme : {};
+    return createApiSecurityScheme({
+      name,
+      type: normalizeSecuritySchemeType(record.type),
+      description: record.description ?? "",
+      in:
+        record.in === "query" || record.in === "header" || record.in === "cookie"
+          ? record.in
+          : undefined,
+      scheme: typeof record.scheme === "string" ? record.scheme : undefined,
+      bearerFormat:
+        typeof record.bearerFormat === "string"
+          ? record.bearerFormat
+          : undefined,
+      flows: isRecord(record.flows) ? Object.keys(record.flows) : undefined,
+      openIdConnectUrl:
+        typeof record.openIdConnectUrl === "string"
+          ? record.openIdConnectUrl
+          : undefined,
+    });
+  });
 }
 
 function inferServersFromDocument(input: Record<string, any>) {
@@ -233,6 +327,7 @@ function toApiResponses(responses: unknown) {
       description: record.description ?? "Response",
       example: extractExample(record),
       schemaId: extractRefName(record),
+      headers: toApiResponseHeaders(record.headers),
     });
   });
 
@@ -263,6 +358,11 @@ function importOperation(
     operationId: operation.operationId ?? "",
     summary: operation.summary ?? `${method.toUpperCase()} ${path}`,
     description: operation.description ?? "",
+    tags: Array.isArray(operation.tags)
+      ? operation.tags.filter((tag): tag is string => typeof tag === "string")
+      : [],
+    deprecated: Boolean(operation.deprecated),
+    security: toApiSecurityRequirements(operation.security),
     parameters,
     requestBody: isSwagger2
       ? toApiRequestBodyFromSwagger(operation, rawParameters)
@@ -329,6 +429,8 @@ function importFromApiDocument(input: Record<string, any>) {
       description: info.description ?? "",
     },
     servers: inferServersFromDocument(input),
+    tags: inferTagsFromDocument(input),
+    securitySchemes: inferSecuritySchemesFromDocument(input),
     schemas,
     resources,
   });
@@ -362,12 +464,41 @@ function normalizeSchema(schema: Partial<ApiSchema>): ApiSchema {
   return createApiSchema(schema);
 }
 
+function normalizeTag(tag: Partial<ApiTag>): ApiTag {
+  return createApiTag(tag);
+}
+
+function normalizeSecurityRequirement(
+  security: Partial<ApiSecurityRequirement>,
+): ApiSecurityRequirement {
+  return createApiSecurityRequirement(security);
+}
+
+function normalizeSecurityScheme(
+  securityScheme: Partial<ApiSecurityScheme>,
+): ApiSecurityScheme {
+  return createApiSecurityScheme(securityScheme);
+}
+
+function normalizeResponseHeader(
+  header: Partial<ApiResponseHeader>,
+): ApiResponseHeader {
+  return createApiResponseHeader(header);
+}
+
 function normalizeOperation(operation: Partial<ApiOperation>): ApiOperation {
   const base = createApiOperation(operation.method ?? "get", operation);
   return {
     ...base,
     parameters: Array.isArray(operation.parameters)
       ? operation.parameters.map(normalizeParameter)
+      : [],
+    tags: Array.isArray(operation.tags)
+      ? operation.tags.filter((tag): tag is string => typeof tag === "string")
+      : [],
+    deprecated: Boolean(operation.deprecated),
+    security: Array.isArray(operation.security)
+      ? operation.security.map(normalizeSecurityRequirement)
       : [],
     requestBody: operation.requestBody
       ? {
@@ -379,7 +510,12 @@ function normalizeOperation(operation: Partial<ApiOperation>): ApiOperation {
         }
       : null,
     responses: Array.isArray(operation.responses)
-      ? operation.responses.map(normalizeResponse)
+      ? operation.responses.map((response) => ({
+          ...normalizeResponse(response),
+          headers: Array.isArray(response.headers)
+            ? response.headers.map(normalizeResponseHeader)
+            : [],
+        }))
       : [createApiResponse()],
   };
 }
@@ -410,6 +546,10 @@ export function normalizeApiSpec(input: Partial<ApiSpec>): ApiSpec {
           url: server.url ?? "",
           description: server.description ?? "",
         }))
+      : [],
+    tags: Array.isArray(input.tags) ? input.tags.map(normalizeTag) : [],
+    securitySchemes: Array.isArray(input.securitySchemes)
+      ? input.securitySchemes.map(normalizeSecurityScheme)
       : [],
     schemas: Array.isArray(input.schemas)
       ? input.schemas.map(normalizeSchema)
