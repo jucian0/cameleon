@@ -211,7 +211,7 @@ export default function RestTemplatesTab() {
                     <CardHeader className="relative gap-3 px-4 py-4">
                       <div className="flex items-start gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/40">
-                          <LayoutTemplate className="h-5 w-5 text-primary" />
+                          <LayoutTemplate className="h-4 w-4 text-primary" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">

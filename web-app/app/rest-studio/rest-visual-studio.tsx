@@ -238,7 +238,7 @@ function ApiStudioNode({
       ) : null}
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border/60 bg-secondary/35 shadow-sm">
-          <Icon className="h-4.5 w-4.5 text-primary" />
+          <Icon className="h-4 w-4 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
@@ -1064,7 +1064,7 @@ function ApiInspector({
             }
             isDisabled={!canEdit}
           >
-            <Plus />
+            <Plus className="h-4 w-4" />
             Add server
           </Button>
         </div>
@@ -1150,7 +1150,7 @@ function ApiInspector({
             }
             isDisabled={!canEdit}
           >
-            <Plus />
+            <Plus className="h-4 w-4" />
             Add tag
           </Button>
         </div>
@@ -1238,7 +1238,7 @@ function ApiInspector({
             }
             isDisabled={!canEdit}
           >
-            <Plus />
+            <Plus className="h-4 w-4" />
             Add scheme
           </Button>
         </div>
@@ -1274,7 +1274,7 @@ function ApiInspector({
             }
             isDisabled={!canEdit}
           >
-            <Plus />
+            <Plus className="h-4 w-4" />
             Add schema
           </Button>
         </div>
@@ -1486,6 +1486,10 @@ function SchemaInspector({
         required:
           Array.isArray(schemaObject.required) &&
           schemaObject.required.includes(name),
+        itemsType:
+          typeof property.items?.type === "string"
+            ? property.items.type
+            : "string",
       };
     },
   );
@@ -1648,37 +1652,54 @@ function SchemaInspector({
                     Define the fields of this object schema.
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  intent="secondary"
-                  size="sm"
-                  onPress={() =>
-                    updateSchema((currentSchemaObject) => {
-                      const currentProperties =
-                        typeof currentSchemaObject.properties === "object" &&
-                        currentSchemaObject.properties !== null
-                          ? currentSchemaObject.properties
-                          : {};
-                      let index = Object.keys(currentProperties).length + 1;
-                      let nextName = `property${index}`;
-                      while (nextName in currentProperties) {
-                        index += 1;
-                        nextName = `property${index}`;
-                      }
-                      return {
-                        ...currentSchemaObject,
-                        properties: {
-                          ...currentProperties,
-                          [nextName]: { type: "string" },
-                        },
-                      };
-                    })
-                  }
-                  isDisabled={!canEdit}
-                >
-                  <Plus />
-                  Add property
-                </Button>
+                <Menu>
+                  <Menu.Trigger aria-label="Add property">
+                    <Button
+                      type="button"
+                      intent="secondary"
+                      size="sm"
+                      isDisabled={!canEdit}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add property
+                    </Button>
+                  </Menu.Trigger>
+                  <Menu.Content placement="bottom end">
+                    {[
+                      { id: "string", label: "String", property: { type: "string" } },
+                      { id: "object", label: "Object", property: { type: "object", properties: {}, required: [] } },
+                      { id: "array", label: "Array", property: { type: "array", items: { type: "string" } } },
+                    ].map((preset) => (
+                      <Menu.Item
+                        key={preset.id}
+                        onAction={() =>
+                          updateSchema((currentSchemaObject) => {
+                            const currentProperties =
+                              typeof currentSchemaObject.properties === "object" &&
+                              currentSchemaObject.properties !== null
+                                ? currentSchemaObject.properties
+                                : {};
+                            let index = Object.keys(currentProperties).length + 1;
+                            let nextName = `property${index}`;
+                            while (nextName in currentProperties) {
+                              index += 1;
+                              nextName = `property${index}`;
+                            }
+                            return {
+                              ...currentSchemaObject,
+                              properties: {
+                                ...currentProperties,
+                                [nextName]: preset.property,
+                              },
+                            };
+                          })
+                        }
+                      >
+                        <Menu.Label>{preset.label}</Menu.Label>
+                      </Menu.Item>
+                    ))}
+                  </Menu.Content>
+                </Menu>
               </div>
               {schemaProperties.length ? (
                 <div className="space-y-3">
@@ -1734,25 +1755,46 @@ function SchemaInspector({
                           isDisabled={!canEdit}
                           onSelectionChange={(key) =>
                             updateSchema((currentSchemaObject) => {
+                              const nextType = String(key);
                               const currentProperties =
                                 typeof currentSchemaObject.properties ===
                                   "object" &&
                                 currentSchemaObject.properties !== null
                                   ? currentSchemaObject.properties
                                   : {};
+                              const currentProperty =
+                                typeof currentProperties[property.name] ===
+                                  "object" &&
+                                currentProperties[property.name] !== null
+                                  ? (currentProperties[property.name] as Record<
+                                      string,
+                                      any
+                                    >)
+                                  : {};
+                              const nextProperty: Record<string, any> = {
+                                ...currentProperty,
+                                type: nextType,
+                              };
+
+                              if (nextType === "array") {
+                                nextProperty.items ??= { type: "string" };
+                                delete nextProperty.properties;
+                                delete nextProperty.required;
+                              } else if (nextType === "object") {
+                                nextProperty.properties ??= {};
+                                nextProperty.required ??= [];
+                                delete nextProperty.items;
+                              } else {
+                                delete nextProperty.items;
+                                delete nextProperty.properties;
+                                delete nextProperty.required;
+                              }
+
                               return {
                                 ...currentSchemaObject,
                                 properties: {
                                   ...currentProperties,
-                                  [property.name]: {
-                                    ...(typeof currentProperties[
-                                      property.name
-                                    ] === "object" &&
-                                    currentProperties[property.name] !== null
-                                      ? currentProperties[property.name]
-                                      : {}),
-                                    type: String(key),
-                                  },
+                                  [property.name]: nextProperty,
                                 },
                               };
                             })
@@ -1760,6 +1802,8 @@ function SchemaInspector({
                         >
                           <SelectTrigger />
                           <SelectList>
+                            <SelectOption id="object">object</SelectOption>
+                            <SelectOption id="array">array</SelectOption>
                             {PARAMETER_TYPES.map((type) => (
                               <SelectOption key={type} id={type}>
                                 {type}
@@ -1863,6 +1907,65 @@ function SchemaInspector({
                           label="Required"
                         />
                       </div>
+                      {property.type === "array" ? (
+                        <div className="mt-3 grid gap-3 lg:grid-cols-[220px_1fr]">
+                          <Select
+                            label="Items type"
+                            selectedKey={property.itemsType}
+                            isDisabled={!canEdit}
+                            onSelectionChange={(key) =>
+                              updateSchema((currentSchemaObject) => {
+                                const currentProperties =
+                                  typeof currentSchemaObject.properties ===
+                                    "object" &&
+                                  currentSchemaObject.properties !== null
+                                    ? currentSchemaObject.properties
+                                    : {};
+                                const currentProperty =
+                                  typeof currentProperties[property.name] ===
+                                    "object" &&
+                                  currentProperties[property.name] !== null
+                                    ? (currentProperties[
+                                        property.name
+                                      ] as Record<string, any>)
+                                    : {};
+                                return {
+                                  ...currentSchemaObject,
+                                  properties: {
+                                    ...currentProperties,
+                                    [property.name]: {
+                                      ...currentProperty,
+                                      items: {
+                                        ...(typeof currentProperty.items ===
+                                          "object" &&
+                                        currentProperty.items !== null
+                                          ? currentProperty.items
+                                          : {}),
+                                        type: String(key),
+                                      },
+                                    },
+                                  },
+                                };
+                              })
+                            }
+                          >
+                            <SelectTrigger />
+                            <SelectList>
+                              {PARAMETER_TYPES.map((type) => (
+                                <SelectOption key={type} id={type}>
+                                  {type}
+                                </SelectOption>
+                              ))}
+                            </SelectList>
+                          </Select>
+                        </div>
+                      ) : null}
+                      {property.type === "object" ? (
+                        <div className="mt-3 rounded-md border border-border/60 bg-secondary/20 px-3 py-2 text-xs text-muted-fg">
+                          Nested object detected. Use the raw JSON editor below for
+                          deeper nested properties.
+                        </div>
+                      ) : null}
                     </div>
                   ))}
                 </div>
@@ -2206,7 +2309,7 @@ function OperationInspector({
                 size="sm"
                 isDisabled={!canEdit || availableSecuritySchemes.length === 0}
               >
-                <Plus />
+                <Plus className="h-4 w-4" />
                 Add security
               </Button>
             </Menu.Trigger>
@@ -2481,7 +2584,7 @@ function ContractInspector({
           }
           isDisabled={!canEdit}
         >
-          <Plus />
+          <Plus className="h-4 w-4" />
           Add parameter
         </Button>
       </div>
@@ -2776,7 +2879,7 @@ function ContractInspector({
                   size="sm"
                   isDisabled={!canEdit}
                 >
-                  <Plus />
+                  <Plus className="h-4 w-4" />
                   Add body
                 </Button>
               </Menu.Trigger>
@@ -3030,7 +3133,7 @@ function ContractInspector({
               size="sm"
               isDisabled={!canEdit}
             >
-              <Plus />
+              <Plus className="h-4 w-4" />
               Add response
             </Button>
           </Menu.Trigger>
@@ -3324,7 +3427,7 @@ function ContractInspector({
                       }
                       isDisabled={!canEdit}
                     >
-                      <Plus />
+                      <Plus className="h-4 w-4" />
                       Add header
                     </Button>
                   </div>
