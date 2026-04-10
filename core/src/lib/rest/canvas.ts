@@ -34,26 +34,45 @@ function layoutGraph(
   const graph = new dagre.graphlib.Graph();
   graph.setGraph({
     rankdir: direction,
-    nodesep: 72,
-    ranksep: 112,
-    marginx: 32,
-    marginy: 32,
+    nodesep: direction === "LR" ? 116 : 88,
+    ranksep: direction === "LR" ? 84 : 112,
+    marginx: 40,
+    marginy: 40,
   });
   graph.setDefaultEdgeLabel(() => ({}));
+
+  const nodeById = new Map(nodes.map((node) => [node.id, node] as const));
 
   for (const node of nodes) {
     const dimensions =
       node.data.kind === "contract" ||
       node.data.kind === "workflow" ||
       node.data.kind === "security"
-        ? { width: 210, height: 88 }
+        ? { width: 198, height: 84 }
+        : node.data.kind === "schema"
+          ? { width: 200, height: 84 }
         : node.data.kind === "api"
           ? { width: 280, height: 96 }
-          : { width: 250, height: 96 };
+          : node.data.kind === "resource"
+            ? { width: 244, height: 96 }
+            : { width: 236, height: 92 };
     graph.setNode(node.id, dimensions);
   }
   for (const currentEdge of edges) {
-    graph.setEdge(currentEdge.source, currentEdge.target);
+    const sourceKind = nodeById.get(currentEdge.source)?.data.kind;
+    const targetKind = nodeById.get(currentEdge.target)?.data.kind;
+    const isChildDetail =
+      sourceKind === "operation" &&
+      (targetKind === "contract" ||
+        targetKind === "workflow" ||
+        targetKind === "security");
+    const isSchemaLink =
+      sourceKind === "contract" && targetKind === "schema";
+
+    graph.setEdge(currentEdge.source, currentEdge.target, {
+      minlen: isChildDetail || isSchemaLink ? 1 : 1,
+      weight: isChildDetail || isSchemaLink ? 10 : 4,
+    });
   }
   dagre.layout(graph);
 
@@ -73,9 +92,17 @@ export function buildApiCanvas(
   spec: ApiSpec,
   selected: ApiCanvasSelection | null,
   direction: ApiCanvasDirection,
+  collapsed: {
+    api?: boolean;
+    resources?: Set<string>;
+    operations?: Set<string>;
+  } = {},
 ) {
   const targetPosition = direction === "TB" ? Position.Top : Position.Left;
   const sourcePosition = direction === "TB" ? Position.Bottom : Position.Right;
+  const collapsedApi = Boolean(collapsed.api);
+  const collapsedResourceIds = collapsed.resources ?? new Set<string>();
+  const collapsedOperationIds = collapsed.operations ?? new Set<string>();
 
   const nodes: ApiCanvasNode[] = [
     {
@@ -89,12 +116,15 @@ export function buildApiCanvas(
         title: spec.info.title || "Untitled API",
         subtitle: `${spec.info.version || "1.0.0"}${spec.servers[0]?.url ? ` · ${spec.servers[0].url}` : ""}`,
         meta:
-          spec.servers.length > 1
+          collapsedApi
+            ? `${spec.resources.length} resources · collapsed`
+            : spec.servers.length > 1
             ? `${spec.servers.length} servers`
             : spec.tags.length
               ? `${spec.tags.length} tags`
               : "Root",
         flags: [
+          ...(collapsedApi ? ["Collapsed"] : []),
           ...(spec.servers.length > 1 ? [`${spec.servers.length} servers`] : []),
           ...spec.tags.slice(0, 2).map((tag) => tag.name),
         ],
@@ -105,6 +135,21 @@ export function buildApiCanvas(
 
   const edges: ApiCanvasEdge[] = [];
   const schemaNodeIds = new Set<string>();
+
+  if (collapsedApi) {
+    return {
+      nodes: layoutGraph(
+        nodes.map((node) => ({
+          ...node,
+          targetPosition: undefined,
+          sourcePosition: undefined,
+        })),
+        edges,
+        direction,
+      ),
+      edges,
+    };
+  }
 
   function ensureSchemaNode(schemaId: string) {
     const schema = spec.schemas.find(
@@ -136,6 +181,7 @@ export function buildApiCanvas(
   }
 
   spec.resources.forEach((resource) => {
+    const isCollapsed = collapsedResourceIds.has(resource.id);
     const resourceNodeId = `resource:${resource.id}`;
     nodes.push({
       id: resourceNodeId,
@@ -147,14 +193,22 @@ export function buildApiCanvas(
         kind: "resource",
         title: resource.path,
         subtitle: resource.summary || "No resource summary yet.",
-        meta: `${resource.operations.length} ops`,
+        meta: isCollapsed
+          ? `${resource.operations.length} ops · collapsed`
+          : `${resource.operations.length} ops`,
+        flags: isCollapsed ? ["Collapsed"] : undefined,
         isSelected:
           selected?.kind === "resource" && selected.resourceId === resource.id,
       },
     });
     edges.push(edge("api", resourceNodeId));
 
+    if (isCollapsed) {
+      return;
+    }
+
     resource.operations.forEach((operation) => {
+      const isOperationCollapsed = collapsedOperationIds.has(operation.id);
       const operationNodeId = `operation:${resource.id}:${operation.id}`;
       nodes.push({
         id: operationNodeId,
@@ -171,6 +225,7 @@ export function buildApiCanvas(
           meta: operation.method.toUpperCase(),
           method: operation.method,
           flags: [
+            ...(isOperationCollapsed ? ["Collapsed"] : []),
             ...(operation.deprecated ? ["Deprecated"] : []),
             ...operation.tags.slice(0, 2),
           ],
@@ -181,6 +236,10 @@ export function buildApiCanvas(
         },
       });
       edges.push(edge(resourceNodeId, operationNodeId));
+
+      if (isOperationCollapsed) {
+        return;
+      }
 
       if (operation.requestBody) {
         const requestNodeId = `request:${resource.id}:${operation.id}`;

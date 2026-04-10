@@ -316,6 +316,13 @@ export function RestVisualStudio({
   const [sheetTarget, setSheetTarget] =
     React.useState<ApiCanvasSelection | null>(null);
   const [direction, setDirection] = React.useState<ApiCanvasDirection>("LR");
+  const [isApiCollapsed, setIsApiCollapsed] = React.useState(false);
+  const [collapsedResourceIds, setCollapsedResourceIds] = React.useState<
+    Set<string>
+  >(new Set());
+  const [collapsedOperationIds, setCollapsedOperationIds] = React.useState<
+    Set<string>
+  >(new Set());
   const [zoom, setZoom] = React.useState(1);
   const [saveState, setSaveState] = React.useState<
     "unsaved" | "saving" | "synced" | "failed"
@@ -354,8 +361,13 @@ export function RestVisualStudio({
   }, [initialDescription, initialName, initialSpec, setApiSpec]);
 
   const graph = React.useMemo(
-    () => buildApiCanvas(spec, focusedTarget, direction),
-    [direction, spec, focusedTarget],
+    () =>
+      buildApiCanvas(spec, focusedTarget, direction, {
+        api: isApiCollapsed,
+        resources: collapsedResourceIds,
+        operations: collapsedOperationIds,
+      }),
+    [collapsedOperationIds, collapsedResourceIds, direction, isApiCollapsed, spec, focusedTarget],
   );
 
   React.useEffect(() => {
@@ -443,6 +455,12 @@ export function RestVisualStudio({
     sheetTarget?.kind === "schema"
       ? spec.schemas.find((schema) => schema.id === sheetTarget.schemaId)
       : null;
+  const isSelectedResourceCollapsed = selectedResource
+    ? collapsedResourceIds.has(selectedResource.id)
+    : false;
+  const isSelectedOperationCollapsed = selectedOperation
+    ? collapsedOperationIds.has(selectedOperation.id)
+    : false;
 
   function focusTarget(target: ApiCanvasSelection) {
     setFocusedTarget(target);
@@ -486,6 +504,83 @@ export function RestVisualStudio({
       kind: "operation",
       resourceId: selectedResource.id,
       operationId: operation.id,
+    });
+  }
+
+  function toggleApiCollapse() {
+    setIsApiCollapsed((current) => {
+      const next = !current;
+      if (next) {
+        setFocusedTarget({ kind: "api" });
+        setSheetTarget((sheet) => (sheet?.kind === "api" ? sheet : null));
+      }
+      return next;
+    });
+  }
+
+  function toggleSelectedResourceCollapse() {
+    if (!selectedResource) return;
+    setCollapsedResourceIds((current) => {
+      const next = new Set(current);
+      if (next.has(selectedResource.id)) {
+        next.delete(selectedResource.id);
+      } else {
+        next.add(selectedResource.id);
+        if (
+          focusedTarget?.kind === "operation" ||
+          focusedTarget?.kind === "requestBody" ||
+          focusedTarget?.kind === "response"
+        ) {
+          setFocusedTarget({
+            kind: "resource",
+            resourceId: selectedResource.id,
+          });
+        }
+        if (
+          sheetTarget?.kind === "operation" ||
+          sheetTarget?.kind === "requestBody" ||
+          sheetTarget?.kind === "response"
+        ) {
+          setSheetTarget({
+            kind: "resource",
+            resourceId: selectedResource.id,
+          });
+        }
+      }
+      return next;
+    });
+  }
+
+  function toggleSelectedOperationCollapse() {
+    if (!selectedResource || !selectedOperation) return;
+    setCollapsedOperationIds((current) => {
+      const next = new Set(current);
+      if (next.has(selectedOperation.id)) {
+        next.delete(selectedOperation.id);
+      } else {
+        next.add(selectedOperation.id);
+        if (
+          focusedTarget?.kind === "requestBody" ||
+          focusedTarget?.kind === "response"
+        ) {
+          setFocusedTarget({
+            kind: "operation",
+            resourceId: selectedResource.id,
+            operationId: selectedOperation.id,
+          });
+        }
+        if (
+          sheetTarget?.kind === "requestBody" ||
+          sheetTarget?.kind === "response"
+        ) {
+          setSheetTarget({
+            kind: "operation",
+            resourceId: selectedResource.id,
+            operationId: selectedOperation.id,
+          });
+        }
+      }
+      return next;
     });
   }
 
@@ -617,7 +712,7 @@ export function RestVisualStudio({
                       type="button"
                       intent="secondary"
                       size="sm"
-                      isDisabled={!canEdit}
+                      isDisabled={!canEdit || isSelectedResourceCollapsed || isApiCollapsed}
                     >
                       <Plus className="h-4 w-4" />
                       Add operation
@@ -793,7 +888,42 @@ export function RestVisualStudio({
           onMove={(_, viewport) => {
             setZoom(viewport.zoom);
           }}
-          onNodeClick={(_, node) => {
+          onNodeClick={(event, node) => {
+            if (event.detail >= 2) {
+              if (node.id === "api") {
+                toggleApiCollapse();
+                return;
+              }
+              if (node.id.startsWith("resource:")) {
+                const resourceId = node.id.replace("resource:", "");
+                setFocusedTarget({ kind: "resource", resourceId });
+                setCollapsedResourceIds((current) => {
+                  const next = new Set(current);
+                  if (next.has(resourceId)) {
+                    next.delete(resourceId);
+                  } else {
+                    next.add(resourceId);
+                  }
+                  return next;
+                });
+                return;
+              }
+              if (node.id.startsWith("operation:")) {
+                const [, resourceId, operationId] = node.id.split(":");
+                setFocusedTarget({ kind: "operation", resourceId, operationId });
+                setCollapsedOperationIds((current) => {
+                  const next = new Set(current);
+                  if (next.has(operationId)) {
+                    next.delete(operationId);
+                  } else {
+                    next.add(operationId);
+                  }
+                  return next;
+                });
+                return;
+              }
+            }
+
             if (node.id === "api") {
               focusTarget({ kind: "api" });
               return;
